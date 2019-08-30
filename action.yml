@@ -1,0 +1,22 @@
+# Azure Functions Github Action
+name: 'Azure Functions'
+description: 'Deploy Function App to Azure Functions'
+inputs:
+  app-name:
+    description: 'Name of the Azure Function App'
+    required: true
+  package:
+    description: 'Path to package or folder. *.zip or a folder to deploy'
+    required: false
+    default: '.'
+  slot-name:
+    description: 'Function app slot to be deploy to'
+    required: false
+outputs:
+  app-url:
+    description: 'URL to work with your function app'
+branding:
+  icon: 'functionapp.svg'
+runs:
+  using: 'node12'
+  main: 'lib/main.js'

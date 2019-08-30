@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "module": "commonjs",
+        "rootDir": "./src",
+        "outDir": "./lib",
+        "strict": false,
+        "strictFunctionTypes": true,
+        "esModuleInterop": true,
+        "noImplicitAny" : true,
+        "noUnusedParameters": true
+    },
+    "include": ["src/**/*"],
+    "exclude": ["node_modules", "**/*.spec.ts"]
+}

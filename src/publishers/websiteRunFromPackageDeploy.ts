@@ -4,9 +4,10 @@ import { SharedKeyCredential, ServiceURL, StorageURL, ContainerURL, Aborter, IBl
 import { StateConstant } from '../constants/state';
 import { IActionContext } from '../interfaces/IActionContext';
 import { IStorageAccount } from '../interfaces/IStorageAccount';
-import { Parser } from '../utils';
+import { Parser, Logger, Sleeper } from '../utils';
 import { ConfigurationConstant } from '../constants/configuration';
 import { ValidationError, AzureResourceError } from '../exceptions';
+import { AzureAppServiceUtility } from 'pipelines-appservice-lib/lib/RestUtilities/AzureAppServiceUtility';
 
 
 export class WebsiteRunFromPackageDeploy {
@@ -26,7 +27,7 @@ export class WebsiteRunFromPackageDeploy {
         const blobName: string = this.createBlobName();
         const blobUrl: BlobURL = await this.uploadBlobFromFile(state, containerUrl, blobName, context.publishContentPath);
         const blobSasParams: string = this.getBlobSasQueryParams(blobName, blobServiceCredential);
-        await this.publishToFunctionapp(state, context.appService, `${blobUrl.url}?${blobSasParams}`);
+        await this.publishToFunctionapp(state, context.appService, context.appServiceUtil, `${blobUrl.url}?${blobSasParams}`);
     }
 
     private static async getStorageCredential(state: StateConstant, storageString: string): Promise<IStorageAccount> {
@@ -102,17 +103,43 @@ export class WebsiteRunFromPackageDeploy {
         return generateBlobSASQueryParameters(blobSasValues, credential).toString();
     }
 
-    private static async publishToFunctionapp(state: StateConstant, appService: AzureAppService, blobSasUrl: string) {
+    private static async publishToFunctionapp(state: StateConstant,
+        appService: AzureAppService, appServiceUtil: AzureAppServiceUtility, blobSasUrl: string) {
         try {
             await appService.patchApplicationSettings({ 'WEBSITE_RUN_FROM_PACKAGE': blobSasUrl });
         } catch (expt) {
-            throw new AzureResourceError(state, "Patch Application Settings", `Failed to set WEBSITE_RUN_FROM_PACKAGE with ${blobSasUrl}`);
+            throw new AzureResourceError(state, "Patch Application Settings", "Failed to set WEBSITE_RUN_FROM_PACKAGE with storage blob link." +
+                ` Please check if the ${blobSasUrl} does exist.`);
         }
+
+        await this.waitForSpinUp(state, appServiceUtil);
 
         try {
             await appService.syncFunctionTriggersViaHostruntime();
         } catch (expt) {
-            throw new AzureResourceError(state, "Sync Trigger Functionapp", `Failed to perform sync trigger on function app`);
+            throw new AzureResourceError(state, "Sync Trigger Functionapp", "Failed to perform sync trigger on function app." +
+                " Function app may have malformed content. Please download the package from WEBSITE_RUN_FROM_PACKAGE app setting.");
+        }
+    }
+
+    private static async waitForSpinUp(state: StateConstant, appServiceUtil: AzureAppServiceUtility) {
+        Logger.Log("Waiting for functino app to spin up after app settings change.");
+        let spinnedUp: boolean = false;
+        let retryCount: number = 10;
+        let retryGapMs: number = 5000;
+        while (retryCount > 0 && !spinnedUp) {
+            Sleeper.timeout(retryGapMs);
+            try {
+                await appServiceUtil.getWebDeployPublishingProfile();
+                spinnedUp = true;
+            } catch {
+                retryCount--;
+            }
+        }
+
+        if (!spinnedUp) {
+            throw new AzureResourceError(state, "Wait For Spin Up", "Cannot detect heartbeats from your function app." +
+                " Please check if your function app is up and running");
         }
     }
 }

@@ -25,6 +25,7 @@ export class ResourceValidator implements IOrchestratable {
     private _sku: FunctionSkuConstant;
     private _language: FunctionRuntimeConstant;
     private _appSettings: IAppSettings;
+    private _appUrl: string;
 
     private _appService: AzureAppService;
     private _appServiceUtil: AzureAppServiceUtility;
@@ -43,6 +44,7 @@ export class ResourceValidator implements IOrchestratable {
         this._sku = await this.getFunctionappSku(state, this._appService);
         this._appSettings = await this.getFunctionappSettings(state, this._appService);
         this._language = await this.getFunctionappLanguage(this._appSettings);
+        this._appUrl = await this._appServiceUtil.getApplicationURL();
 
         return StateConstant.PreparePublishContent;
     }
@@ -62,6 +64,7 @@ export class ResourceValidator implements IOrchestratable {
         context.os = this._isLinux ? RuntimeStackConstant.Linux : RuntimeStackConstant.Windows;
         context.sku = this._sku;
         context.language = this._language;
+        context.appUrl = this._appUrl;
 
         this.validateRuntimeSku(state, context);
         this.validateLanguage(state, context);

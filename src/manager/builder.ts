@@ -28,7 +28,8 @@ export class Builder {
             appSettings: undefined,
             language: undefined,
             os: undefined,
-            sku: undefined
+            sku: undefined,
+            appUrl: undefined
         }
     }
 }

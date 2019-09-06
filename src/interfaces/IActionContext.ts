@@ -25,6 +25,7 @@ export interface IActionContext {
     sku: FunctionSkuConstant;
     os: RuntimeStackConstant;
     language: FunctionRuntimeConstant;
+    appUrl: string;
 
     endpoint: IAuthorizationHandler;
     appService: AzureAppService;

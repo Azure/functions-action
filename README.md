@@ -1,3 +1,48 @@
+# GitHub Actions for deploying to Azure Functions
+
+With the Azure Functions Github Action, you can automate your workflow to deploy [Azure Functions](https://azure.microsoft.com/en-us/services/functions/).
+
+Get started today with a [free Azure account](https://azure.com/free/open-source)!
+
+The repository contains a Github Action to deploy your function app project into Azure Functions. The definition of this Github action is in [here](https://github.com/Azure/functions-action/blob/master/action.yml).
+
+# End-to-End Workflow
+
+## Dependencies on other Github Actions
+* [Checkout](https://github.com/actions/checkout) Checkout your Git repository content into Github Actions agent
+* [Azure Login](https://github.com/Azure/actions) Login with your Azure credentials for function app deployment authentication.
+* Environment setup actions
+  * [Setup DotNet](https://github.com/actions/setup-dotnet) Build your DotNet core function app or function app extensions
+  * [Setup Node](https://github.com/actions/setup-node) Resolve Node function app dependencies using npm
+  * [Setup Python](https://github.com/actions/setup-python) Resolve Python function app dependencies using pip
+  * [Setup Java](https://github.com/actions/setup-java) Resolve Java function app dependencies using maven
+
+## Azure Service Principle for RBAC
+You may want to create an [Azure Service Principal for RBAC](https://docs.microsoft.com/en-us/azure/role-based-access-control/overview) and add them as a Github Secret in your repository.
+1. Download Azure CLI from [here](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest), run `az login` to login with your Azure credentials.
+2. Run Azure CLI command
+```
+   az ad sp create-for-rbac --name "myApp" --role contributor \
+                            --scopes /subscriptions/{subscription-id}/resourceGroups/{resource-group} \
+                            --sdk-auth
+
+  # Replace {subscription-id}, {resource-group} with the subscription, resource group details of your Azure Functions app
+```
+3. Paste the json response from above Azure CLI to your Github Repository > Settings > Secrets > Add a new secret > AZURE_CREDENTIALS.
+
+## Create Azure Functionapps and Deploy using Github Actions
+1. Follow the tutorial [Azure Functions Quickstarts](https://docs.microsoft.com/en-us/azure/azure-functions/functions-create-first-function-vs-code)
+2. Pick a template from the following table depends on your Azure Functions **runtime** and **OS type** and place the template to `.github/workflows/workflow.yml` in your project location.
+3. Commit and push your project to Github repository, you should see a new Github Action is initiated in **Actions** tab.
+
+| Templates   | Windows Consumption | Windows Dedicated | Windows ElasticPremium | Linux Consumption | Linux Dedicated | Linux Container |
+|------------|---------------------|-------------------|------------------------|-------------------|-----------------|-----------------|
+| DotNet     | x                   | x                 | x                      | x                 | x               | x               |
+| Node       | x                   | x                 | x                      | x                 | x               | x               |
+| PowerShell | x                   | x                 | x                      | -                 | -               | -               |
+| Java       | x                   | x                 | x                      | -                 | -               | -               |
+| Python     | -                   | -                 | -                      | x                 | x               | x               |
+These templates will **NOT** resolve the **extensions.csproj** in your project. If you want to use binding extensions (e.g. Blob Triggers), please consider [registering Azure Functions binding extensions](https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-register) in your host.json. Alternatively, you can add a `dotnet build` step in your workflow.yml file.
 
 # Contributing
 

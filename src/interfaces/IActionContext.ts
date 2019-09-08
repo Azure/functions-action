@@ -19,7 +19,6 @@ export interface IActionContext {
     packageType: PackageType;
     publishContentPath: string;
     publishMethod: PublishMethodConstant;
-    deploymentId: string;
 
     appSettings: IAppSettings;
     sku: FunctionSkuConstant;

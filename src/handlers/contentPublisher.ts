@@ -21,8 +21,4 @@ export class ContentPublisher implements IOrchestratable {
         }
         return StateConstant.ValidatePublishedContent;
     }
-
-    public async changeContext(_0: StateConstant, _1: IActionParameters, context: IActionContext): Promise<IActionContext> {
-        return context;
-    }
 }

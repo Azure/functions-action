@@ -17,7 +17,6 @@ export class Builder {
             resourceGroupName: undefined,
             appService: undefined,
             appServiceUtil: undefined,
-            deploymentId: undefined,
             endpoint: undefined,
             kuduService: undefined,
             kuduServiceUtil: undefined,

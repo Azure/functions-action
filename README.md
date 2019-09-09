@@ -9,13 +9,13 @@ The repository contains a Github Action to deploy your function app project into
 # End-to-End Workflow
 
 ## Dependencies on other Github Actions
-* [Checkout](https://github.com/actions/checkout) Checkout your Git repository content into Github Actions agent
+* [Checkout](https://github.com/actions/checkout) Checkout your Git repository content into Github Actions agent.
 * [Azure Login](https://github.com/Azure/actions) Login with your Azure credentials for function app deployment authentication.
 * Environment setup actions
-  * [Setup DotNet](https://github.com/actions/setup-dotnet) Build your DotNet core function app or function app extensions
-  * [Setup Node](https://github.com/actions/setup-node) Resolve Node function app dependencies using npm
-  * [Setup Python](https://github.com/actions/setup-python) Resolve Python function app dependencies using pip
-  * [Setup Java](https://github.com/actions/setup-java) Resolve Java function app dependencies using maven
+  * [Setup DotNet](https://github.com/actions/setup-dotnet) Build your DotNet core function app or function app extensions.
+  * [Setup Node](https://github.com/actions/setup-node) Resolve Node function app dependencies using npm.
+  * [Setup Python](https://github.com/actions/setup-python) Resolve Python function app dependencies using pip.
+  * [Setup Java](https://github.com/actions/setup-java) Resolve Java function app dependencies using maven.
 
 ## Azure Service Principle for RBAC
 You may want to create an [Azure Service Principal for RBAC](https://docs.microsoft.com/en-us/azure/role-based-access-control/overview) and add them as a Github Secret in your repository.
@@ -26,22 +26,22 @@ You may want to create an [Azure Service Principal for RBAC](https://docs.micros
                             --scopes /subscriptions/{subscription-id}/resourceGroups/{resource-group} \
                             --sdk-auth
 
-  # Replace {subscription-id}, {resource-group} with the subscription, resource group details of your Azure Functions app
+  # Replace {subscription-id}, {resource-group} with the subscription, resource group details of your Azure function app.
 ```
 3. Paste the json response from above Azure CLI to your Github Repository > Settings > Secrets > Add a new secret > AZURE_CREDENTIALS.
 
 ## Create Azure Functionapps and Deploy using Github Actions
-1. Follow the tutorial [Azure Functions Quickstarts](https://docs.microsoft.com/en-us/azure/azure-functions/functions-create-first-function-vs-code)
+1. Follow the tutorial [Azure Functions Quickstart](https://docs.microsoft.com/en-us/azure/azure-functions/functions-create-first-function-vs-code)
 2. Pick a template from the following table depends on your Azure Functions **runtime** and **OS type** and place the template to `.github/workflows/workflow.yml` in your project location.
 3. Commit and push your project to Github repository, you should see a new Github Action is initiated in **Actions** tab.
 
-| Templates  | Windows Consumption | Windows Dedicated | Windows ElasticPremium | Linux Consumption | Linux Dedicated | Linux Container |
-|------------|---------------------|-------------------|------------------------|-------------------|-----------------|-----------------|
-| DotNet     | x                   | x                 | x                      | x                 | x               | x               |
-| Node       | x                   | x                 | x                      | x                 | x               | x               |
-| PowerShell | x                   | x                 | x                      | -                 | -               | -               |
-| Java       | x                   | x                 | x                      | -                 | -               | -               |
-| Python     | -                   | -                 | -                      | x                 | x               | x               |
+| Templates  | Windows Consumption | Windows ElasticPremium  | Windows Dedicated      | Linux Consumption | Linux ElasticPremium | Linux Dedicated |  Linux Container |
+|------------|---------------------|-------------------------|------------------------|-------------------|----------------------|------------------|------------------|
+| DotNet     | x                   | x                       | x                      | x                 | x                    | x                | x                |
+| Node       | x                   | x                       | x                      | x                 | x                    | x                | x                |
+| PowerShell | x                   | x                       | x                      | -                 | -                    | -                | x                |
+| Java       | x                   | x                       | x                      | -                 | -                    | -                | x                |
+| Python     | -                   | -                       | -                      | x                 | x                    | x                | x                |
 
 These templates will **NOT** resolve the **extensions.csproj** in your project. If you want to use binding extensions (e.g. Blob Triggers), please consider [registering Azure Functions binding extensions](https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-register) in your host.json. Alternatively, you can add a `dotnet build --output ./bin` step in your `.github/workflows/workflow.yml` file.
 

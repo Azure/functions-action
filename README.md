@@ -35,14 +35,15 @@ You may want to create an [Azure Service Principal for RBAC](https://docs.micros
 2. Pick a template from the following table depends on your Azure Functions **runtime** and **OS type** and place the template to `.github/workflows/workflow.yml` in your project location.
 3. Commit and push your project to Github repository, you should see a new Github Action is initiated in **Actions** tab.
 
-| Templates   | Windows Consumption | Windows Dedicated | Windows ElasticPremium | Linux Consumption | Linux Dedicated | Linux Container |
+| Templates  | Windows Consumption | Windows Dedicated | Windows ElasticPremium | Linux Consumption | Linux Dedicated | Linux Container |
 |------------|---------------------|-------------------|------------------------|-------------------|-----------------|-----------------|
 | DotNet     | x                   | x                 | x                      | x                 | x               | x               |
 | Node       | x                   | x                 | x                      | x                 | x               | x               |
 | PowerShell | x                   | x                 | x                      | -                 | -               | -               |
 | Java       | x                   | x                 | x                      | -                 | -               | -               |
 | Python     | -                   | -                 | -                      | x                 | x               | x               |
-These templates will **NOT** resolve the **extensions.csproj** in your project. If you want to use binding extensions (e.g. Blob Triggers), please consider [registering Azure Functions binding extensions](https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-register) in your host.json. Alternatively, you can add a `dotnet build` step in your workflow.yml file.
+
+These templates will **NOT** resolve the **extensions.csproj** in your project. If you want to use binding extensions (e.g. Blob Triggers), please consider [registering Azure Functions binding extensions](https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-register) in your host.json. Alternatively, you can add a `dotnet build --output ./bin` step in your `.github/workflows/workflow.yml` file.
 
 # Contributing
 

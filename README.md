@@ -32,18 +32,20 @@ You may want to create an [Azure Service Principal for RBAC](https://docs.micros
 
 ## Create Azure Functionapps and Deploy using Github Actions
 1. Follow the tutorial [Azure Functions Quickstart](https://docs.microsoft.com/en-us/azure/azure-functions/functions-create-first-function-vs-code)
-2. Pick a template from the following table depends on your Azure Functions **runtime** and **OS type** and place the template to `.github/workflows/workflow.yml` in your project repo.
+2. Pick a template from the following table depends on your Azure Functions **runtime** and **OS type** and place the template to `.github/workflows/` in your project repository.
 3. Commit and push your project to Github repository, you should see a new Github Action is initiated in **Actions** tab.
 
-| Templates  | Windows Consumption | Windows ElasticPremium  | Windows Dedicated      | Linux Consumption | Linux ElasticPremium | Linux Dedicated |  Linux Container |
-|------------|---------------------|-------------------------|------------------------|-------------------|----------------------|------------------|------------------|
-| DotNet     | x                   | x                       | x                      | x                 | x                    | x                | x                |
-| Node       | x                   | x                       | x                      | x                 | x                    | x                | x                |
-| PowerShell | x                   | x                       | x                      | -                 | -                    | -                | x                |
-| Java       | x                   | x                       | x                      | -                 | -                    | -                | x                |
-| Python     | -                   | -                       | -                      | x                 | x                    | x                | x                |
+| Templates  | Windows |  Linux |
+|------------|---------|--------|
+| DotNet     | [windows_dotnet.yml](https://github.com/Azure/functions-action/blob/master/templates/windows_dotnet.yml) | [linux_dotnet.yml](https://github.com/Azure/functions-action/blob/master/templates/linux_dotnet.yml) |
+| Node       | [windows_node.yml](https://github.com/Azure/functions-action/blob/master/templates/windows_node.yml) | [linux_node.yml](https://github.com/Azure/functions-action/blob/master/templates/linux_node.yml) |
+| PowerShell | [windows_powershell.yml](https://github.com/Azure/functions-action/blob/master/templates/windows_powershell.yml) | - |
+| Java       | [windows_java.yml](https://github.com/Azure/functions-action/blob/master/templates/windows_java.yml) | - |
+| Python     | - | [linux_python.yml](https://github.com/Azure/functions-action/blob/master/templates/linux_python.yml) |
 
-These templates will **NOT** resolve the **extensions.csproj** in your project. If you want to use binding extensions (e.g. Blob Triggers), please consider [registering Azure Functions binding extensions](https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-register) in your host.json. Alternatively, you can add a `dotnet build --output ./bin` step in your `.github/workflows/workflow.yml` file.
+These templates will **NOT** resolve the **extensions.csproj** in your project. If you want to use binding extensions (e.g. Blob/Queue/EventHub Triggers), please consider [registering Azure Functions binding extensions](https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-register) in your host.json.
+
+Alternatively, you can add a `- run: dotnet build --output ./bin` step **before** functions-action step.
 
 # Contributing
 

@@ -1,0 +1,51 @@
+
+# Action Requires
+# 1. Setup the AZURE_CREDENTIALS secrets in your Github Repository by following README.md
+# 2. Replace PLEASE_REPLACE_THIS_WITH_YOUR_FUNCTION_APP_NAME with your Azure function app name
+# 3. Add this yaml file to your project's .github/workflows/
+# 4. Push your local project to your Github Repository
+
+name: Windows_Java_Workflow
+
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+  build-and-deploy:
+    runs-on: windows-latest
+    steps:
+    - name: 'Checkout Github Action'
+      uses: actions/checkout@master
+    - name: 'Login via Azure CLI'
+      uses: Azure/actions/login@master
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    - name: Setup Java 1.8.x
+      uses: actions/setup-java@v1
+      with:
+        java-version: '1.8.x'
+    - name: 'Run mvn'
+      shell: pwsh
+      run: |
+        # If your function app project is not located in your repository's root direcotry
+        # Please change your directory for dotnet build in pushd
+        pushd .
+        mvn clean package
+        mvn azure-functions:package
+        popd
+    - name: 'Run Azure Functions Action'
+      uses: Azure/functions-action@master
+      id: fa
+      with:
+        app-name: PLEASE_REPLACE_THIS_WITH_YOUR_FUNCTION_APP_NAME
+        # If your function app project is not located in your repository's root
+        # Please consider prefixing the project path in this package parameter
+        package: ./target/azure-functions/PLEASE_REPLACE_THIS_WITH_YOUR_FUNCTION_APP_NAME
+    #- name: 'use the published functionapp url in upcoming steps'
+    #  run: |
+    #    echo "${{ steps.fa.outputs.app-url }}"
+
+# For more information on Github Actions:
+#   https://help.github.com/en/categories/automating-your-workflow-with-github-actions

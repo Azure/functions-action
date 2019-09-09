@@ -32,7 +32,7 @@ You may want to create an [Azure Service Principal for RBAC](https://docs.micros
 
 ## Create Azure Functionapps and Deploy using Github Actions
 1. Follow the tutorial [Azure Functions Quickstart](https://docs.microsoft.com/en-us/azure/azure-functions/functions-create-first-function-vs-code)
-2. Pick a template from the following table depends on your Azure Functions **runtime** and **OS type** and place the template to `.github/workflows/workflow.yml` in your project location.
+2. Pick a template from the following table depends on your Azure Functions **runtime** and **OS type** and place the template to `.github/workflows/workflow.yml` in your project repo.
 3. Commit and push your project to Github repository, you should see a new Github Action is initiated in **Actions** tab.
 
 | Templates  | Windows Consumption | Windows ElasticPremium  | Windows Dedicated      | Linux Consumption | Linux ElasticPremium | Linux Dedicated |  Linux Container |

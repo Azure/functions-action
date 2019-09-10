@@ -124,7 +124,7 @@ export class WebsiteRunFromPackageDeploy {
 
     private static async waitForSpinUp(state: StateConstant, appUrl: string) {
         Logger.Log("Waiting for function app to spin up after app settings change.");
-        Sleeper.timeout(5000);
+        await Sleeper.timeout(5000);
         try {
             await Client.ping(appUrl, 10, 5);
         } catch {

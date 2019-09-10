@@ -29,7 +29,7 @@ jobs:
     - name: 'Run pip'
       shell: bash
       run: |
-        # If your function app project is not located in your repository's root direcotry
+        # If your function app project is not located in your repository's root
         # Please change your directory for dotnet build in pushd
         pushd .
         python -m pip install --upgrade pip

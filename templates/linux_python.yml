@@ -30,7 +30,7 @@ jobs:
       shell: bash
       run: |
         # If your function app project is not located in your repository's root
-        # Please change your directory for dotnet build in pushd
+        # Please change your directory for pip in pushd
         pushd .
         python -m pip install --upgrade pip
         pip install -r requirements.txt --target=".python_packages/lib/python3.6/site-packages"

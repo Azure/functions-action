@@ -34,7 +34,7 @@ jobs:
       shell: pwsh
       run: |
         # If your function app project is not located in your repository's root
-        # Please change your directory for dotnet build in pushd
+        # Please change your directory for maven build in pushd
         pushd ./POM_ARTIFACT_ID
         mvn clean package
         mvn azure-functions:package

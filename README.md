@@ -4,7 +4,9 @@ With the Azure Functions Github Action, you can automate your workflow to deploy
 
 Get started today with a [free Azure account](https://azure.com/free/open-source)!
 
-The repository contains a Github Action to deploy your function app project into Azure Functions. The definition of this Github action is in [here](https://github.com/Azure/functions-action/blob/master/action.yml).
+The repository contains a Github Action to deploy your function app project into Azure Functions.
+
+The definition of this Github Action is in [here](https://github.com/Azure/functions-action/blob/master/action.yml).
 
 # End-to-End Workflow
 
@@ -28,12 +30,12 @@ You may want to create an [Azure Service Principal for RBAC](https://docs.micros
 
   # Replace {subscription-id}, {resource-group} with the subscription, resource group details of your Azure function app.
 ```
-3. Paste the json response from above Azure CLI to your Github Repository > Settings > Secrets > Add a new secret > AZURE_CREDENTIALS.
+3. Paste the json response from above Azure CLI to your Github Repository > Settings > Secrets > Add a new secret > **AZURE_CREDENTIALS**
 
 ## Create Azure Functionapps and Deploy using Github Actions
 1. Follow the tutorial [Azure Functions Quickstart](https://docs.microsoft.com/en-us/azure/azure-functions/functions-create-first-function-vs-code)
 2. Pick a template from the following table depends on your Azure Functions **runtime** and **OS type** and place the template to `.github/workflows/` in your project repository.
-3. Commit and push your project to Github repository, you should see a new Github Action is initiated in **Actions** tab.
+3. Commit and push your project to Github repository, you should see a new Github Action initiated in **Actions** tab.
 
 | Templates  | Windows |  Linux |
 |------------|---------|--------|

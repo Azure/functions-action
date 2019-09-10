@@ -2,8 +2,10 @@
 # Action Requires
 # 1. Setup the AZURE_CREDENTIALS secrets in your Github Repository by following README.md
 # 2. Replace PLEASE_REPLACE_THIS_WITH_YOUR_FUNCTION_APP_NAME with your Azure function app name
-# 3. Add this yaml file to your project's .github/workflows/
-# 4. Push your local project to your Github Repository
+# 3. Replace POM_ARTIFACT_ID with the value in project <artifactId> in pom.xml
+# 4. Replace POM_FUNCTION_APP_NAME with the value in properties <functionAppName> in pom.xml
+# 5. Add this yaml file to your project's .github/workflows/
+# 6. Push your local project to your Github Repository
 
 name: Windows_Java_Workflow
 
@@ -25,13 +27,15 @@ jobs:
     - name: Setup Java 1.8.x
       uses: actions/setup-java@v1
       with:
+        # If your pom.xml <maven.compiler.source> version is not in 1.8.x
+        # Please change the Java version to match the version in pom.xml <maven.compiler.source>
         java-version: '1.8.x'
     - name: 'Run mvn'
       shell: pwsh
       run: |
-        # If your function app project is not located in your repository's root direcotry
+        # If your function app project is not located in your repository's root
         # Please change your directory for dotnet build in pushd
-        pushd .
+        pushd ./POM_ARTIFACT_ID
         mvn clean package
         mvn azure-functions:package
         popd
@@ -42,7 +46,7 @@ jobs:
         app-name: PLEASE_REPLACE_THIS_WITH_YOUR_FUNCTION_APP_NAME
         # If your function app project is not located in your repository's root
         # Please consider prefixing the project path in this package parameter
-        package: ./target/azure-functions/PLEASE_REPLACE_THIS_WITH_YOUR_FUNCTION_APP_NAME
+        package: ./POM_ARTIFACT_ID/target/azure-functions/POM_FUNCTION_APP_NAME
     #- name: 'use the published functionapp url in upcoming steps'
     #  run: |
     #    echo "${{ steps.fa.outputs.app-url }}"

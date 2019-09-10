@@ -98,6 +98,12 @@ export class FileIOError extends BaseException {
     }
 }
 
+export class WebRequestError extends BaseException {
+    constructor(url: string, verb: string, message: string, innerException?: BaseException) {
+        super(`When [${verb}] ${url}, error: ${message}`, innerException);
+    }
+}
+
 export class AzureResourceError extends BaseException {
     constructor(state: StateConstant, action: string, message: string, innerException?: BaseException) {
         super(`When request Azure resource at ${StateConstant[state]}, ${action} : ${message}`, innerException);

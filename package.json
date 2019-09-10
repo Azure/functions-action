@@ -20,6 +20,6 @@
     "@actions/core": "^1.0.0",
     "@types/q": "^1.5.2",
     "@azure/storage-blob": "^10.4.0",
-    "pipelines-appservice-lib": "^1.0.4"
+    "pipelines-appservice-lib": "^1.0.5"
   }
 }

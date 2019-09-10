@@ -4,9 +4,9 @@ With the Azure Functions Github Action, you can automate your workflow to deploy
 
 Get started today with a [free Azure account](https://azure.com/free/open-source)!
 
-The repository contains a Github Action to deploy your function app project into Azure Functions.
+The repository contains a Github Action to deploy your function app project into Azure Functions. If you are looking for a Github Action to deploy your customized image into an Azure Functions container, please consider using [functions-container-action](https://github.com/Azure/functions-container-action).
 
-The definition of this Github Action is in [here](https://github.com/Azure/functions-action/blob/master/action.yml).
+The definition of this Github Action is in [action.yml](https://github.com/Azure/functions-action/blob/master/action.yml).
 
 # End-to-End Workflow
 

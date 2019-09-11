@@ -25,10 +25,10 @@ You may want to create an [Azure Service Principal for RBAC](https://docs.micros
 2. Run Azure CLI command
 ```
    az ad sp create-for-rbac --name "myApp" --role contributor \
-                            --scopes /subscriptions/{subscription-id}/resourceGroups/{resource-group} \
+                            --scopes /subscriptions/{subscription-id}/resourceGroups/{resource-group}/providers/Microsoft.Web/sites/{app-name} \
                             --sdk-auth
 
-  # Replace {subscription-id}, {resource-group} with the subscription, resource group details of your Azure function app.
+  # Replace {subscription-id}, {resource-group}, and {app-name} with the names of your subscription, resource group,and Azure function app.
 ```
 3. Paste the json response from above Azure CLI to your Github Repository > Settings > Secrets > Add a new secret > **AZURE_CREDENTIALS**
 

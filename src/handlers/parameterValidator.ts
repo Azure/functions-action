@@ -17,6 +17,9 @@ export class ParameterValidator implements IOrchestratable {
         this._appName = core.getInput(ConfigurationConstant.ParamInAppName);
         this._packagePath = core.getInput(ConfigurationConstant.ParamInPackagePath);
         this._slot = core.getInput(ConfigurationConstant.ParamInSlot);
+        if (this._slot !== undefined && this._slot.trim() === "") {
+            this._slot = undefined;
+        }
         this.validateFields(state);
         return StateConstant.ValidateAzureResource;
     }

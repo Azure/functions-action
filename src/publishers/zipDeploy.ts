@@ -16,7 +16,10 @@ export class ZipDeploy {
             if (isDeploymentSucceeded) {
                 await context.kuduServiceUtil.postZipDeployOperation(deploymentId, deploymentId);
             }
-            await context.kuduServiceUtil.updateDeploymentStatus(isDeploymentSucceeded, null, { 'type': 'Deployment' });
+            await context.kuduServiceUtil.updateDeploymentStatus(isDeploymentSucceeded, null, {
+                'type': 'Deployment',
+                'slotName': context.appService.getSlot()
+            });
         }
 
         return deploymentId;

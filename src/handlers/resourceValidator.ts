@@ -33,10 +33,11 @@ export class ResourceValidator implements IOrchestratable {
     private _kuduServiceUtil: KuduServiceUtility;
 
     public async invoke(state: StateConstant, params: IActionParameters): Promise<StateConstant> {
+        const appNameWithSlot: string = this.getAppNameWithSlot(params.appName, params.slot);
         this._endpoint = getHandler();
-        await this.getResourceDetails(state, this._endpoint, params.appName);
+        await this.getResourceDetails(state, this._endpoint, appNameWithSlot);
 
-        this._appService = new AzureAppService(this._endpoint, this._resourceGroupName, params.appName);
+        this._appService = new AzureAppService(this._endpoint, this._resourceGroupName, appNameWithSlot);
         this._appServiceUtil = new AzureAppServiceUtility(this._appService);
         this._kuduService = await this._appServiceUtil.getKuduService();
         this._kuduServiceUtil = new KuduServiceUtility(this._kuduService);
@@ -69,6 +70,13 @@ export class ResourceValidator implements IOrchestratable {
         this.validateRuntimeSku(state, context);
         this.validateLanguage(state, context);
         return context;
+    }
+
+    private getAppNameWithSlot(appName: string, slotName: string) {
+        if (slotName) {
+            return `${appName}-${slotName}`;
+        }
+        return appName;
     }
 
     private async getResourceDetails(state: StateConstant, endpoint: IAuthorizationHandler, appName: string) {

@@ -5,7 +5,8 @@ export class Builder {
     public static GetDefaultActionParameters(): IActionParameters {
         return {
             appName: undefined,
-            packagePath: undefined
+            packagePath: undefined,
+            slot: undefined
         }
     }
 

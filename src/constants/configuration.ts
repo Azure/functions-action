@@ -1,6 +1,7 @@
 export class ConfigurationConstant {
     public static readonly ParamInAppName: string = 'app-name';
     public static readonly ParamInPackagePath: string = 'package';
+    public static readonly ParamInSlot: string = 'slot';
     public static readonly ParamOutResultName: string = 'app-url';
 
     public static readonly EnvAzureHttpUserAgent: string = 'AZURE_HTTP_USER_AGENT';

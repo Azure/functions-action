@@ -11,10 +11,12 @@ import { ConfigurationConstant } from '../constants/configuration';
 export class ParameterValidator implements IOrchestratable {
     private _appName: string;
     private _packagePath: string;
+    private _slot: string;
 
     public async invoke(state: StateConstant): Promise<StateConstant> {
         this._appName = core.getInput(ConfigurationConstant.ParamInAppName);
         this._packagePath = core.getInput(ConfigurationConstant.ParamInPackagePath);
+        this._slot = core.getInput(ConfigurationConstant.ParamInSlot);
         this.validateFields(state);
         return StateConstant.ValidateAzureResource;
     }
@@ -22,6 +24,7 @@ export class ParameterValidator implements IOrchestratable {
     public async changeParams(_0: StateConstant, params: IActionParameters): Promise<IActionParameters> {
         params.appName = this._appName;
         params.packagePath = this._packagePath;
+        params.slot = this._slot;
         return params;
     }
 

@@ -1,5 +1,5 @@
 # Azure Functions Github Action
-name: 'Azure Functions'
+name: 'Azure Functions Action'
 description: 'Deploy Function App to Azure Functions'
 inputs:
   app-name:
@@ -17,6 +17,7 @@ outputs:
     description: 'URL to work with your function app'
 branding:
   icon: 'functionapp.svg'
+  color: 'blue'
 runs:
   using: 'node12'
   main: 'lib/main.js'

@@ -20,7 +20,7 @@ The definition of this GitHub Action is in [action.yml](https://github.com/Azure
   * [Setup Java](https://github.com/actions/setup-java) Resolve Java function app dependencies using maven.
 
 ## Azure Service Principle for RBAC
-You may want to create an [Azure Service Principal for RBAC](https://docs.microsoft.com/en-us/azure/role-based-access-control/overview) and add them as a GitHub Secret in your repository.
+Create an [Azure Service Principal for RBAC](https://docs.microsoft.com/en-us/azure/role-based-access-control/overview) and add it as a [GitHub Secret in your repository](https://help.github.com/en/articles/virtual-environments-for-github-actions#creating-and-using-secrets-encrypted-variables).
 1. Download Azure CLI from [here](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest), run `az login` to login with your Azure credentials.
 2. Run Azure CLI command
 ```
@@ -29,6 +29,15 @@ You may want to create an [Azure Service Principal for RBAC](https://docs.micros
                             --sdk-auth
 
   # Replace {subscription-id}, {resource-group}, and {app-name} with the names of your subscription, resource group, and Azure function app.
+  # The command should output a JSON object similar to this:
+
+  {
+    "clientId": "<GUID>",
+    "clientSecret": "<GUID>",
+    "subscriptionId": "<GUID>",
+    "tenantId": "<GUID>",
+    (...)
+  }
 ```
 3. Paste the json response from above Azure CLI to your Github Repository > Settings > Secrets > Add a new secret > **AZURE_CREDENTIALS**
 

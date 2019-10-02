@@ -16,6 +16,8 @@ import { ConfigurationConstant } from '../constants/configuration';
 import { RuntimeStackConstant } from '../constants/runtime_stack';
 import { FunctionRuntimeConstant, FunctionRuntimeUtil } from '../constants/function_runtime';
 import { Logger } from '../utils';
+import { IScmCredentials } from '../interfaces/IScmCredentials';
+import { AuthenticationType } from '../constants/authentication_type';
 
 export class ResourceValidator implements IOrchestratable {
     private _resourceGroupName: string;
@@ -32,19 +34,14 @@ export class ResourceValidator implements IOrchestratable {
     private _kuduService: Kudu;
     private _kuduServiceUtil: KuduServiceUtility;
 
-    public async invoke(state: StateConstant, params: IActionParameters): Promise<StateConstant> {
-        this._endpoint = getHandler();
-        await this.getResourceDetails(state, this._endpoint, params.appName);
-
-        this._appService = new AzureAppService(this._endpoint, this._resourceGroupName, params.appName, params.slot);
-        this._appServiceUtil = new AzureAppServiceUtility(this._appService);
-        this._kuduService = await this._appServiceUtil.getKuduService();
-        this._kuduServiceUtil = new KuduServiceUtility(this._kuduService);
-
-        this._sku = await this.getFunctionappSku(state, this._appService);
-        this._appSettings = await this.getFunctionappSettings(state, this._appService);
-        this._language = await this.getFunctionappLanguage(this._appSettings);
-        this._appUrl = await this._appServiceUtil.getApplicationURL();
+    public async invoke(state: StateConstant, params: IActionParameters, context: IActionContext): Promise<StateConstant> {
+        if (context.authenticationType == AuthenticationType.Rbac) {
+            Logger.Warn('Using RBAC for authentication, enable resource validation.');
+            await this.getDetailsByRbac(state, params);
+        } else if (context.authenticationType == AuthenticationType.Scm) {
+            Logger.Warn('Using SCM crednetial for authentication, disable resource validation.');
+            await this.getDetailsByScm(state, context);
+        }
 
         return StateConstant.PreparePublishContent;
     }
@@ -69,6 +66,27 @@ export class ResourceValidator implements IOrchestratable {
         this.validateRuntimeSku(state, context);
         this.validateLanguage(state, context);
         return context;
+    }
+
+    private async getDetailsByRbac(state: StateConstant, params: IActionParameters) {
+        this._endpoint = getHandler();
+        await this.getResourceDetails(state, this._endpoint, params.appName);
+        this._appService = new AzureAppService(this._endpoint, this._resourceGroupName, params.appName, params.slot);
+        this._appServiceUtil = new AzureAppServiceUtility(this._appService);
+        this._kuduService = await this._appServiceUtil.getKuduService();
+        this._kuduServiceUtil = new KuduServiceUtility(this._kuduService);
+        this._sku = await this.getFunctionappSku(state, this._appService);
+        this._appSettings = await this.getFunctionappSettingsRbac(state, this._appService);
+        this._language = await this.getFunctionappLanguage(this._appSettings);
+        this._appUrl = await this._appServiceUtil.getApplicationURL();
+    }
+
+    private async getDetailsByScm(state: StateConstant, context: IActionContext) {
+        const scm: IScmCredentials = context.scmCredentials;
+        this._kuduService = new Kudu(scm.uri, scm.username, scm.password);
+        this._kuduServiceUtil = new KuduServiceUtility(this._kuduService);
+        this._appSettings = await this.getFunctionappSettingsScm(state, this._kuduService);
+        this._appUrl = scm.appUrl;
     }
 
     private async getResourceDetails(state: StateConstant, endpoint: IAuthorizationHandler, appName: string) {
@@ -104,16 +122,16 @@ export class ResourceValidator implements IOrchestratable {
         return result;
     }
 
-    private async getFunctionappSettings(state: StateConstant, appService: AzureAppService): Promise<IAppSettings> {
-        let appSettings;
+    private async getFunctionappSettingsRbac(state: StateConstant, appService: AzureAppService): Promise<IAppSettings> {
+        let appSettings: any;
         try {
             appSettings = await appService.getApplicationSettings(true);
         } catch (expt) {
-            throw new AzureResourceError(state, 'Get Function App Settings', 'Failed to acquire app settings', expt);
+            throw new AzureResourceError(state, 'Get Function App Settings', 'Failed to acquire app settings (RBAC)', expt);
         }
 
         if (appSettings === undefined || appSettings.properties === undefined) {
-            throw new AzureResourceError(state, 'Get Function App Settings', 'Function app settings should not be empty');
+            throw new AzureResourceError(state, 'Get Function App Settings', 'Function app settings should not be empty (RBAC)');
         }
 
         if (!appSettings.properties['AzureWebJobsStorage']) {
@@ -122,16 +140,52 @@ export class ResourceValidator implements IOrchestratable {
             console.log(`::add-mask::${appSettings.properties['AzureWebJobsStorage']}`);
         }
 
-        Logger.Log('Sucessfully acquired app settings from function app!');
+        Logger.Log('Sucessfully acquired app settings from function app (RBAC)!');
         for (const key in appSettings.properties) {
             Logger.Debug(`- ${key} = ${appSettings.properties[key]}`);
         }
 
         const result: IAppSettings = {
             AzureWebJobsStorage: appSettings.properties['AzureWebJobsStorage'],
-            FUNCTIONS_WORKER_RUNTIME: appSettings.properties['FUNCTIONS_WORKER_RUNTIME']
+            FUNCTIONS_WORKER_RUNTIME: appSettings.properties['FUNCTIONS_WORKER_RUNTIME'],
+            ENABLE_ORYX_BUILD: appSettings.properties['ENABLE_ORYX_BUILD'],
+            SCM_DO_BUILD_DURING_DEPLOYMENT: appSettings.properties['SCM_DO_BUILD_DURING_DEPLOYMENT'],
+            WEBSITE_RUN_FROM_PACKAGE: appSettings.properties['WEBSITE_RUN_FROM_PACKAGE'],
         };
         return result;
+    }
+
+    private async getFunctionappSettingsScm(state: StateConstant, kuduService: Kudu): Promise<IAppSettings> {
+        let appSettings: any;
+        try {
+            appSettings = await kuduService.getAppSettings();
+        } catch (expt) {
+            throw new AzureResourceError(state, 'Get Function App Settings', 'Failed to acquire app settings (SCM)', expt);
+        }
+
+        if (appSettings === undefined) {
+            throw new AzureResourceError(state, 'Get Function App Settings', 'Function app settings should not be empty (SCM)');
+        }
+
+        if (!appSettings['AzureWebJobsStorage']) {
+            throw new AzureResourceError(state, 'Get Function App Settings', 'AzureWebJobsStorage cannot be empty');
+        } else {
+            console.log(`::add-mask::${appSettings['AzureWebJobsStorage']}`);
+        }
+
+        Logger.Log('Sucessfully acquired app settings from function app (SCM)!');
+        for (const key in appSettings) {
+            Logger.Debug(`- ${key} = ${appSettings[key]}`);
+        }
+
+        const result: IAppSettings = {
+            AzureWebJobsStorage: appSettings['AzureWebJobsStorage'],
+            FUNCTIONS_WORKER_RUNTIME: appSettings['FUNCTIONS_WORKER_RUNTIME'],
+            ENABLE_ORYX_BUILD: appSettings['ENABLE_ORYX_BUILD'],
+            SCM_DO_BUILD_DURING_DEPLOYMENT: appSettings['SCM_DO_BUILD_DURING_DEPLOYMENT'],
+            WEBSITE_RUN_FROM_PACKAGE: appSettings['WEBSITE_RUN_FROM_PACKAGE'],
+        };
+        return result
     }
 
     private getFunctionappLanguage(appSettings: IAppSettings): FunctionRuntimeConstant {
@@ -146,6 +200,10 @@ export class ResourceValidator implements IOrchestratable {
     }
 
     private validateRuntimeSku(state: StateConstant, context: IActionContext) {
+        if (context.os === undefined || context.sku === undefined) {
+            return;
+        }
+
         // Linux Elastic Premium is not supported
         if (context.os === RuntimeStackConstant.Linux && context.sku === FunctionSkuConstant.ElasticPremium) {
             throw new ValidationError(state, 'Function Runtime',
@@ -154,6 +212,10 @@ export class ResourceValidator implements IOrchestratable {
     }
 
     private validateLanguage(state: StateConstant, context: IActionContext) {
+        if (context.os === undefined || context.language === undefined) {
+            return;
+        }
+
         // Windows Python is not supported
         if (context.os === RuntimeStackConstant.Windows) {
             if (context.language === FunctionRuntimeConstant.Python) {

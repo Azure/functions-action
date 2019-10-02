@@ -9,27 +9,32 @@ import { PublishMethodConstant } from '../constants/publish_method';
 import { FunctionSkuConstant } from '../constants/function_sku';
 import { RuntimeStackConstant } from '../constants/runtime_stack';
 import { FunctionRuntimeConstant } from '../constants/function_runtime';
+import { IScmCredentials } from './IScmCredentials';
+import { AuthenticationType } from '../constants/authentication_type';
 
 export interface IActionContext {
     azureHttpUserAgent: string;
     azureHttpUserAgentPrefix: string;
-    resourceGroupName: string;
-    kind: string;
-    isLinux: boolean;
+    resourceGroupName: string; //rbac only
+    kind: string; //rbac only
+    isLinux: boolean; //rbac only
     package: Package;
     packageType: PackageType;
     publishContentPath: string;
     publishMethod: PublishMethodConstant;
 
+    scmCredentials: IScmCredentials; //scm only
+    authenticationType: AuthenticationType;
+
     appSettings: IAppSettings;
-    sku: FunctionSkuConstant;
-    os: RuntimeStackConstant;
-    language: FunctionRuntimeConstant;
+    sku: FunctionSkuConstant; //rbac only
+    os: RuntimeStackConstant; //rbac only
+    language: FunctionRuntimeConstant; //rbac only
     appUrl: string;
 
-    endpoint: IAuthorizationHandler;
-    appService: AzureAppService;
-    appServiceUtil: AzureAppServiceUtility;
+    endpoint: IAuthorizationHandler; //rbac only
+    appService: AzureAppService; //rbac only
+    appServiceUtil: AzureAppServiceUtility; //rbac only
     kuduService: Kudu;
     kuduServiceUtil: KuduServiceUtility;
 }

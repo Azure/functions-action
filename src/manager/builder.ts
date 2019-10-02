@@ -6,7 +6,8 @@ export class Builder {
         return {
             appName: undefined,
             packagePath: undefined,
-            slot: undefined
+            slot: undefined,
+            publishProfile: undefined
         }
     }
 
@@ -30,7 +31,9 @@ export class Builder {
             language: undefined,
             os: undefined,
             sku: undefined,
-            appUrl: undefined
+            appUrl: undefined,
+            scmCredentials: undefined,
+            authenticationType: undefined
         }
     }
 }

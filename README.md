@@ -19,8 +19,58 @@ The definition of this GitHub Action is in [action.yml](https://github.com/Azure
   * [Setup Python](https://github.com/actions/setup-python) Resolve Python function app dependencies using pip.
   * [Setup Java](https://github.com/actions/setup-java) Resolve Java function app dependencies using maven.
 
+<<<<<<< HEAD
 ## Azure Service Principle for RBAC
 Create an [Azure Service Principal for RBAC](https://docs.microsoft.com/en-us/azure/role-based-access-control/overview) and add it as a [GitHub Secret in your repository](https://help.github.com/en/articles/virtual-environments-for-github-actions#creating-and-using-secrets-encrypted-variables).
+||||||| parent of 86fac11... Add publish-profile support
+## Azure Service Principle for RBAC
+You may want to create an [Azure Service Principal for RBAC](https://docs.microsoft.com/en-us/azure/role-based-access-control/overview) and add them as a GitHub Secret in your repository.
+=======
+## Using Publish Profile as Deployment Credential
+You may want to get the publish profile from your function app. Using publish profile as deployemnt credential is recommended
+if you are not the owner of your Azure subscription.
+1. In Azure portal, go to your function app.
+2. Click **Get publish profile** and download **.PublishSettings** file.
+3. Open the **.PublishSettings** file and copy the content.
+4. Paste the XML content to your Github Repository > Settings > Secrets > Add a new secret > **SCM_CREDENTIALS**
+
+## Create Azure function app and Deploy using GitHub Actions (Publish Profile)
+1. Follow the tutorial [Azure Functions Quickstart](https://docs.microsoft.com/en-us/azure/azure-functions/functions-create-first-function-vs-code)
+2. Use the following template to create the `.github/workflows/` file in your project repository.
+3. Change `app-name` to your function app name.
+4. Commit and push your project to GitHub repository, you should see a new GitHub workflow initiated in **Actions** tab.
+```yaml
+name: Linux_Node_Workflow_ScmCred
+
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '10.x'
+    - name: 'run npm'
+      run: |
+        npm install
+        npm run build --if-present
+        npm run test --if-present
+    - uses: Azure/functions-action@v1
+      id: fa
+      with:
+        app-name: PLEASE_REPLACE_THIS_WITH_YOUR_FUNCTION_APP_NAME
+        publish-profile: ${{ secrets.SCM_CREDENTIALS }}
+
+```
+
+## Using Azure Service Principle for RBAC as Deployment Credential
+You may want to create an [Azure Service Principal for RBAC](https://docs.microsoft.com/en-us/azure/role-based-access-control/overview) and add them as a GitHub Secret in your repository.
+>>>>>>> 86fac11... Add publish-profile support
 1. Download Azure CLI from [here](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest), run `az login` to login with your Azure credentials.
 2. Run Azure CLI command
 ```
@@ -41,11 +91,11 @@ Create an [Azure Service Principal for RBAC](https://docs.microsoft.com/en-us/az
 ```
 3. Paste the json response from above Azure CLI to your Github Repository > Settings > Secrets > Add a new secret > **AZURE_CREDENTIALS**
 
-## Create Azure function app and Deploy using GitHub Actions
+## Create Azure function app and Deploy using GitHub Actions (RBAC)
 1. Follow the tutorial [Azure Functions Quickstart](https://docs.microsoft.com/en-us/azure/azure-functions/functions-create-first-function-vs-code)
 2. Pick a template from the following table depends on your Azure Functions **runtime** and **OS type** and place the template to `.github/workflows/` in your project repository.
 3. Change `app-name` to your function app name.
-4. Commit and push your project to GitHub repository, you should see a new GitHub Action initiated in **Actions** tab.
+4. Commit and push your project to GitHub repository, you should see a new GitHub workflow initiated in **Actions** tab.
 
 | Templates  | Windows |  Linux |
 |------------|---------|--------|

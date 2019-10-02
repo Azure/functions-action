@@ -14,11 +14,12 @@
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^12.6.8",
+    "@types/q": "^1.5.2",
+    "@types/xml2js": "^0.4.5",
     "typescript": "^3.5.3"
   },
   "dependencies": {
     "@actions/core": "^1.0.0",
-    "@types/q": "^1.5.2",
     "@azure/storage-blob": "^10.4.0",
     "pipelines-appservice-lib": "^1.0.6"
   }

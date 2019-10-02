@@ -1,4 +1,7 @@
 export interface IAppSettings {
-    AzureWebJobsStorage: string;
-    FUNCTIONS_WORKER_RUNTIME: string;
+    AzureWebJobsStorage: Readonly<string>;
+    FUNCTIONS_WORKER_RUNTIME: Readonly<string>;
+    ENABLE_ORYX_BUILD: Readonly<string>;
+    SCM_DO_BUILD_DURING_DEPLOYMENT: Readonly<string>;
+    WEBSITE_RUN_FROM_PACKAGE: Readonly<string>;
 }

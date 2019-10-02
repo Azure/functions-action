@@ -10,6 +10,8 @@ import { PublishMethodConstant } from "../constants/publish_method";
 import { FunctionSkuConstant } from "../constants/function_sku";
 import { RuntimeStackConstant } from "../constants/runtime_stack";
 import { Logger } from '../utils';
+import { IScmCredentials } from '../interfaces/IScmCredentials';
+import { AuthenticationType } from '../constants/authentication_type';
 
 export class ContentPreparer implements IOrchestratable {
     private _packageType: PackageType;
@@ -20,10 +22,10 @@ export class ContentPreparer implements IOrchestratable {
         this.validatePackageType(state, context.package);
         this._packageType = context.package.getPackageType();
         this._publishContentPath = await this.generatePublishContent(state, params.packagePath, this._packageType);
-        this._publishMethod = this.derivePublishMethod(state, this._packageType, context.os, context.sku);
+        this._publishMethod = this.derivePublishMethod(state, this._packageType, context.os, context.sku, context.authenticationType);
 
         try {
-            context.kuduServiceUtil.warmpUp();
+            await context.kuduServiceUtil.warmpUp();
         } catch (expt) {
             throw new AzureResourceError(state, "Warmup", `Failed to warmup ${params.appName}`, expt);
         }
@@ -67,8 +69,20 @@ export class ContentPreparer implements IOrchestratable {
         }
     }
 
-    private derivePublishMethod(state: StateConstant, packageType: PackageType, osType: RuntimeStackConstant, sku: FunctionSkuConstant): PublishMethodConstant {
-        // Linux Consumption sets WEBSITE_RUN_FROM_PACKAGE app settings
+    private derivePublishMethod(
+        state: StateConstant,
+        packageType: PackageType,
+        osType: RuntimeStackConstant,
+        sku: FunctionSkuConstant,
+        authenticationType: AuthenticationType
+    ): PublishMethodConstant {
+        // Uses api/zipdeploy endpoint if scm credential is provided
+        if (authenticationType == AuthenticationType.Scm) {
+            Logger.Log('Will use api/zipdeploy to deploy (scm credential)');
+            return PublishMethodConstant.ZipDeploy;
+        }
+
+        // Linux Consumption sets WEBSITE_RUN_FROM_PACKAGE app settings when scm credential is not available
         if (osType === RuntimeStackConstant.Linux && sku === FunctionSkuConstant.Consumption) {
             Logger.Log('Will use WEBSITE_RUN_FROM_PACKAGE to deploy');
             return PublishMethodConstant.WebsiteRunFromPackageDeploy;
@@ -78,7 +92,7 @@ export class ContentPreparer implements IOrchestratable {
         switch(packageType) {
             case PackageType.zip:
             case PackageType.folder:
-                Logger.Log('Will use api/zipdeploy to deploy');
+                Logger.Log('Will use api/zipdeploy to deploy (rbac authentication)');
                 return PublishMethodConstant.ZipDeploy;
             default:
                 throw new ValidationError(state, "Derive Publish Method", "only accepts zip or folder");

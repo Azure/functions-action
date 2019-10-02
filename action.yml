@@ -12,6 +12,9 @@ inputs:
   slot-name:
     description: 'Function app slot to be deploy to'
     required: false
+  publish-profile:
+    description: 'Publish profile (*.publishsettings) file contents with web deploy secrets'
+    required: false
 outputs:
   app-url:
     description: 'URL to work with your function app'

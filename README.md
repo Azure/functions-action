@@ -19,13 +19,6 @@ The definition of this GitHub Action is in [action.yml](https://github.com/Azure
   * [Setup Python](https://github.com/actions/setup-python) Resolve Python function app dependencies using pip.
   * [Setup Java](https://github.com/actions/setup-java) Resolve Java function app dependencies using maven.
 
-<<<<<<< HEAD
-## Azure Service Principle for RBAC
-Create an [Azure Service Principal for RBAC](https://docs.microsoft.com/en-us/azure/role-based-access-control/overview) and add it as a [GitHub Secret in your repository](https://help.github.com/en/articles/virtual-environments-for-github-actions#creating-and-using-secrets-encrypted-variables).
-||||||| parent of 86fac11... Add publish-profile support
-## Azure Service Principle for RBAC
-You may want to create an [Azure Service Principal for RBAC](https://docs.microsoft.com/en-us/azure/role-based-access-control/overview) and add them as a GitHub Secret in your repository.
-=======
 ## Using Publish Profile as Deployment Credential
 You may want to get the publish profile from your function app. Using publish profile as deployemnt credential is recommended
 if you are not the owner of your Azure subscription.
@@ -70,7 +63,6 @@ jobs:
 
 ## Using Azure Service Principle for RBAC as Deployment Credential
 You may want to create an [Azure Service Principal for RBAC](https://docs.microsoft.com/en-us/azure/role-based-access-control/overview) and add them as a GitHub Secret in your repository.
->>>>>>> 86fac11... Add publish-profile support
 1. Download Azure CLI from [here](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest), run `az login` to login with your Azure credentials.
 2. Run Azure CLI command
 ```

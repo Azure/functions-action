@@ -36,10 +36,10 @@ export class ResourceValidator implements IOrchestratable {
 
     public async invoke(state: StateConstant, params: IActionParameters, context: IActionContext): Promise<StateConstant> {
         if (context.authenticationType == AuthenticationType.Rbac) {
-            Logger.Warn('Using RBAC for authentication, enable resource validation.');
+            Logger.Log('Using RBAC for authentication, GitHub Action will perform resource validation.');
             await this.getDetailsByRbac(state, params);
         } else if (context.authenticationType == AuthenticationType.Scm) {
-            Logger.Warn('Using SCM crednetial for authentication, disable resource validation.');
+            Logger.Log('Using SCM credential for authentication, GitHub Action will not perform resource validation.');
             await this.getDetailsByScm(state, context);
         }
 

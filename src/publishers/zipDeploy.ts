@@ -57,14 +57,14 @@ export class ZipDeploy {
             if (context.authenticationType === AuthenticationType.Rbac &&
                 context.os === RuntimeStackConstant.Windows &&
                 context.appSettings.WEBSITE_RUN_FROM_PACKAGE !== '1') {
-                Logger.Warn('Setting WEBSITE_RUN_FROM_PACKAGE to 1');
+                Logger.Log('Setting WEBSITE_RUN_FROM_PACKAGE to 1');
                 await context.appService.patchApplicationSettings({
                     'WEBSITE_RUN_FROM_PACKAGE': '1'
                 });
                 await this.checkAppSettingPropagatedToKudu(context, 'WEBSITE_RUN_FROM_PACKAGE', '1');
             } else if (context.authenticationType === AuthenticationType.Scm &&
                 context.appSettings.SCM_DO_BUILD_DURING_DEPLOYMENT !== 'false') {
-                Logger.Warn('Setting SCM_DO_BUILD_DURING_DEPLOYMENT in Kudu container to false');
+                Logger.Log('Setting SCM_DO_BUILD_DURING_DEPLOYMENT in Kudu container to false');
                 await Client.updateAppSettingViaKudu(context.scmCredentials.uri, {
                     'SCM_DO_BUILD_DURING_DEPLOYMENT': 'false'
                 }, 3);
@@ -79,7 +79,7 @@ export class ZipDeploy {
             const original: IAppSettings = context.appSettings;
             if (context.authenticationType === AuthenticationType.Scm) {
                 if (context.appSettings.SCM_DO_BUILD_DURING_DEPLOYMENT != original.SCM_DO_BUILD_DURING_DEPLOYMENT) {
-                    Logger.Warn(`Restore SCM_DO_BUILD_DURING_DEPLOYMENT in Kudu container back to ${original.SCM_DO_BUILD_DURING_DEPLOYMENT}.`);
+                    Logger.Log(`Restore SCM_DO_BUILD_DURING_DEPLOYMENT in Kudu container back to ${original.SCM_DO_BUILD_DURING_DEPLOYMENT}.`);
                     if (original.SCM_DO_BUILD_DURING_DEPLOYMENT === undefined) {
                         await Client.deleteAppSettingViaKudu(context.scmCredentials.uri, 'SCM_DO_BUILD_DURING_DEPLOYMENT', 3);
                     } else {
@@ -110,7 +110,7 @@ export class ZipDeploy {
                 Logger.Warn(`Failed to check app setting propagation for ${key}, remaining retry ${retryCount-1}`);
             }
 
-            Logger.Warn(`App setting ${key} has not been propagated to Kudu container yet, remaining retry ${retryCount-1}`)
+            Logger.Log(`App setting ${key} has not been propagated to Kudu container yet, remaining retry ${retryCount-1}`)
             retryCount--;
         }
 

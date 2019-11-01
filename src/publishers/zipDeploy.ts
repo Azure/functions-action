@@ -5,7 +5,6 @@ import { Logger, Sleeper, Client, Parser } from "../utils";
 import { AuthenticationType } from "../constants/authentication_type";
 import { IAppSettings } from "../interfaces/IAppSettings";
 import { RuntimeStackConstant } from "../constants/runtime_stack";
-import { FunctionSkuConstant } from "../constants/function_sku";
 
 export class ZipDeploy {
     public static async execute(state: StateConstant, context: IActionContext): Promise<string> {
@@ -13,6 +12,7 @@ export class ZipDeploy {
         let deploymentId: string;
         let isDeploymentSucceeded: boolean = false;
         this.validateApplicationSettings(state, context);
+        const originalAppSettings: IAppSettings = context.appSettings;
 
         try {
             await this.patchApplicationSettings(context);
@@ -31,8 +31,8 @@ export class ZipDeploy {
             });
         }
 
-        await this.restoreScmTemporarySettings(context);
-        await this.deleteScmTemporarySettings(context);
+        await this.restoreScmTemporarySettings(context, originalAppSettings);
+        await this.deleteScmTemporarySettings(context, originalAppSettings);
         return deploymentId;
     }
 
@@ -56,48 +56,48 @@ export class ZipDeploy {
     private static async patchApplicationSettings(context: IActionContext) {
         try {
             if (context.os === RuntimeStackConstant.Windows &&
+                context.authenticationType === AuthenticationType.Rbac &&
                 !Parser.IsTrueLike(context.appSettings.WEBSITE_RUN_FROM_PACKAGE)) {
                 Logger.Log('Setting WEBSITE_RUN_FROM_PACKAGE to 1');
                 await this._updateApplicationSettings(context, { 'WEBSITE_RUN_FROM_PACKAGE': '1' });
                 await this.checkAppSettingPropagatedToKudu(context, 'WEBSITE_RUN_FROM_PACKAGE', '1');
             }
 
-            if (context.os === RuntimeStackConstant.Linux &&
+            if (context.authenticationType === AuthenticationType.Scm &&
                 !Parser.IsFalseLike(context.appSettings.SCM_DO_BUILD_DURING_DEPLOYMENT)) {
                 Logger.Log('Setting SCM_DO_BUILD_DURING_DEPLOYMENT in Kudu container to false');
-                await this._updateApplicationSettings(context, { 'SCM_DO_BUILD_DURING_DEPLOYMENT': 'false'});
+                await this._updateApplicationSettings(context, { 'SCM_DO_BUILD_DURING_DEPLOYMENT': 'false' });
                 await this.checkAppSettingPropagatedToKudu(context, 'SCM_DO_BUILD_DURING_DEPLOYMENT', 'false');
             }
 
-            if (context.os === RuntimeStackConstant.Linux &&
+            if (context.authenticationType === AuthenticationType.Scm &&
                 !Parser.IsFalseLike(context.appSettings.ENABLE_ORYX_BUILD)) {
                 Logger.Log('Setting ENABLE_ORYX_BUILD in Kudu container to false');
-                await this._updateApplicationSettings(context, { 'ENABLE_ORYX_BUILD': 'false'});
+                await this._updateApplicationSettings(context, { 'ENABLE_ORYX_BUILD': 'false' });
                 await this.checkAppSettingPropagatedToKudu(context, 'ENABLE_ORYX_BUILD', 'false');
             }
 
         } catch (expt) {
-            Logger.Warn("Patch Application Settings: Failed to change app settings.");
+            Logger.Warn(`Patch Application Settings: Failed to change app settings. ${expt}`);
         }
     }
 
-    private static async restoreScmTemporarySettings(context: IActionContext) {
+    private static async restoreScmTemporarySettings(context: IActionContext, original: IAppSettings) {
         try {
-            const original: IAppSettings = context.appSettings;
             if (context.authenticationType === AuthenticationType.Scm) {
                 // Restore previous app settings if they are temporarily changed
                 if (original.WEBSITE_RUN_FROM_PACKAGE) {
-                    await Client.updateAppSettingViaKudu(context.scmCredentials.uri, {
+                    await Client.updateAppSettingViaKudu(context.scmCredentials, {
                         'WEBSITE_RUN_FROM_PACKAGE': original.WEBSITE_RUN_FROM_PACKAGE
                     }, 3, 3, false);
                 }
                 if (original.SCM_DO_BUILD_DURING_DEPLOYMENT) {
-                    await Client.updateAppSettingViaKudu(context.scmCredentials.uri, {
+                    await Client.updateAppSettingViaKudu(context.scmCredentials, {
                         'SCM_DO_BUILD_DURING_DEPLOYMENT': original.SCM_DO_BUILD_DURING_DEPLOYMENT
                     }, 3, 3, false);
                 }
                 if (original.ENABLE_ORYX_BUILD) {
-                    await Client.updateAppSettingViaKudu(context.scmCredentials.uri, {
+                    await Client.updateAppSettingViaKudu(context.scmCredentials, {
                         'ENABLE_ORYX_BUILD': original.ENABLE_ORYX_BUILD
                     }, 3, 3, false);
                 }
@@ -107,21 +107,20 @@ export class ZipDeploy {
         }
     }
 
-    private static async deleteScmTemporarySettings(context: IActionContext) {
+    private static async deleteScmTemporarySettings(context: IActionContext, original: IAppSettings) {
         try {
-            const original: IAppSettings = context.appSettings;
             if (context.authenticationType === AuthenticationType.Scm) {
                 // Delete previous app settings if they are temporarily set
                 if (original.WEBSITE_RUN_FROM_PACKAGE === undefined) {
-                    await Client.deleteAppSettingViaKudu(context.scmCredentials.uri,
+                    await Client.deleteAppSettingViaKudu(context.scmCredentials,
                         'WEBSITE_RUN_FROM_PACKAGE', 3, 3, false);
                 }
                 if (original.SCM_DO_BUILD_DURING_DEPLOYMENT === undefined) {
-                    await Client.deleteAppSettingViaKudu(context.scmCredentials.uri,
+                    await Client.deleteAppSettingViaKudu(context.scmCredentials,
                         'SCM_DO_BUILD_DURING_DEPLOYMENT', 3, 3, false);
                 }
                 if (original.ENABLE_ORYX_BUILD === undefined) {
-                    await Client.deleteAppSettingViaKudu(context.scmCredentials.uri,
+                    await Client.deleteAppSettingViaKudu(context.scmCredentials,
                         'ENABLE_ORYX_BUILD', 3, 3, false);
                 }
             }
@@ -138,7 +137,7 @@ export class ZipDeploy {
             await Sleeper.timeout(retryInterval);
             try {
                 const settings: any = await context.kuduService.getAppSettings();
-                if (settings && settings[key] === expectedValue) {
+                if (settings && settings[key] && settings[key] === expectedValue) {
                     isSuccess = true;
                     break;
                 }
@@ -170,10 +169,12 @@ export class ZipDeploy {
 
     private static async _updateApplicationSettings(context: IActionContext, settings: Record<string, string>) {
         if (context.authenticationType === AuthenticationType.Rbac) {
-            await context.appService.patchApplicationSettings(settings);
+            Logger.Log("Update using context.appService.patchApplicationSettings");
+            return await context.appService.patchApplicationSettings(settings);
         }
         if (context.authenticationType === AuthenticationType.Scm) {
-            await Client.updateAppSettingViaKudu(context.scmCredentials.uri, settings, 3);
+            Logger.Log("Update using Client.updateAppSettingViaKudu");
+            return await Client.updateAppSettingViaKudu(context.scmCredentials, settings, 3);
         }
     }
 }

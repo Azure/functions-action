@@ -10,7 +10,6 @@ import { PublishMethodConstant } from "../constants/publish_method";
 import { FunctionSkuConstant } from "../constants/function_sku";
 import { RuntimeStackConstant } from "../constants/runtime_stack";
 import { Logger } from '../utils';
-import { IScmCredentials } from '../interfaces/IScmCredentials';
 import { AuthenticationType } from '../constants/authentication_type';
 
 export class ContentPreparer implements IOrchestratable {

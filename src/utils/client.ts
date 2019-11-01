@@ -1,4 +1,5 @@
 import { WebRequest, WebRequestOptions, WebResponse, sendRequest } from 'pipelines-appservice-lib/lib/webClient';
+import { IScmCredentials } from '../interfaces/IScmCredentials';
 import { WebRequestError } from '../exceptions';
 import { Logger } from './logger';
 
@@ -21,14 +22,16 @@ export class Client {
         }
     }
 
-    public static async updateAppSettingViaKudu(kuduUrl: string, appSettings: Record<string, string>,
+    public static async updateAppSettingViaKudu(scm: IScmCredentials, appSettings: Record<string, string>,
         retryCount: number = 1, retryIntervalSecond: number = 5, throwOnError: Boolean = true): Promise<WebResponse> {
+        const base64Cred: string = Buffer.from(`${scm.username}:${scm.password}`).toString('base64');
         const request: WebRequest = {
             method: 'POST',
-            uri: `${kuduUrl}/api/settings`,
+            uri: `${scm.uri}/api/settings`,
             body: JSON.stringify(appSettings),
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Basic ${base64Cred}`
             }
         };
         const options: WebRequestOptions = {
@@ -38,21 +41,28 @@ export class Client {
         };
 
         try {
-            return await sendRequest(request, options);
+            const response = await sendRequest(request, options);
+            Logger.Log(`Response with status code ${response.statusCode}`);
+            return response;
         } catch (expt) {
             if (throwOnError) {
-                throw new WebRequestError(kuduUrl, 'POST', 'Failed to update app settings via kudu', expt);
+                throw new WebRequestError(scm.uri, 'POST', 'Failed to update app settings via kudu', expt);
             } else {
-                Logger.Warn(`Failed to perform POST ${kuduUrl}`);
+                Logger.Warn(`Failed to perform POST ${scm.uri}`);
             }
         }
     }
 
-    public static async deleteAppSettingViaKudu(kuduUrl: string, appSetting: string,
+    public static async deleteAppSettingViaKudu(scm: IScmCredentials, appSetting: string,
         retryCount: number = 1, retryIntervalSecond: number = 5, throwOnError: Boolean = true): Promise<WebResponse> {
+        const base64Cred: string = Buffer.from(`${scm.username}:${scm.password}`).toString('base64');
         const request: WebRequest = {
             method: 'DELETE',
-            uri: `${kuduUrl}/api/settings/${appSetting}`
+            uri: `${scm.uri}/api/settings/${appSetting}`,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Basic ${base64Cred}`
+            }
         };
         const options: WebRequestOptions = {
             retriableStatusCodes: [404, 409, 500, 502, 503],
@@ -61,12 +71,14 @@ export class Client {
         };
 
         try {
-            return await sendRequest(request, options);
+            const response = await sendRequest(request, options);
+            Logger.Log(`Response with status code ${response.statusCode}`);
+            return response;
         } catch (expt) {
             if (throwOnError) {
-                throw new WebRequestError(kuduUrl, 'DELETE', 'Failed to delete app setting via kudu', expt);
+                throw new WebRequestError(scm.uri, 'DELETE', 'Failed to delete app setting via kudu', expt);
             } else {
-                Logger.Warn(`Failed to perform DELETE ${kuduUrl}`);
+                Logger.Warn(`Failed to perform DELETE ${scm.uri}`);
             }
         }
     }

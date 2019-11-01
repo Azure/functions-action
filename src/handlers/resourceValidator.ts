@@ -58,7 +58,7 @@ export class ResourceValidator implements IOrchestratable {
         context.kuduServiceUtil = this._kuduServiceUtil;
 
         context.appSettings = this._appSettings;
-        context.os = this._isLinux ? RuntimeStackConstant.Linux : RuntimeStackConstant.Windows;
+        context.os = this.getOsTypeFromIsLinux(this._isLinux);
         context.sku = this._sku;
         context.language = this._language;
         context.appUrl = this._appUrl;
@@ -87,6 +87,7 @@ export class ResourceValidator implements IOrchestratable {
         this._kuduServiceUtil = new KuduServiceUtility(this._kuduService);
         this._appSettings = await this.getFunctionappSettingsScm(state, this._kuduService);
         this._appUrl = scm.appUrl;
+        this._isLinux = null;
     }
 
     private async getResourceDetails(state: StateConstant, endpoint: IAuthorizationHandler, appName: string) {
@@ -98,6 +99,16 @@ export class ResourceValidator implements IOrchestratable {
         this._resourceGroupName = appDetails["resourceGroupName"];
         this._kind = appDetails["kind"];
         this._isLinux = this._kind.indexOf('linux') >= 0;
+    }
+
+    private getOsTypeFromIsLinux(isLinux: boolean) {
+        if (isLinux === null || isLinux === undefined) {
+            return RuntimeStackConstant.Unknown;
+        } else if (isLinux === true) {
+            return RuntimeStackConstant.Linux;
+        } else {
+            return RuntimeStackConstant.Windows;
+        }
     }
 
     private async getFunctionappSku(state: StateConstant, appService: AzureAppService): Promise<FunctionSkuConstant> {
@@ -151,6 +162,7 @@ export class ResourceValidator implements IOrchestratable {
             ENABLE_ORYX_BUILD: appSettings.properties['ENABLE_ORYX_BUILD'],
             SCM_DO_BUILD_DURING_DEPLOYMENT: appSettings.properties['SCM_DO_BUILD_DURING_DEPLOYMENT'],
             WEBSITE_RUN_FROM_PACKAGE: appSettings.properties['WEBSITE_RUN_FROM_PACKAGE'],
+            SCM_RUN_FROM_PACKAGE: appSettings.properties['SCM_RUN_FROM_PACKAGE']
         };
         return result;
     }
@@ -184,6 +196,7 @@ export class ResourceValidator implements IOrchestratable {
             ENABLE_ORYX_BUILD: appSettings['ENABLE_ORYX_BUILD'],
             SCM_DO_BUILD_DURING_DEPLOYMENT: appSettings['SCM_DO_BUILD_DURING_DEPLOYMENT'],
             WEBSITE_RUN_FROM_PACKAGE: appSettings['WEBSITE_RUN_FROM_PACKAGE'],
+            SCM_RUN_FROM_PACKAGE: appSettings['SCM_RUN_FROM_PACKAGE']
         };
         return result
     }

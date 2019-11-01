@@ -1,5 +1,6 @@
 import { WebRequest, WebRequestOptions, WebResponse, sendRequest } from 'pipelines-appservice-lib/lib/webClient';
 import { WebRequestError } from '../exceptions';
+import { Logger } from './logger';
 
 export class Client {
     public static async ping(url: string, retryCount: number = 1, retryIntervalSecond: number = 5): Promise<WebResponse> {
@@ -21,7 +22,7 @@ export class Client {
     }
 
     public static async updateAppSettingViaKudu(kuduUrl: string, appSettings: Record<string, string>,
-        retryCount: number = 1, retryIntervalSecond: number = 5): Promise<WebResponse> {
+        retryCount: number = 1, retryIntervalSecond: number = 5, throwOnError: Boolean = true): Promise<WebResponse> {
         const request: WebRequest = {
             method: 'POST',
             uri: `${kuduUrl}/api/settings`,
@@ -39,12 +40,16 @@ export class Client {
         try {
             return await sendRequest(request, options);
         } catch (expt) {
-            throw new WebRequestError(kuduUrl, 'POST', 'Failed to update app settings via kudu', expt);
+            if (throwOnError) {
+                throw new WebRequestError(kuduUrl, 'POST', 'Failed to update app settings via kudu', expt);
+            } else {
+                Logger.Warn(`Failed to perform POST ${kuduUrl}`);
+            }
         }
     }
 
     public static async deleteAppSettingViaKudu(kuduUrl: string, appSetting: string,
-        retryCount: number = 1, retryIntervalSecond: number = 5): Promise<WebResponse> {
+        retryCount: number = 1, retryIntervalSecond: number = 5, throwOnError: Boolean = true): Promise<WebResponse> {
         const request: WebRequest = {
             method: 'DELETE',
             uri: `${kuduUrl}/api/settings/${appSetting}`
@@ -58,7 +63,11 @@ export class Client {
         try {
             return await sendRequest(request, options);
         } catch (expt) {
-            throw new WebRequestError(kuduUrl, 'DELETE', 'Failed to delete app setting via kudu', expt);
+            if (throwOnError) {
+                throw new WebRequestError(kuduUrl, 'DELETE', 'Failed to delete app setting via kudu', expt);
+            } else {
+                Logger.Warn(`Failed to perform DELETE ${kuduUrl}`);
+            }
         }
     }
 }

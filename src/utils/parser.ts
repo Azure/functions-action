@@ -19,22 +19,18 @@ export class Parser {
     }
 
     public static IsTrueLike(value: string): boolean {
-        if (value === undefined) {
+        if (!value || !value.trim()) {
             return false;
         }
 
-        if (value.trim() === "") {
+        return value.trim().toLowerCase() in ["1", "true", "t", "yes", "y"];
+    }
+
+    public static IsFalseLike(value: string): boolean {
+        if (!value || !value.trim()) {
             return false;
         }
 
-        if (value.trim().toLowerCase() in ["0", "false", "f", "no", "n"]) {
-            return false;
-        }
-
-        if (value.trim().toLowerCase() in ["1", "true", "t", "yes", "y"]) {
-            return true;
-        }
-
-        throw new UnexpectedConversion('value', `Failed to determine if ${value} represents true or false`);
+        return value.trim().toLowerCase() in ["0", "false", "f", "no", "n"];
     }
 }

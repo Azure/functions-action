@@ -1,6 +1,6 @@
-import { generateTemporaryFolderOrZipPath } from 'pipelines-appservice-lib/lib/Utilities/utility.js';
-import { archiveFolder } from 'pipelines-appservice-lib/lib/Utilities/ziputility.js';
-import { PackageType, Package } from "pipelines-appservice-lib/lib/Utilities/packageUtility";
+import { generateTemporaryFolderOrZipPath } from 'azure-actions-utility/utility.js';
+import { archiveFolder } from 'azure-actions-utility/ziputility.js';
+import { PackageType, Package } from "azure-actions-utility/packageUtility";
 import { IOrchestratable } from "../interfaces/IOrchestratable";
 import { StateConstant } from "../constants/state";
 import { IActionContext } from "../interfaces/IActionContext";

@@ -1,15 +1,16 @@
 import * as core from '@actions/core';
-import { parseString } from 'xml2js';
-import { exist, Package } from 'pipelines-appservice-lib/lib/Utilities/packageUtility'
-import { IOrchestratable } from '../interfaces/IOrchestratable';
-import { StateConstant } from '../constants/state';
-import { AuthenticationType } from '../constants/authentication_type';
-import { IActionParameters } from '../interfaces/IActionParameters';
-import { ValidationError } from '../exceptions';
-import { IActionContext } from '../interfaces/IActionContext';
-import { IScmCredentials } from '../interfaces/IScmCredentials';
-import { ConfigurationConstant } from '../constants/configuration';
 
+import { Package, exist } from 'azure-actions-utility/packageUtility'
+
+import { AuthenticationType } from '../constants/authentication_type';
+import { ConfigurationConstant } from '../constants/configuration';
+import { IActionContext } from '../interfaces/IActionContext';
+import { IActionParameters } from '../interfaces/IActionParameters';
+import { IOrchestratable } from '../interfaces/IOrchestratable';
+import { IScmCredentials } from '../interfaces/IScmCredentials';
+import { StateConstant } from '../constants/state';
+import { ValidationError } from '../exceptions';
+import { parseString } from 'xml2js';
 
 export class ParameterValidator implements IOrchestratable {
     private _appName: string;
@@ -65,8 +66,8 @@ export class ParameterValidator implements IOrchestratable {
                 appUrl: res.destinationAppUrl
             };
 
-            console.log(`::add-mask::${creds.username}`);
-            console.log(`::add-mask::${creds.password}`);
+            core.setSecret(`${creds.username}`);
+            core.setSecret(`${creds.password}`);
 
             if (creds.uri.indexOf("scm") < 0) {
                 throw new ValidationError(state, ConfigurationConstant.ParamInPublishProfile, "should contain scm URL");

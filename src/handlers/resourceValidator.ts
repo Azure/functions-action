@@ -1,29 +1,30 @@
-import { IAuthorizationHandler } from 'pipelines-appservice-lib/lib/ArmRest/IAuthorizationHandler';
-import { getHandler } from 'pipelines-appservice-lib/lib/AuthorizationHandlerFactory';
-import { AzureResourceFilterUtility } from 'pipelines-appservice-lib/lib/RestUtilities/AzureResourceFilterUtility';
-import { IOrchestratable } from '../interfaces/IOrchestratable';
-import { StateConstant } from '../constants/state';
-import { ValidationError, AzureResourceError } from '../exceptions';
-import { IActionParameters } from '../interfaces/IActionParameters';
-import { IActionContext } from '../interfaces/IActionContext';
-import { AzureAppService } from 'pipelines-appservice-lib/lib/ArmRest/azure-app-service';
-import { AzureAppServiceUtility } from 'pipelines-appservice-lib/lib/RestUtilities/AzureAppServiceUtility';
-import { Kudu } from 'pipelines-appservice-lib/lib/KuduRest/azure-app-kudu-service';
-import { KuduServiceUtility } from 'pipelines-appservice-lib/lib/RestUtilities/KuduServiceUtility';
-import { FunctionSkuConstant, FunctionSkuUtil } from '../constants/function_sku';
-import { IAppSettings } from '../interfaces/IAppSettings';
-import { ConfigurationConstant } from '../constants/configuration';
-import { RuntimeStackConstant } from '../constants/runtime_stack';
+import { AzureResourceError, ValidationError } from '../exceptions';
 import { FunctionRuntimeConstant, FunctionRuntimeUtil } from '../constants/function_runtime';
-import { Logger } from '../utils';
-import { IScmCredentials } from '../interfaces/IScmCredentials';
+import { FunctionSkuConstant, FunctionSkuUtil } from '../constants/function_sku';
+
 import { AuthenticationType } from '../constants/authentication_type';
+import { AuthorizerFactory } from 'azure-actions-webclient/AuthorizerFactory';
+import { AzureAppService } from 'azure-actions-appservice-rest/Arm/azure-app-service';
+import { AzureAppServiceUtility } from 'azure-actions-appservice-rest/Utilities/AzureAppServiceUtility';
+import { AzureResourceFilterUtility } from 'azure-actions-appservice-rest/Utilities/AzureResourceFilterUtility';
+import { ConfigurationConstant } from '../constants/configuration';
+import { IActionContext } from '../interfaces/IActionContext';
+import { IActionParameters } from '../interfaces/IActionParameters';
+import { IAppSettings } from '../interfaces/IAppSettings';
+import { IAuthorizer } from 'azure-actions-webclient/Authorizer/IAuthorizer';
+import { IOrchestratable } from '../interfaces/IOrchestratable';
+import { IScmCredentials } from '../interfaces/IScmCredentials';
+import { Kudu } from 'azure-actions-appservice-rest/Kudu/azure-app-kudu-service';
+import { KuduServiceUtility } from 'azure-actions-appservice-rest/Utilities/KuduServiceUtility';
+import { Logger } from '../utils';
+import { RuntimeStackConstant } from '../constants/runtime_stack';
+import { StateConstant } from '../constants/state';
 
 export class ResourceValidator implements IOrchestratable {
     private _resourceGroupName: string;
     private _isLinux: boolean;
     private _kind: string;
-    private _endpoint: IAuthorizationHandler;
+    private _endpoint: IAuthorizer;
     private _sku: FunctionSkuConstant;
     private _language: FunctionRuntimeConstant;
     private _appSettings: IAppSettings;
@@ -69,7 +70,7 @@ export class ResourceValidator implements IOrchestratable {
     }
 
     private async getDetailsByRbac(state: StateConstant, params: IActionParameters) {
-        this._endpoint = getHandler();
+        this._endpoint = await AuthorizerFactory.getAuthorizer();
         await this.getResourceDetails(state, this._endpoint, params.appName);
         this._appService = new AzureAppService(this._endpoint, this._resourceGroupName, params.appName, params.slot);
         this._appServiceUtil = new AzureAppServiceUtility(this._appService);
@@ -90,7 +91,7 @@ export class ResourceValidator implements IOrchestratable {
         this._isLinux = null;
     }
 
-    private async getResourceDetails(state: StateConstant, endpoint: IAuthorizationHandler, appName: string) {
+    private async getResourceDetails(state: StateConstant, endpoint: IAuthorizer, appName: string) {
         const appDetails = await AzureResourceFilterUtility.getAppDetails(endpoint, appName);
         if (appDetails === undefined) {
             throw new ValidationError(state, ConfigurationConstant.ParamInAppName, "function app should exist");

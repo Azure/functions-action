@@ -1,13 +1,13 @@
-import { AzureAppService } from 'pipelines-appservice-lib/lib/ArmRest/azure-app-service';
-import { BlobURL, BlockBlobURL, Pipeline, uploadFileToBlockBlob, generateBlobSASQueryParameters } from '@azure/storage-blob';
-import { SharedKeyCredential, ServiceURL, StorageURL, ContainerURL, Aborter, IBlobSASSignatureValues } from '@azure/storage-blob';
-import { StateConstant } from '../constants/state';
+import { Aborter, ContainerURL, IBlobSASSignatureValues, ServiceURL, SharedKeyCredential, StorageURL } from '@azure/storage-blob';
+import { AzureResourceError, ValidationError } from '../exceptions';
+import { BlobURL, BlockBlobURL, Pipeline, generateBlobSASQueryParameters, uploadFileToBlockBlob } from '@azure/storage-blob';
+import { Client, Logger, Parser, Sleeper } from '../utils';
+
+import { AzureAppService } from 'azure-actions-appservice-rest/Arm/azure-app-service';
+import { ConfigurationConstant } from '../constants/configuration';
 import { IActionContext } from '../interfaces/IActionContext';
 import { IStorageAccount } from '../interfaces/IStorageAccount';
-import { ConfigurationConstant } from '../constants/configuration';
-import { ValidationError, AzureResourceError } from '../exceptions';
-import { Parser, Logger, Client, Sleeper } from '../utils';
-
+import { StateConstant } from '../constants/state';
 
 export class WebsiteRunFromPackageDeploy {
     public static async execute(state: StateConstant, context: IActionContext) {

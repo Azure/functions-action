@@ -1,9 +1,12 @@
-import { WebRequest, WebRequestOptions, WebResponse, sendRequest } from 'pipelines-appservice-lib/lib/webClient';
+import { WebClient, WebRequest, WebRequestOptions, WebResponse } from 'azure-actions-webclient/WebClient';
+
 import { IScmCredentials } from '../interfaces/IScmCredentials';
-import { WebRequestError } from '../exceptions';
 import { Logger } from './logger';
+import { WebRequestError } from '../exceptions';
 
 export class Client {
+    public static webClient = new WebClient();
+
     public static async ping(url: string, retryCount: number = 1, retryIntervalSecond: number = 5): Promise<WebResponse> {
         const request: WebRequest = {
             method: 'GET',
@@ -16,7 +19,7 @@ export class Client {
         };
 
         try {
-            return await sendRequest(request, options);
+            return await Client.webClient.sendRequest(request, options);
         } catch (expt) {
             throw new WebRequestError(url, 'GET', 'Failed to ping', expt);
         }
@@ -41,7 +44,7 @@ export class Client {
         };
 
         try {
-            const response = await sendRequest(request, options);
+            const response = await Client.webClient.sendRequest(request, options);
             Logger.Log(`Response with status code ${response.statusCode}`);
             return response;
         } catch (expt) {
@@ -71,7 +74,7 @@ export class Client {
         };
 
         try {
-            const response = await sendRequest(request, options);
+            const response = await Client.webClient.sendRequest(request, options);
             Logger.Log(`Response with status code ${response.statusCode}`);
             return response;
         } catch (expt) {

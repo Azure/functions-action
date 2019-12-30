@@ -19,8 +19,10 @@
     "typescript": "^3.5.3"
   },
   "dependencies": {
-    "@actions/core": "^1.0.0",
+    "@actions/core": "^1.2.0",
     "@azure/storage-blob": "^10.4.0",
-    "pipelines-appservice-lib": "^1.0.6"
+    "azure-actions-appservice-rest": "^1.0.8",
+    "azure-actions-utility": "^1.0.3",
+    "azure-actions-webclient": "^1.0.8"
   }
 }

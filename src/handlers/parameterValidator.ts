@@ -29,6 +29,7 @@ export class ParameterValidator implements IOrchestratable {
         }
         this.validateFields(state);
         this._scmCredentials = await this.parseScmCredentials(state, this._publishProfile);
+        this.validateScmCredentialsSlotName(state);
         return StateConstant.ValidateAzureResource;
     }
 
@@ -91,6 +92,15 @@ export class ParameterValidator implements IOrchestratable {
 
         if (!exist(this._packagePath)) {
             throw new ValidationError(state, ConfigurationConstant.ParamInPackagePath, `cannot find '${this._packagePath}'`);
+        }
+    }
+
+    private validateScmCredentialsSlotName(state: StateConstant): void {
+        if (this._scmCredentials && this._appName && this._slot) {
+            const urlName: string = `${this._appName}-${this._slot}`;
+            if (this._scmCredentials.uri.indexOf(urlName) === -1) {
+                throw new ValidationError(state, ConfigurationConstant.ParamInSlot, `SCM credential does not match slot-name`);
+            }
         }
     }
 }

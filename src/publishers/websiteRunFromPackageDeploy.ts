@@ -26,7 +26,7 @@ export class WebsiteRunFromPackageDeploy {
         const blobName: string = this.createBlobName();
         const blobUrl: BlobURL = await this.uploadBlobFromFile(state, containerUrl, blobName, context.publishContentPath);
         const blobSasParams: string = this.getBlobSasQueryParams(blobName, blobServiceCredential);
-        await this.publishToFunctionapp(state, context.appService, context.appUrl, `${blobUrl.url}?${blobSasParams}`);
+        await this.publishToFunctionapp(state, context.appService, `${blobUrl.url}?${blobSasParams}`);
     }
 
     private static async getStorageCredential(state: StateConstant, storageString: string): Promise<IStorageAccount> {
@@ -103,15 +103,13 @@ export class WebsiteRunFromPackageDeploy {
     }
 
     private static async publishToFunctionapp(state: StateConstant,
-        appService: AzureAppService, appUrl: string, blobSasUrl: string) {
+        appService: AzureAppService, blobSasUrl: string) {
         try {
             await appService.patchApplicationSettings({ 'WEBSITE_RUN_FROM_PACKAGE': blobSasUrl });
         } catch (expt) {
             throw new AzureResourceError(state, "Patch Application Settings", "Failed to set WEBSITE_RUN_FROM_PACKAGE with storage blob link." +
                 ` Please check if the ${blobSasUrl} does exist.`);
         }
-
-        await this.waitForSpinUp(state, appUrl);
 
         try {
             await appService.syncFunctionTriggersViaHostruntime();

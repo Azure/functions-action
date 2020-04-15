@@ -21,9 +21,9 @@
   "dependencies": {
     "@actions/core": "^1.2.0",
     "@azure/storage-blob": "^10.4.0",
-    "azure-actions-appservice-rest": "^1.0.8",
+    "azure-actions-appservice-rest": "^1.0.9",
     "azure-actions-utility": "^1.0.3",
-    "azure-actions-webclient": "^1.0.8",
+    "azure-actions-webclient": "^1.0.11",
     "xml2js": "^0.4.23"
   }
 }

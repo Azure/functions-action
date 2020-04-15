@@ -16,7 +16,6 @@ export class ZipDeploy {
 
         try {
             await this.patchApplicationSettings(context);
-            await this.waitForSpinUp(state, context.appUrl);
             deploymentId = await context.kuduServiceUtil.deployUsingZipDeploy(filePath);
             isDeploymentSucceeded = true;
         } catch (expt) {

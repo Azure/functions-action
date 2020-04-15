@@ -4,8 +4,8 @@
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
 # Github Actions master branch will not have node_modules (use v1 instead)
-node_modules/
-lib/
+# node_modules/
+# lib/
 
 # User-specific files
 *.suo

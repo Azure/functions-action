@@ -99,7 +99,7 @@ export class ResourceValidator implements IOrchestratable {
 
         this._resourceGroupName = appDetails["resourceGroupName"];
         this._kind = appDetails["kind"];
-        this._isLinux = this._kind.indexOf('linux') >= 0;
+        this._isLinux = this._kind.indexOf('linux') >= 0 || this._kind.indexOf('kubeapp') >=0;
     }
 
     private getOsTypeFromIsLinux(isLinux: boolean) {
@@ -129,7 +129,7 @@ export class ResourceValidator implements IOrchestratable {
             Logger.Debug(`- ${key} = ${configSettings.properties[key]}`);
         }
 
-        const result: FunctionSkuConstant = FunctionSkuUtil.FromString(configSettings.properties.sku);
+        const result: FunctionSkuConstant = (!!configSettings.properties.sku) ? FunctionSkuUtil.FromString(configSettings.properties.sku) : undefined;
         Logger.Log(`Detected function app sku: ${FunctionSkuConstant[result]}`);
         return result;
     }

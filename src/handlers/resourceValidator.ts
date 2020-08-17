@@ -213,15 +213,9 @@ export class ResourceValidator implements IOrchestratable {
         return result;
     }
 
-    private validateRuntimeSku(state: StateConstant, context: IActionContext) {
+    private validateRuntimeSku(_: StateConstant, context: IActionContext) {
         if (context.os === undefined || context.sku === undefined) {
             return;
-        }
-
-        // Linux Elastic Premium is not supported
-        if (context.os === RuntimeStackConstant.Linux && context.sku === FunctionSkuConstant.ElasticPremium) {
-            throw new ValidationError(state, 'Function Runtime',
-                "Linux ElasticPremium plan is not yet supported");
         }
     }
 
@@ -240,11 +234,6 @@ export class ResourceValidator implements IOrchestratable {
 
         // Linux Java and Linux Powershell is not supported
         if (context.os === RuntimeStackConstant.Linux) {
-            if (context.language === FunctionRuntimeConstant.Java) {
-                throw new ValidationError(state, 'Function Runtime',
-                    "Java Function App on Linux is not yet supported");
-            }
-
             if (context.language === FunctionRuntimeConstant.Powershell) {
                 throw new ValidationError(state, 'Function Runtime',
                     "PowerShell Function App on Windows is not yet supported");

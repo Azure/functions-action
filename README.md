@@ -6,7 +6,9 @@ Get started today with a [free Azure account](https://azure.com/free/open-source
 
 The repository contains a GitHub Action to deploy your function app project into Azure Functions. If you are looking for a GitHub Action to deploy your customized container image into an Azure Functions container, please consider using [functions-container-action](https://github.com/Azure/functions-container-action).
 
-The definition of this GitHub Action is in [action.yml](https://github.com/Azure/functions-action/blob/master/action.yml).
+The definition of this GitHub Action is in [action.yml](https://github.com/Azure/functions-action/blob/master/action.yml). 
+
+[Kudu zip deploy](https://github.com/projectkudu/kudu/wiki/Deploying-from-a-zip-file-or-url) method is used by the action for deployment of Functions. 
 
 # End-to-End Workflow
 
@@ -23,6 +25,8 @@ The definition of this GitHub Action is in [action.yml](https://github.com/Azure
 If you are have extension project(s) in your repo, these templates will **NOT** resolve the **extensions.csproj** in your project. If you want to use binding extensions (e.g. Blob/Queue/EventHub Triggers), please consider [registering Azure Functions binding extensions](https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-register) in your host.json.
 
 Alternatively, you can add a `- run: dotnet build --output ./bin` step **before** functions-action step.
+
+"Remove additional files at destination" is not supported by Kudu deploy method which is used in this action and should be handled separately. When a new build is deployed with zipdeploy, files and directories that were created by the previous deployment but are no longer present in the build will be deleted. Any other files and directories found in the site that aren't being overwritten by the deployment, such as those placed there via FTP or created by your app during runtime, will be preserved.
 
 ## Using Publish Profile as Deployment Credential (recommended)
 You may want to get the publish profile from your function app.

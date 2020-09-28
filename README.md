@@ -35,7 +35,7 @@ Using publish profile as deployemnt credential is recommended if you are not the
 1. In Azure portal, go to your function app.
 2. Click **Get publish profile** and download **.PublishSettings** file.
 3. Open the **.PublishSettings** file and copy the content.
-4. Paste the XML content to your Github Repository > Settings > Secrets > Add a new secret > **AZURE_FUNCTIONAPP_PUBLISH_PROFILE**
+4. Paste the XML content to your GitHub Repository > Settings > Secrets > Add a new secret > **AZURE_FUNCTIONAPP_PUBLISH_PROFILE**
 5. Use the above template to create the `.github/workflows/your-workflow.yml` file in your project repository.
 6. Change variable values in `env:` section according to your function app.
 7. Commit and push your project to GitHub repository, you should see a new GitHub workflow initiated in **Actions** tab.
@@ -60,12 +60,12 @@ You may want to create an [Azure Service Principal for RBAC](https://docs.micros
     (...)
   }
 ```
-3. Copy and paste the json response from above Azure CLI to your Github Repository > Settings > Secrets > Add a new secret > **AZURE_RBAC_CREDENTIALS**
+3. Copy and paste the json response from above Azure CLI to your GitHub Repository > Settings > Secrets > Add a new secret > **AZURE_RBAC_CREDENTIALS**
 4. Use [Windows DotNet Function App RBAC](https://github.com/Azure/actions-workflow-samples/blob/master/FunctionApp/windows-dotnet-functionapp-on-azure-rbac.yml) template as a reference to build your workflow in `.github/workflows/` directory.
 5. Change variable values in `env:` section according to your function app.
 6. Commit and push your project to GitHub repository, you should see a new GitHub workflow initiated in **Actions** tab.
 
-## Dependencies on other Github Actions
+## Dependencies on other GitHub Actions
 * [Checkout](https://github.com/actions/checkout) Checkout your Git repository content into GitHub Actions agent.
 * [Azure Login](https://github.com/Azure/actions) Login with your Azure credentials for function app deployment authentication.
 * Environment setup actions

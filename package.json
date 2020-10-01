@@ -19,7 +19,7 @@
     "typescript": "^3.5.3"
   },
   "dependencies": {
-    "@actions/core": "^1.2.0",
+    "@actions/core": "^1.2.6",
     "@azure/storage-blob": "^10.4.0",
     "azure-actions-appservice-rest": "^1.0.9",
     "azure-actions-utility": "^1.0.3",

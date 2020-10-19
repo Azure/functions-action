@@ -40,7 +40,7 @@ Using publish profile as deployemnt credential is recommended if you are not the
 6. Change variable values in `env:` section according to your function app.
 7. Commit and push your project to GitHub repository, you should see a new GitHub workflow initiated in **Actions** tab.
 
-## Using Azure Service Principle for RBAC as Deployment Credential (deprecated)
+## Using Azure Service Principle for RBAC as Deployment Credential
 You may want to create an [Azure Service Principal for RBAC](https://docs.microsoft.com/en-us/azure/role-based-access-control/overview) and add them as a GitHub Secret in your repository.
 1. Download Azure CLI from [here](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest), run `az login` to login with your Azure credentials.
 2. Run Azure CLI command

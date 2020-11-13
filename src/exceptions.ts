@@ -10,7 +10,7 @@ export class BaseException extends Error {
     ) {
         super();
         this._innerException = innerException ? innerException : undefined;
-        super.message = message ? message : "";
+        this.message = message ? message : "";
     }
 
     public GetInnerException(): BaseException {

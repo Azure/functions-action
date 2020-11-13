@@ -11,6 +11,8 @@ import { IScmCredentials } from '../interfaces/IScmCredentials';
 import { StateConstant } from '../constants/state';
 import { ValidationError } from '../exceptions';
 import { parseString } from 'xml2js';
+import { Builder } from '../managers/builder';
+import { Logger } from '../utils/logger';
 
 export class ParameterValidator implements IOrchestratable {
     private _appName: string;
@@ -18,6 +20,10 @@ export class ParameterValidator implements IOrchestratable {
     private _slot: string;
     private _publishProfile: string;
     private _scmCredentials: IScmCredentials
+
+    constructor() {
+        this.parseScmCredentials = this.parseScmCredentials.bind(this);
+    }
 
     public async invoke(state: StateConstant): Promise<StateConstant> {
         this._appName = core.getInput(ConfigurationConstant.ParamInAppName);
@@ -49,34 +55,66 @@ export class ParameterValidator implements IOrchestratable {
     }
 
     private async parseScmCredentials(state: StateConstant, publishProfile: string): Promise<IScmCredentials> {
-        let creds: IScmCredentials = undefined;
+        let creds: IScmCredentials = Builder.GetDefaultScmCredential();
         if (publishProfile === undefined || publishProfile.trim() === "") {
             return creds;
         }
 
-        await parseString(publishProfile, (error, result) => {
+        let xmlProfile: any = undefined;
+        await parseString(publishProfile, (error, xmlResult) => {
             if (error) {
                 throw new ValidationError(state, ConfigurationConstant.ParamInPublishProfile, "should be a valid XML");
             }
-
-            const res = result.publishData.publishProfile[0].$;
-            creds = {
-                uri: res.publishUrl.split(":")[0],
-                username: res.userName,
-                password: res.userPWD,
-                appUrl: res.destinationAppUrl
-            };
-
-            core.setSecret(`${creds.username}`);
-            core.setSecret(`${creds.password}`);
-
-            if (creds.uri.indexOf("scm") < 0) {
-                throw new ValidationError(state, ConfigurationConstant.ParamInPublishProfile, "should contain scm URL");
-            }
-            creds.uri = `https://${creds.username}:${creds.password}@${creds.uri}`;
+            xmlProfile = xmlResult;
         });
 
+        if (this.tryParseOldPublishProfile(xmlProfile, creds)) {
+            Logger.Log('Successfully parsed SCM credential from old publishProfile');
+        } else if (this.tryParseNewPublishProfile(xmlProfile, creds)) {
+            Logger.Log('Successfully passed SCM crednetial from new publishProfile');
+        } else {
+            throw new ValidationError(state, ConfigurationConstant.ParamInPublishProfile, "should contain valid SCM credential");
+        }
+
+        core.setSecret(`${creds.username}`);
+        core.setSecret(`${creds.password}`);
         return creds;
+    }
+
+    private tryParseOldPublishProfile(xmlResult: any, out: IScmCredentials): boolean {
+        // uri: hazeng-fa-python38-azurecli.scm.azurewebsites.net
+        const options = xmlResult.publishData.publishProfile.filter((p: any) => {
+            return p.$.publishMethod === "MSDeploy"
+        });
+        const msDeploy = options[0].$;
+        const publishUrl = msDeploy.publishUrl.split(":")[0];
+        if (publishUrl.indexOf(".scm.") >= 0) {
+            out.uri = `https://${msDeploy.userName}:${msDeploy.userPWD}@${publishUrl}`;
+            out.username = msDeploy.userName;
+            out.password = msDeploy.userPWD;
+            out.appUrl = msDeploy.destinationAppUrl;
+            return true;
+        }
+        return false;
+    }
+
+    private tryParseNewPublishProfile(xmlResult: any, out: IScmCredentials): boolean {
+        // uri: waws-prod-mwh-007.publish.azurewebsites.windows.net:443
+        const options = xmlResult.publishData.publishProfile.filter((p: any) => {
+            return p.$.publishMethod === "MSDeploy"
+        });
+        const msDeploy = options[0].$;
+        const publishUrl: string = msDeploy.publishUrl.split(":")[0];
+        if (publishUrl.indexOf(".publish.") >= 0) {
+            // appName contains slot name setting
+            const appName = msDeploy.userName.substring(1).replace('__', '-');
+            out.uri = `https://${msDeploy.userName}:${msDeploy.userPWD}@${appName}.scm.azurewebsites.net`;
+            out.username = msDeploy.userName;
+            out.password = msDeploy.userPWD;
+            out.appUrl = msDeploy.destinationAppUrl;
+            return true;
+        }
+        return false;
     }
 
     private validateFields(state: StateConstant): void {
@@ -97,7 +135,13 @@ export class ParameterValidator implements IOrchestratable {
 
     private validateScmCredentialsSlotName(state: StateConstant): void {
         if (this._scmCredentials && this._appName && this._slot) {
-            const urlName: string = `${this._appName}-${this._slot}`;
+            let urlName: string = this._appName;
+
+            // If slot name is 'production', the url name should not contain 'production' in it
+            if (this._slot.toLowerCase() !== ConfigurationConstant.ProductionSlotName) {
+                urlName = `${this._appName}-${this._slot}`;
+            }
+
             if (this._scmCredentials.uri.indexOf(urlName) === -1) {
                 throw new ValidationError(state, ConfigurationConstant.ParamInSlot, `SCM credential does not match slot-name`);
             }

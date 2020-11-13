@@ -5,7 +5,10 @@
   "main": "lib/main.js",
   "scripts": {
     "start": "node lib/main.js",
-    "build": "tsc --project tsconfig.prod.json"
+    "build": "tsc --project tsconfig.prod.json",
+    "test": "mocha -r ts-node/register tests/**/*.spec.ts",
+    "test-file": "mocha -r ts-node/register",
+    "coverage": "nyc -r lcov -e .ts -x \"*.spec.ts\" npm run test"
   },
   "author": {
     "name": "Hanzhang Zeng",
@@ -13,12 +16,18 @@
   },
   "license": "MIT",
   "devDependencies": {
+    "@types/chai": "^4.2.14",
+    "@types/mocha": "^8.0.4",
     "@types/node": "^12.6.8",
     "@types/q": "^1.5.2",
-    "@types/xml2js": "^0.4.5",
-    "typescript": "^3.5.3"
+    "chai": "^4.2.0",
+    "mocha": "^8.2.1",
+    "nyc": "^15.1.0",
+    "ts-node": "^9.0.0"
   },
   "dependencies": {
+    "typescript": "^3.9.7",
+    "@types/xml2js": "^0.4.5",
     "@actions/core": "^1.2.6",
     "@azure/storage-blob": "^10.4.0",
     "azure-actions-appservice-rest": "^1.0.9",

@@ -1,7 +1,17 @@
 import { IActionParameters } from "../interfaces/IActionParameters";
 import { IActionContext } from "../interfaces/IActionContext";
+import { IScmCredentials } from "../interfaces/IScmCredentials";
 
 export class Builder {
+    public static GetDefaultScmCredential(): IScmCredentials {
+        return {
+            appUrl: undefined,
+            password: undefined,
+            uri: undefined,
+            username: undefined
+        }
+    }
+
     public static GetDefaultActionParameters(): IActionParameters {
         return {
             appName: undefined,

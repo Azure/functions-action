@@ -1,6 +1,6 @@
 import * as core from '@actions/core';
 
-import { Orchestrator } from './manager/orchestrator';
+import { Orchestrator } from './managers/orchestrator';
 import { StateConstant } from './constants/state';
 import { Initializer } from './handlers/initializer';
 import { ParameterValidator } from './handlers/parameterValidator';

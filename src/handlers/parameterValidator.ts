@@ -50,13 +50,13 @@ export class ParameterValidator implements IOrchestratable {
     public async changeContext(_0: StateConstant, _1: IActionParameters, context: IActionContext): Promise<IActionContext> {
         context.package = new Package(this._packagePath);
         context.scmCredentials = this._scmCredentials;
-        context.authenticationType = this._scmCredentials ? AuthenticationType.Scm : AuthenticationType.Rbac;
+        context.authenticationType = this._scmCredentials.appUrl ? AuthenticationType.Scm : AuthenticationType.Rbac;
         return context;
     }
 
     private async parseScmCredentials(state: StateConstant, publishProfile: string): Promise<IScmCredentials> {
         let creds: IScmCredentials = Builder.GetDefaultScmCredential();
-        if (publishProfile === undefined || publishProfile.trim() === "") {
+        if (publishProfile === undefined || publishProfile === "") {
             return creds;
         }
 

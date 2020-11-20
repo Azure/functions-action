@@ -37,10 +37,10 @@ export class ResourceValidator implements IOrchestratable {
 
     public async invoke(state: StateConstant, params: IActionParameters, context: IActionContext): Promise<StateConstant> {
         if (context.authenticationType == AuthenticationType.Rbac) {
-            Logger.Log('Using RBAC for authentication, GitHub Action will perform resource validation.');
+            Logger.Info('Using RBAC for authentication, GitHub Action will perform resource validation.');
             await this.getDetailsByRbac(state, params);
         } else if (context.authenticationType == AuthenticationType.Scm) {
-            Logger.Log('Using SCM credential for authentication, GitHub Action will not perform resource validation.');
+            Logger.Info('Using SCM credential for authentication, GitHub Action will not perform resource validation.');
             await this.getDetailsByScm(state, context);
         }
 
@@ -124,13 +124,13 @@ export class ResourceValidator implements IOrchestratable {
             throw new AzureResourceError(state, 'Get Function App SKU', 'Function app sku should not be empty');
         }
 
-        Logger.Log('Sucessfully acquired site configs from function app!');
+        Logger.Info('Sucessfully acquired site configs from function app!');
         for (const key in configSettings.properties) {
             Logger.Debug(`- ${key} = ${configSettings.properties[key]}`);
         }
 
         const result: FunctionSkuConstant = FunctionSkuUtil.FromString(configSettings.properties.sku);
-        Logger.Log(`Detected function app sku: ${FunctionSkuConstant[result]}`);
+        Logger.Info(`Detected function app sku: ${FunctionSkuConstant[result]}`);
         return result;
     }
 
@@ -152,7 +152,7 @@ export class ResourceValidator implements IOrchestratable {
             console.log(`::add-mask::${appSettings.properties['AzureWebJobsStorage']}`);
         }
 
-        Logger.Log('Sucessfully acquired app settings from function app (RBAC)!');
+        Logger.Info('Sucessfully acquired app settings from function app (RBAC)!');
         for (const key in appSettings.properties) {
             Logger.Debug(`- ${key} = ${appSettings.properties[key]}`);
         }
@@ -186,7 +186,7 @@ export class ResourceValidator implements IOrchestratable {
             console.log(`::add-mask::${appSettings['AzureWebJobsStorage']}`);
         }
 
-        Logger.Log('Sucessfully acquired app settings from function app (SCM)!');
+        Logger.Info('Sucessfully acquired app settings from function app (SCM)!');
         for (const key in appSettings) {
             Logger.Debug(`- ${key} = ${appSettings[key]}`);
         }
@@ -206,9 +206,9 @@ export class ResourceValidator implements IOrchestratable {
         const result: FunctionRuntimeConstant = FunctionRuntimeUtil.FromString(appSettings.FUNCTIONS_WORKER_RUNTIME);
 
         if (result === FunctionRuntimeConstant.None) {
-            Logger.Log('Detected function app language: None (V1 function app)');
+            Logger.Info('Detected function app language: None (V1 function app)');
         } else {
-            Logger.Log(`Detected function app language: ${FunctionRuntimeConstant[result]}`);
+            Logger.Info(`Detected function app language: ${FunctionRuntimeConstant[result]}`);
         }
         return result;
     }

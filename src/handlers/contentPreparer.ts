@@ -53,11 +53,11 @@ export class ContentPreparer implements IOrchestratable {
     private async generatePublishContent(state: StateConstant, packagePath: string, packageType: PackageType): Promise<string> {
         switch (packageType) {
             case PackageType.zip:
-                Logger.Log(`Will directly deploy ${packagePath} as function app content`);
+                Logger.Info(`Will directly deploy ${packagePath} as function app content`);
                 return packagePath;
             case PackageType.folder:
                 const tempoaryFilePath: string = generateTemporaryFolderOrZipPath(process.env.RUNNER_TEMP, false);
-                Logger.Log(`Will archive ${packagePath} into ${tempoaryFilePath} as function app content`);
+                Logger.Info(`Will archive ${packagePath} into ${tempoaryFilePath} as function app content`);
                 try {
                     return await archiveFolder(packagePath, "", tempoaryFilePath) as string;
                 } catch (expt) {
@@ -77,13 +77,13 @@ export class ContentPreparer implements IOrchestratable {
     ): PublishMethodConstant {
         // Uses api/zipdeploy endpoint if scm credential is provided
         if (authenticationType == AuthenticationType.Scm) {
-            Logger.Log('Will use api/zipdeploy to deploy (scm credential)');
+            Logger.Info('Will use api/zipdeploy to deploy (scm credential)');
             return PublishMethodConstant.ZipDeploy;
         }
 
         // Linux Consumption sets WEBSITE_RUN_FROM_PACKAGE app settings when scm credential is not available
         if (osType === RuntimeStackConstant.Linux && sku === FunctionSkuConstant.Consumption) {
-            Logger.Log('Will use WEBSITE_RUN_FROM_PACKAGE to deploy');
+            Logger.Info('Will use WEBSITE_RUN_FROM_PACKAGE to deploy');
             return PublishMethodConstant.WebsiteRunFromPackageDeploy;
         }
 
@@ -91,7 +91,7 @@ export class ContentPreparer implements IOrchestratable {
         switch(packageType) {
             case PackageType.zip:
             case PackageType.folder:
-                Logger.Log('Will use api/zipdeploy to deploy (rbac authentication)');
+                Logger.Info('Will use api/zipdeploy to deploy (rbac authentication)');
                 return PublishMethodConstant.ZipDeploy;
             default:
                 throw new ValidationError(state, "Derive Publish Method", "only accepts zip or folder");

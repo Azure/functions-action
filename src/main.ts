@@ -8,6 +8,7 @@ import { ResourceValidator } from './handlers/resourceValidator';
 import { ContentPreparer } from './handlers/contentPreparer';
 import { ContentPublisher } from './handlers/contentPublisher';
 import { PublishValidator } from './handlers/publishValidator';
+import { Logger } from './utils';
 import { UnexpectedExitException, ExecutionException } from './exceptions';
 
 
@@ -25,10 +26,10 @@ async function main(): Promise<void> {
             await actionManager.execute();
         } catch (expt) {
             if (expt instanceof ExecutionException) {
-                expt.PrintTraceback(core.error);
+                expt.PrintTraceback(Logger.Error);
             } else if (expt instanceof Error) {
-                core.error(expt.message);
-                core.error(expt.stack);
+                Logger.Error(expt.message);
+                Logger.Error(expt.stack);
             }
             break;
         }

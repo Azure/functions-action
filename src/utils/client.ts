@@ -45,7 +45,7 @@ export class Client {
 
         try {
             const response = await Client.webClient.sendRequest(request, options);
-            Logger.Log(`Response with status code ${response.statusCode}`);
+            Logger.Info(`Response with status code ${response.statusCode}`);
             return response;
         } catch (expt) {
             if (throwOnError) {
@@ -75,7 +75,7 @@ export class Client {
 
         try {
             const response = await Client.webClient.sendRequest(request, options);
-            Logger.Log(`Response with status code ${response.statusCode}`);
+            Logger.Info(`Response with status code ${response.statusCode}`);
             return response;
         } catch (expt) {
             if (throwOnError) {

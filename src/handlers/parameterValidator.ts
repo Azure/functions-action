@@ -69,9 +69,9 @@ export class ParameterValidator implements IOrchestratable {
         });
 
         if (this.tryParseOldPublishProfile(xmlProfile, creds)) {
-            Logger.Log('Successfully parsed SCM credential from old publishProfile');
+            Logger.Info('Successfully parsed SCM credential from old publishProfile');
         } else if (this.tryParseNewPublishProfile(xmlProfile, creds)) {
-            Logger.Log('Successfully passed SCM crednetial from new publishProfile');
+            Logger.Info('Successfully passed SCM crednetial from new publishProfile');
         } else {
             throw new ValidationError(state, ConfigurationConstant.ParamInPublishProfile, "should contain valid SCM credential");
         }

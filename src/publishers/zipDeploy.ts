@@ -57,21 +57,21 @@ export class ZipDeploy {
             if (context.os === RuntimeStackConstant.Windows &&
                 context.authenticationType === AuthenticationType.Rbac &&
                 !Parser.IsTrueLike(context.appSettings.WEBSITE_RUN_FROM_PACKAGE)) {
-                Logger.Log('Setting WEBSITE_RUN_FROM_PACKAGE to 1');
+                Logger.Info('Setting WEBSITE_RUN_FROM_PACKAGE to 1');
                 await this._updateApplicationSettings(context, { 'WEBSITE_RUN_FROM_PACKAGE': '1' });
                 await this.checkAppSettingPropagatedToKudu(context, 'WEBSITE_RUN_FROM_PACKAGE', '1');
             }
 
             if (context.authenticationType === AuthenticationType.Scm &&
                 !Parser.IsFalseLike(context.appSettings.SCM_DO_BUILD_DURING_DEPLOYMENT)) {
-                Logger.Log('Setting SCM_DO_BUILD_DURING_DEPLOYMENT in Kudu container to false');
+                Logger.Info('Setting SCM_DO_BUILD_DURING_DEPLOYMENT in Kudu container to false');
                 await this._updateApplicationSettings(context, { 'SCM_DO_BUILD_DURING_DEPLOYMENT': 'false' });
                 await this.checkAppSettingPropagatedToKudu(context, 'SCM_DO_BUILD_DURING_DEPLOYMENT', 'false');
             }
 
             if (context.authenticationType === AuthenticationType.Scm &&
                 !Parser.IsFalseLike(context.appSettings.ENABLE_ORYX_BUILD)) {
-                Logger.Log('Setting ENABLE_ORYX_BUILD in Kudu container to false');
+                Logger.Info('Setting ENABLE_ORYX_BUILD in Kudu container to false');
                 await this._updateApplicationSettings(context, { 'ENABLE_ORYX_BUILD': 'false' });
                 await this.checkAppSettingPropagatedToKudu(context, 'ENABLE_ORYX_BUILD', 'false');
             }
@@ -144,35 +144,24 @@ export class ZipDeploy {
                 Logger.Warn(`Failed to check app setting propagation for ${key}, remaining retry ${retryCount-1}`);
             }
 
-            Logger.Log(`App setting ${key} has not been propagated to Kudu container yet, remaining retry ${retryCount-1}`)
+            Logger.Info(`App setting ${key} has not been propagated to Kudu container yet, remaining retry ${retryCount-1}`)
             retryCount--;
         }
 
         if (isSuccess) {
-            Logger.Log(`App setting ${key} propagated to Kudu container`);
+            Logger.Info(`App setting ${key} propagated to Kudu container`);
         } else {
             Logger.Warn(`App setting ${key} fails to propagate to Kudu container`);
         }
     }
 
-    private static async waitForSpinUp(state: StateConstant, appUrl: string) {
-        Logger.Log("Waiting for function app to spin up after app settings change.");
-        await Sleeper.timeout(5000);
-        try {
-            await Client.ping(appUrl, 10, 5);
-        } catch {
-            throw new AzureResourceError(state, "Wait For Spin Up", "Cannot detect heartbeats from your function app." +
-            " Please check if your function app is up and running. You may need to manually restart it.");
-        }
-    }
-
     private static async _updateApplicationSettings(context: IActionContext, settings: Record<string, string>) {
         if (context.authenticationType === AuthenticationType.Rbac) {
-            Logger.Log("Update using context.appService.patchApplicationSettings");
+            Logger.Info("Update using context.appService.patchApplicationSettings");
             return await context.appService.patchApplicationSettings(settings);
         }
         if (context.authenticationType === AuthenticationType.Scm) {
-            Logger.Log("Update using Client.updateAppSettingViaKudu");
+            Logger.Info("Update using Client.updateAppSettingViaKudu");
             return await Client.updateAppSettingViaKudu(context.scmCredentials, settings, 3);
         }
     }

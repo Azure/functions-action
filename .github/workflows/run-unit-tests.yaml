@@ -1,0 +1,47 @@
+name: RUN_UNIT_TESTS
+
+on:
+  push:
+    branches:
+      - master
+      - dev
+      - releases/*
+    tags:
+      - v1.*
+  pull_request:
+    branches:
+      - master
+      - dev
+
+env:
+  NODE_VERSION: '10.x'
+
+jobs:
+  run-unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+    - name: 'Checkout GitHub Action'
+      uses: actions/checkout@master
+    - name: Setup Node ${{ env.NODE_VERSION }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+    - name: 'Resolve Project Dependencies Using NPM'
+      shell: bash
+      run: |
+        npm install
+    - name: 'Run Unit Tests'
+      shell: bash
+      run: |
+        set -e -x
+        npm run test
+    - name: 'Report Coverage'
+      shell: bash
+      run: |
+        set -e -x
+        npm run coverage
+        npm run coverage-report
+    - name: 'Upload Coverage Report to CodeCov'
+      uses: codecov/codecov-action@v1.0.13
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}

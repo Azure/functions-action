@@ -10,16 +10,16 @@ describe('logger', function () {
     _loggedMessage = message;
   }
 
-  const EnvVarsBackup = process.env;
+  const _envBackup = process.env;
 
   beforeEach(() => {
     Logger.SetLevel(Logger.DefaultLogLevel);
-    process.env = { ...EnvVarsBackup };
+    process.env = { ..._envBackup };
     _loggedMessage = '';
   });
 
   afterEach(() => {
-    process.env = EnvVarsBackup;
+    process.env = _envBackup;
   });
 
   it('should have a default log level set to debug', function() {

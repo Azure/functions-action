@@ -23,6 +23,7 @@ export class ParameterValidator implements IOrchestratable {
 
     constructor() {
         this.parseScmCredentials = this.parseScmCredentials.bind(this);
+        this.validateFields = this.validateFields.bind(this);
     }
 
     public async invoke(state: StateConstant): Promise<StateConstant> {
@@ -86,6 +87,10 @@ export class ParameterValidator implements IOrchestratable {
         const options = xmlResult.publishData.publishProfile.filter((p: any) => {
             return p.$.publishMethod === "MSDeploy"
         });
+        if ((options || []).length == 0) {
+            Logger.Error('The old publish profile does not contain MSDeploy section');
+            return false;
+        }
         const msDeploy = options[0].$;
         const publishUrl = msDeploy.publishUrl.split(":")[0];
         if (publishUrl.indexOf(".scm.") >= 0) {
@@ -103,6 +108,10 @@ export class ParameterValidator implements IOrchestratable {
         const options = xmlResult.publishData.publishProfile.filter((p: any) => {
             return p.$.publishMethod === "MSDeploy"
         });
+        if ((options || []).length == 0) {
+            Logger.Error('The new publish profile does not contain MSDeploy section');
+            return false;
+        }
         const msDeploy = options[0].$;
         const publishUrl: string = msDeploy.publishUrl.split(":")[0];
         if (publishUrl.indexOf(".publish.") >= 0) {
@@ -143,7 +152,7 @@ export class ParameterValidator implements IOrchestratable {
             }
 
             if (this._scmCredentials.uri.indexOf(urlName) === -1) {
-                throw new ValidationError(state, ConfigurationConstant.ParamInSlot, `SCM credential does not match slot-name`);
+                throw new ValidationError(state, ConfigurationConstant.ParamInSlot, 'SCM credential does not match slot-name');
             }
         }
     }

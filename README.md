@@ -1,14 +1,19 @@
 # GitHub Actions for deploying to Azure Functions
 
+| Build Status | Unit Test |
+|--------------|-----------|
+| dev          | ![dev unit test status](https://github.com/Azure/functions-action/workflows/RUN_UNIT_TESTS/badge.svg?branch=dev) |
+| master       | ![master unit test status](https://github.com/Azure/functions-action/workflows/RUN_UNIT_TESTS/badge.svg?branch=master) |
+
 With the Azure Functions GitHub Action, you can automate your workflow to deploy [Azure Functions](https://azure.microsoft.com/en-us/services/functions/).
 
 Get started today with a [free Azure account](https://azure.com/free/open-source)!
 
 The repository contains a GitHub Action to deploy your function app project into Azure Functions. If you are looking for a GitHub Action to deploy your customized container image into an Azure Functions container, please consider using [functions-container-action](https://github.com/Azure/functions-container-action).
 
-The definition of this GitHub Action is in [action.yml](https://github.com/Azure/functions-action/blob/master/action.yml). 
+The definition of this GitHub Action is in [action.yml](https://github.com/Azure/functions-action/blob/master/action.yml).
 
-[Kudu zip deploy](https://github.com/projectkudu/kudu/wiki/Deploying-from-a-zip-file-or-url) method is used by the action for deployment of Functions. 
+[Kudu zip deploy](https://github.com/projectkudu/kudu/wiki/Deploying-from-a-zip-file-or-url) method is used by the action for deployment of Functions.
 
 # End-to-End Workflow
 

@@ -1,9 +1,9 @@
 # GitHub Actions for deploying to Azure Functions
 
-| Build Status | Unit Test |
-|--------------|-----------|
-| dev          | ![dev unit test status](https://github.com/Azure/functions-action/workflows/RUN_UNIT_TESTS/badge.svg?branch=dev) |
-| master       | ![master unit test status](https://github.com/Azure/functions-action/workflows/RUN_UNIT_TESTS/badge.svg?branch=master) |
+| Build Status | Unit Test | UT CodeCov |
+|--------------|-----------|------------|
+| dev          | ![dev unit test](https://github.com/Azure/functions-action/workflows/RUN_UNIT_TESTS/badge.svg?branch=dev) | ![dev coverage](https://codecov.io/gh/Azure/functions-action/branch/dev/graph/badge.svg)
+| master       | ![master unit test](https://github.com/Azure/functions-action/workflows/RUN_UNIT_TESTS/badge.svg?branch=master) | ![master coverage](https://codecov.io/gh/Azure/functions-action/branch/master/graph/badge.svg)
 
 With the Azure Functions GitHub Action, you can automate your workflow to deploy [Azure Functions](https://azure.microsoft.com/en-us/services/functions/).
 

@@ -1,0 +1,1 @@
+This folder is a temporary location for testing artifact storage

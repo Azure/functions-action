@@ -75,6 +75,11 @@ export class ContentPreparer implements IOrchestratable {
         sku: FunctionSkuConstant,
         authenticationType: AuthenticationType
     ): PublishMethodConstant {
+        // Package Type Check early
+        if (packageType !== PackageType.zip && packageType !== PackageType.folder) {
+            throw new ValidationError(state, "Derive Publish Method", "only accepts zip or folder");
+        }
+
         // Uses api/zipdeploy endpoint if scm credential is provided
         if (authenticationType == AuthenticationType.Scm) {
             Logger.Info('Will use api/zipdeploy to deploy (scm credential)');
@@ -88,13 +93,7 @@ export class ContentPreparer implements IOrchestratable {
         }
 
         // Rest Skus which support api/zipdeploy endpoint
-        switch(packageType) {
-            case PackageType.zip:
-            case PackageType.folder:
-                Logger.Info('Will use api/zipdeploy to deploy (rbac authentication)');
-                return PublishMethodConstant.ZipDeploy;
-            default:
-                throw new ValidationError(state, "Derive Publish Method", "only accepts zip or folder");
-        }
+        Logger.Info('Will use api/zipdeploy to deploy (rbac authentication)');
+        return PublishMethodConstant.ZipDeploy;
     }
 }

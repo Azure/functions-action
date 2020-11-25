@@ -9,7 +9,7 @@ import { ContentPreparer } from './handlers/contentPreparer';
 import { ContentPublisher } from './handlers/contentPublisher';
 import { PublishValidator } from './handlers/publishValidator';
 import { Logger } from './utils';
-import { UnexpectedExitException, ExecutionException } from './exceptions';
+import { UnexpectedExitException, ExecutionException, BaseException } from './exceptions';
 
 
 async function main(): Promise<void> {
@@ -25,11 +25,13 @@ async function main(): Promise<void> {
         try {
             await actionManager.execute();
         } catch (expt) {
-            if (expt instanceof ExecutionException) {
+            if (expt instanceof BaseException) {
                 expt.PrintTraceback(Logger.Error);
             } else if (expt instanceof Error) {
                 Logger.Error(expt.message);
-                Logger.Error(expt.stack);
+                if (expt.stack) {
+                    Logger.Error(expt.stack);
+                }
             }
             break;
         }

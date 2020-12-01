@@ -119,15 +119,4 @@ export class WebsiteRunFromPackageDeploy {
                 " inspect the package from WEBSITE_RUN_FROM_PACKAGE.");
         }
     }
-
-    private static async waitForSpinUp(state: StateConstant, appUrl: string) {
-        Logger.Log("Waiting for function app to spin up after app settings change.");
-        await Sleeper.timeout(5000);
-        try {
-            await Client.ping(appUrl, 10, 5);
-        } catch {
-            throw new AzureResourceError(state, "Wait For Spin Up", "Cannot detect heartbeats from your function app." +
-            " Please check if your function app is up and running. You may need to manually restart it.");
-        }
-    }
 }

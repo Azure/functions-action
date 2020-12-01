@@ -14,4 +14,6 @@ export class ConfigurationConstant {
     public static readonly BlobUploadBlockSizeByte: number = 4 * 1024 * 1024;
     public static readonly BlobUplaodBlockParallel: number = 4;
     public static readonly BlobPermission: string = 'r';
+
+    public static readonly ProductionSlotName: string = 'production';
 }

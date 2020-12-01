@@ -4,34 +4,52 @@ import { IPrinter } from "../interfaces/IPrinter";
 import { IActionParameters } from "../interfaces/IActionParameters";
 import { IActionContext } from "../interfaces/IActionContext";
 import { StateConstant } from "../constants/state";
+import { LogLevelConstant } from "../constants/log_level";
 import { Parser } from "./parser";
 
 export class Logger {
-    public static Debug(message: string) {
-        if (Parser.IsTrueLike(process.env.GITHUB_ACTION_DEBUG)) {
-            console.log(`##[debug] ${message}`);
+    public static DefaultLogLevel = LogLevelConstant.Debug;
+    private static LogLevel = Logger.DefaultLogLevel;
+
+    public static SetLevel(newLevel: LogLevelConstant) {
+        Logger.LogLevel = newLevel;
+    }
+
+    public static Debug(message: string, debugPrinter: IPrinter = core.debug) {
+        if (Logger.LogLevel <= LogLevelConstant.Debug &&
+            Parser.IsTrueLike(process.env.GITHUB_ACTION_DEBUG)) {
+                debugPrinter(message);
         }
     }
 
-    public static Log(message: string) {
-        console.log(message);
+    public static Info(message: string, infoPrinter: IPrinter = core.info) {
+        if (Logger.LogLevel <= LogLevelConstant.Info) {
+            infoPrinter(message);
+        }
     }
 
-    public static Warn(message: string) {
-        core.warning(message);
+    public static Warn(message: string, warnPrinter: IPrinter = core.warning) {
+        if (Logger.LogLevel <= LogLevelConstant.Warning) {
+            warnPrinter(message);
+        }
     }
 
-    public static Error(message: string) {
-        core.error(message);
+    public static Error(message: string, errorPrinter: IPrinter = core.error) {
+        if (Logger.LogLevel <= LogLevelConstant.Error) {
+            errorPrinter(message);
+        }
     }
 
-    public static PrintTraceback(be: BaseException, printer: IPrinter = core.error): void {
+    public static PrintTraceback(
+        be: BaseException,
+        printer: IPrinter = Logger.Error
+    ): void {
         be.PrintTraceback(printer);
     }
 
     public static PrintCurrentState(
         state: StateConstant,
-        printer: IPrinter = console.log
+        printer: IPrinter = Logger.Debug
     ): void {
         printer(`##[${StateConstant[state]}]`);
     }
@@ -39,7 +57,7 @@ export class Logger {
     public static PrintStateParameters(
         state: StateConstant,
         params: IActionParameters,
-        printer: IPrinter = core.debug
+        printer: IPrinter = Logger.Debug
     ): void {
         printer(`[${StateConstant[state]}] params`);
         for (let key in params) {
@@ -50,7 +68,7 @@ export class Logger {
     public static PrintStateContext(
         state: StateConstant,
         context: IActionContext,
-        printer: IPrinter = core.debug
+        printer: IPrinter = Logger.Debug
     ): void {
         printer(`[${StateConstant[state]}] context`);
         for (let key in context) {

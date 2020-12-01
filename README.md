@@ -1,5 +1,10 @@
 # GitHub Actions for deploying to Azure Functions
 
+| Build Status | Unit Test | UT CodeCov |
+|--------------|-----------|------------|
+| dev          | ![dev unit test](https://github.com/Azure/functions-action/workflows/RUN_UNIT_TESTS/badge.svg?branch=dev) | ![dev coverage](https://codecov.io/gh/Azure/functions-action/branch/dev/graph/badge.svg)
+| master       | ![master unit test](https://github.com/Azure/functions-action/workflows/RUN_UNIT_TESTS/badge.svg?branch=master) | ![master coverage](https://codecov.io/gh/Azure/functions-action/branch/master/graph/badge.svg)
+
 With the Azure Functions GitHub Action, you can automate your workflow to deploy [Azure Functions](https://azure.microsoft.com/en-us/services/functions/).
 
 Get started today with a [free Azure account](https://azure.com/free/open-source)!
@@ -7,6 +12,8 @@ Get started today with a [free Azure account](https://azure.com/free/open-source
 The repository contains a GitHub Action to deploy your function app project into Azure Functions. If you are looking for a GitHub Action to deploy your customized container image into an Azure Functions container, please consider using [functions-container-action](https://github.com/Azure/functions-container-action).
 
 The definition of this GitHub Action is in [action.yml](https://github.com/Azure/functions-action/blob/master/action.yml).
+
+[Kudu zip deploy](https://github.com/projectkudu/kudu/wiki/Deploying-from-a-zip-file-or-url) method is used by the action for deployment of Functions.
 
 # End-to-End Workflow
 
@@ -24,6 +31,8 @@ If you are have extension project(s) in your repo, these templates will **NOT** 
 
 Alternatively, you can add a `- run: dotnet build --output ./bin` step **before** functions-action step.
 
+"Remove additional files at destination" is not supported by Kudu deploy method which is used in this action and should be handled separately. When a new build is deployed with zipdeploy, files and directories that were created by the previous deployment but are no longer present in the build will be deleted. Any other files and directories found in the site that aren't being overwritten by the deployment, such as those placed there via FTP or created by your app during runtime, will be preserved.
+
 ## Using Publish Profile as Deployment Credential (recommended)
 You may want to get the publish profile from your function app.
 Using publish profile as deployemnt credential is recommended if you are not the owner of your Azure subscription.
@@ -31,12 +40,12 @@ Using publish profile as deployemnt credential is recommended if you are not the
 1. In Azure portal, go to your function app.
 2. Click **Get publish profile** and download **.PublishSettings** file.
 3. Open the **.PublishSettings** file and copy the content.
-4. Paste the XML content to your Github Repository > Settings > Secrets > Add a new secret > **AZURE_FUNCTIONAPP_PUBLISH_PROFILE**
+4. Paste the XML content to your GitHub Repository > Settings > Secrets > Add a new secret > **AZURE_FUNCTIONAPP_PUBLISH_PROFILE**
 5. Use the above template to create the `.github/workflows/your-workflow.yml` file in your project repository.
 6. Change variable values in `env:` section according to your function app.
 7. Commit and push your project to GitHub repository, you should see a new GitHub workflow initiated in **Actions** tab.
 
-## Using Azure Service Principle for RBAC as Deployment Credential (deprecated)
+## Using Azure Service Principle for RBAC as Deployment Credential
 You may want to create an [Azure Service Principal for RBAC](https://docs.microsoft.com/en-us/azure/role-based-access-control/overview) and add them as a GitHub Secret in your repository.
 1. Download Azure CLI from [here](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest), run `az login` to login with your Azure credentials.
 2. Run Azure CLI command
@@ -56,12 +65,12 @@ You may want to create an [Azure Service Principal for RBAC](https://docs.micros
     (...)
   }
 ```
-3. Copy and paste the json response from above Azure CLI to your Github Repository > Settings > Secrets > Add a new secret > **AZURE_RBAC_CREDENTIALS**
+3. Copy and paste the json response from above Azure CLI to your GitHub Repository > Settings > Secrets > Add a new secret > **AZURE_RBAC_CREDENTIALS**
 4. Use [Windows DotNet Function App RBAC](https://github.com/Azure/actions-workflow-samples/blob/master/FunctionApp/windows-dotnet-functionapp-on-azure-rbac.yml) template as a reference to build your workflow in `.github/workflows/` directory.
 5. Change variable values in `env:` section according to your function app.
 6. Commit and push your project to GitHub repository, you should see a new GitHub workflow initiated in **Actions** tab.
 
-## Dependencies on other Github Actions
+## Dependencies on other GitHub Actions
 * [Checkout](https://github.com/actions/checkout) Checkout your Git repository content into GitHub Actions agent.
 * [Azure Login](https://github.com/Azure/actions) Login with your Azure credentials for function app deployment authentication.
 * Environment setup actions

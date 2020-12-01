@@ -4,7 +4,11 @@ import { UnexpectedConversion } from "../exceptions";
 export class Parser {
     public static GetAzureWebjobsStorage(azureWebjobsStorage:string): { [key: string]: string } {
         const result: { [key: string]: string } = {};
-        azureWebjobsStorage.trim().split(';').map(entry => {
+        azureWebjobsStorage.trim().split(';').forEach(entry => {
+            if (!entry) {
+                return; // Last ';' delimeter
+            }
+
             const keyValue: string = entry.trim();
             const delimeterIndex: number = keyValue.indexOf('=');
             if (delimeterIndex === -1) {
@@ -23,7 +27,7 @@ export class Parser {
             return false;
         }
 
-        return value.trim().toLowerCase() in ["1", "true", "t", "yes", "y"];
+        return ["1", "true", "t", "yes", "y"].includes(value.trim().toLowerCase());
     }
 
     public static IsFalseLike(value: string): boolean {
@@ -31,6 +35,6 @@ export class Parser {
             return false;
         }
 
-        return value.trim().toLowerCase() in ["0", "false", "f", "no", "n"];
+        return ["0", "false", "f", "no", "n"].includes(value.trim().toLowerCase());
     }
 }

@@ -87,7 +87,7 @@ export class ResourceValidator implements IOrchestratable {
         this._kuduService = new Kudu(scm.uri, scm.username, scm.password);
         this._kuduServiceUtil = new KuduServiceUtility(this._kuduService);
         //Kudu API (GET {publishURL}/api/settings api is not available for kubeapp
-        this._appSettings = (scm.uri.indexOf("k4apps") === -1) ? await this.getFunctionappSettingsScm(state, this._kuduService) : null;s
+        this._appSettings = (scm.uri.indexOf("k4apps") === -1) ? await this.getFunctionappSettingsScm(state, this._kuduService) : null;
         this._appUrl = scm.appUrl;
         this._isLinux = null;
     }

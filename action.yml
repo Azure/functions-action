@@ -15,6 +15,11 @@ inputs:
   publish-profile:
     description: 'Publish profile (*.publishsettings) file contents with web deploy secrets'
     required: false
+  respect-pom-xml:
+    description: "Automatically look up Java function app artifact from pom.xml (default: 'false').
+                  When this is set to 'true', publish-profile should point to the folder of host.json."
+    required: false
+    default: 'false'
 outputs:
   app-url:
     description: 'URL to work with your function app'

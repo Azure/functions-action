@@ -13,12 +13,14 @@ import { ValidationError } from '../exceptions';
 import { parseString } from 'xml2js';
 import { Builder } from '../managers/builder';
 import { Logger } from '../utils/logger';
+import { Parser } from '../utils/parser';
 
 export class ParameterValidator implements IOrchestratable {
     private _appName: string;
     private _packagePath: string;
     private _slot: string;
     private _publishProfile: string;
+    private _respectPomXml: string;
     private _scmCredentials: IScmCredentials
 
     constructor() {
@@ -27,10 +29,14 @@ export class ParameterValidator implements IOrchestratable {
     }
 
     public async invoke(state: StateConstant): Promise<StateConstant> {
+        // Parse action input from action.xml
         this._appName = core.getInput(ConfigurationConstant.ParamInAppName);
         this._packagePath = core.getInput(ConfigurationConstant.ParamInPackagePath);
         this._slot = core.getInput(ConfigurationConstant.ParamInSlot);
         this._publishProfile = core.getInput(ConfigurationConstant.ParamInPublishProfile);
+        this._respectPomXml = core.getInput(ConfigurationConstant.ParamInRespectPomXml);
+
+        // Validate field
         if (this._slot !== undefined && this._slot.trim() === "") {
             this._slot = undefined;
         }
@@ -45,6 +51,7 @@ export class ParameterValidator implements IOrchestratable {
         params.packagePath = this._packagePath;
         params.slot = this._slot;
         params.publishProfile = this._publishProfile;
+        params.respectPomXml = Parser.IsTrueLike(this._respectPomXml);
         return params;
     }
 

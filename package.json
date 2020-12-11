@@ -33,9 +33,9 @@
     "@types/xml2js": "^0.4.5",
     "@actions/core": "^1.2.6",
     "@azure/storage-blob": "^10.4.0",
-    "azure-actions-appservice-rest": "^1.0.9",
+    "azure-actions-appservice-rest": "^1.3.0",
     "azure-actions-utility": "^1.0.3",
-    "azure-actions-webclient": "^1.0.11",
+    "azure-actions-webclient": "^1.1.0",
     "xml2js": "^0.4.23"
   }
 }

@@ -3,4 +3,5 @@ export interface IActionParameters {
     packagePath: string;
     slot: string;
     publishProfile: string;
+    respectPomXml: boolean;
 }

@@ -16,6 +16,7 @@ describe('builder', function () {
     expect(param.packagePath).to.be.undefined;
     expect(param.publishProfile).to.be.undefined;
     expect(param.slot).to.be.undefined;
+    expect(param.respectPomXml).to.be.false;
   });
 
   it('should build a default action context', function() {

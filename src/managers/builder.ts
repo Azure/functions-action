@@ -17,7 +17,8 @@ export class Builder {
             appName: undefined,
             packagePath: undefined,
             slot: undefined,
-            publishProfile: undefined
+            publishProfile: undefined,
+            respectPomXml: false
         }
     }
 

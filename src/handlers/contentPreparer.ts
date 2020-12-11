@@ -1,3 +1,6 @@
+import { existsSync, readFileSync } from 'fs';
+import { resolve } from 'path';
+import { parseString } from 'xml2js';
 import { generateTemporaryFolderOrZipPath } from 'azure-actions-utility/utility.js';
 import { archiveFolder } from 'azure-actions-utility/ziputility.js';
 import { PackageType, Package } from "azure-actions-utility/packageUtility";
@@ -5,7 +8,7 @@ import { IOrchestratable } from "../interfaces/IOrchestratable";
 import { StateConstant } from "../constants/state";
 import { IActionContext } from "../interfaces/IActionContext";
 import { IActionParameters } from "../interfaces/IActionParameters";
-import { ValidationError, FileIOError, AzureResourceError } from "../exceptions";
+import { ValidationError, FileIOError } from "../exceptions";
 import { PublishMethodConstant } from "../constants/publish_method";
 import { FunctionSkuConstant } from "../constants/function_sku";
 import { RuntimeStackConstant } from "../constants/runtime_stack";
@@ -18,16 +21,14 @@ export class ContentPreparer implements IOrchestratable {
     private _publishMethod: PublishMethodConstant;
 
     public async invoke(state: StateConstant, params: IActionParameters, context: IActionContext): Promise<StateConstant> {
+        // Collect prerequisites from context
         this.validatePackageType(state, context.package);
         this._packageType = context.package.getPackageType();
-        this._publishContentPath = await this.generatePublishContent(state, params.packagePath, this._packageType);
+        this._publishContentPath = await this.generatePublishContent(state, params, this._packageType);
         this._publishMethod = this.derivePublishMethod(state, this._packageType, context.os, context.sku, context.authenticationType);
 
-        try {
-            await context.kuduServiceUtil.warmpUp();
-        } catch (expt) {
-            throw new AzureResourceError(state, "Warmup", `Failed to warmup ${params.appName}`, expt);
-        }
+        // Warm up instances
+        await this.warmUpInstance(params, context);
 
         return StateConstant.PublishContent;
     }
@@ -50,22 +51,77 @@ export class ContentPreparer implements IOrchestratable {
         }
     }
 
-    private async generatePublishContent(state: StateConstant, packagePath: string, packageType: PackageType): Promise<string> {
+    private async warmUpInstance(params: IActionParameters, context: IActionContext): Promise<void> {
+        try {
+            await context.kuduServiceUtil.warmpUp();
+        } catch (expt) {
+            Logger.Warn(`Failed to warmup ${params.appName}. Continue deployment.`);
+        }
+    }
+
+    private async generatePublishContent(state: StateConstant, params: IActionParameters, packageType: PackageType): Promise<string> {
+        const packagePath: string = params.packagePath;
+        const respectPomXml: boolean = params.respectPomXml;
+
         switch (packageType) {
             case PackageType.zip:
                 Logger.Info(`Will directly deploy ${packagePath} as function app content`);
                 return packagePath;
             case PackageType.folder:
                 const tempoaryFilePath: string = generateTemporaryFolderOrZipPath(process.env.RUNNER_TEMP, false);
-                Logger.Info(`Will archive ${packagePath} into ${tempoaryFilePath} as function app content`);
+                let sourceLocation: string = packagePath;
+                if (respectPomXml) {
+                    sourceLocation = await this.getPomXmlSourceLocation(packagePath);
+                }
+                Logger.Info(`Will archive ${sourceLocation} into ${tempoaryFilePath} as function app content`);
                 try {
-                    return await archiveFolder(packagePath, "", tempoaryFilePath) as string;
+                    return await archiveFolder(sourceLocation, "", tempoaryFilePath) as string;
                 } catch (expt) {
-                    throw new FileIOError(state, "Generate Publish Content", `Failed to archive ${packagePath}`, expt);
+                    throw new FileIOError(state, "Generate Publish Content", `Failed to archive ${sourceLocation}`, expt);
                 }
             default:
                 throw new ValidationError(state, "Generate Publish Content", "only accepts zip or folder");
         }
+    }
+
+    private async getPomXmlSourceLocation(packagePath: string): Promise<string> {
+        const pomXmlPath: string = resolve(packagePath, 'pom.xml');
+        if (!existsSync(pomXmlPath)) {
+            Logger.Warn(`The file ${pomXmlPath} does not exist. Please ensure your publish-profile setting points to a folder containing host.json.`);
+            Logger.Warn(`Using ${packagePath} as source folder for packaging`);
+            return packagePath;
+        }
+
+        let pomXmlContent: string = undefined;
+        try {
+            pomXmlContent = readFileSync(pomXmlPath, 'utf8');
+        } catch (expt) {
+            Logger.Warn(`The file ${pomXmlPath} does not have valid content, using ${packagePath} as source folder for packaging`);
+            return packagePath
+        }
+
+        let pomXmlResult: any = undefined;
+        await parseString(pomXmlContent, (error, xmlResult) => {
+            if (!error) {
+                pomXmlResult = xmlResult;
+            }
+        });
+        if (!pomXmlResult) {
+            Logger.Warn(`The xml file ${pomXmlPath} is invalid, using ${packagePath} as source folder for packaging`);
+            return packagePath;
+        }
+
+        let functionAppName: string = undefined;
+        try {
+            functionAppName = pomXmlResult.project.properties[0].functionAppName[0];
+        } catch (expt) {
+            Logger.Warn(`Cannot find functionAppName section in pom.xml, using ${packagePath} as source folder for packaging`);
+            return packagePath;
+        }
+
+        const pomPackagePath: string = resolve(packagePath, 'target', 'azure-functions', functionAppName);
+        Logger.Info(`Sucessfully parsed pom.xml. Using ${pomPackagePath} as source folder for packaging`);
+        return pomPackagePath;
     }
 
     private derivePublishMethod(

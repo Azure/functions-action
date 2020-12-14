@@ -4,7 +4,7 @@ import { StateConstant } from '../../src/constants/state';
 import { ParameterValidator } from '../../src/handlers/parameterValidator';
 import { IScmCredentials } from '../../src/interfaces/IScmCredentials';
 
-describe('parameterValidator', function () {
+describe('Check ParameterValidator', function () {
   let _rootPath: string;
 
   beforeEach(() => {

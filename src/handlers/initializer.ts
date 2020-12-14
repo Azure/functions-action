@@ -7,44 +7,26 @@ import { IActionContext } from '../interfaces/IActionContext';
 import { IActionParameters } from '../interfaces/IActionParameters';
 
 export class Initializer implements IOrchestratable {
-    private _userAgentPrefix: string;
-    private _userAgentActionName: string;
-    private _userAgentRepo: string;
-
     public async invoke(): Promise<StateConstant> {
-        this.getUserAgentInformation();
-        const userAgentName: string = this.getUserAgentName(
-            this._userAgentActionName,
-            this._userAgentRepo,
-            this._userAgentPrefix
-        );
+        const userAgentName: string = this.getUserAgent();
         core.exportVariable('AZURE_HTTP_USER_AGENT', userAgentName);
         return StateConstant.ValidateParameter;
     }
 
     public async changeContext(_0: StateConstant, _1: IActionParameters, context: IActionContext): Promise<IActionContext> {
-        context.azureHttpUserAgent = this.getUserAgentName(
-            this._userAgentActionName,
-            this._userAgentRepo,
-            this._userAgentPrefix
-        );
-        context.azureHttpUserAgentPrefix = this._userAgentPrefix;
+        context.azureHttpUserAgent = this.getUserAgent();
+        context.azureHttpUserAgentPrefix = this.getUserAgentPrefix();
         return context;
     }
 
-    private getUserAgentInformation(): void {
-        if (process.env.AZURE_HTTP_USER_AGENT !== undefined) {
-            this._userAgentPrefix = String(process.env.AZURE_HTTP_USER_AGENT);
-        }
-        this._userAgentActionName = ConfigurationConstant.ActionName;
-        this._userAgentRepo = crypto.createHash('sha256').update(`${process.env.GITHUB_REPOSITORY}`).digest('hex');
+    private getUserAgentPrefix(): string {
+        return !!process.env.AZURE_HTTP_USER_AGENT ? `${process.env.AZURE_HTTP_USER_AGENT}` : "";
     }
 
-    private getUserAgentName(actionName: string, repo: string, prefix?: string): string {
-        let agentName: string = `GITHUBACTIONS_${actionName}_${repo}`;
-        if (prefix !== undefined) {
-            agentName = `${prefix}+${agentName}`;
-        }
-        return agentName.replace(' ', '_');
+    private getUserAgent(): string {
+        const prefix = this.getUserAgentPrefix();
+        const repo = crypto.createHash('sha256').update(`${process.env.GITHUB_REPOSITORY}`).digest('hex');
+        const action = ConfigurationConstant.ActionName;
+        return (!!prefix ? `${prefix}+` : '') + `GITHUBACTIONS_${action}_${repo}`;
     }
 }

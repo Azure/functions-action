@@ -1,6 +1,7 @@
 import { expect, assert } from 'chai';
 import { resolve } from 'path';
-import { unlinkSync } from 'fs';
+import * as rimraf from 'rimraf';
+import { writeFile } from 'fs-extra';
 import { PackageType, Package } from "azure-actions-utility/packageUtility";
 import { StateConstant } from '../../src/constants/state';
 import { ContentPreparer } from '../../src/handlers/contentPreparer';
@@ -21,6 +22,7 @@ describe('Check ContentPreparer', function () {
 
   afterEach(() => {
     process.env = _envBackup;
+    rimraf(`${_rootPath}/tests/temp/*.zip`, (_) => {});
   });
 
   it('should throw error if package path is not found', function () {
@@ -62,7 +64,7 @@ describe('Check ContentPreparer', function () {
 
   it('should generate zip file path to publish', async function () {
     const preparer = new ContentPreparer();
-    const zipPath = `${_rootPath}/tests/sample/NetCoreApp.zip`;
+    const zipPath = `${_rootPath}/tests/samples/NetCoreApp.zip`;
 
     const params = Builder.GetDefaultActionParameters();
     params.packagePath = zipPath;
@@ -76,7 +78,7 @@ describe('Check ContentPreparer', function () {
 
   it('should archive folder path to publish', async function () {
     const preparer = new ContentPreparer();
-    const folderPath = `${_rootPath}/tests/sample/NetCoreAppFolder`;
+    const folderPath = `${_rootPath}/tests/samples/NetCoreAppFolder`;
     process.env.RUNNER_TEMP = `${_rootPath}/tests/temp`;
 
     const params = Builder.GetDefaultActionParameters();
@@ -87,14 +89,13 @@ describe('Check ContentPreparer', function () {
       StateConstant.PreparePublishContent, params, PackageType.folder
     );
 
-    // Clean up
-    unlinkSync(publishPath);
+    // Test
     expect(publishPath).to.contains('.zip');
   });
 
   it('should archive java function app follow pom.xml', async function () {
     const preparer = new ContentPreparer();
-    const folderPath = `${_rootPath}/tests/sample/JavaAppFolder`;
+    const folderPath = `${_rootPath}/tests/samples/JavaAppFolder`;
     process.env.RUNNER_TEMP = `${_rootPath}/tests/temp`;
 
     const params = Builder.GetDefaultActionParameters();
@@ -106,8 +107,28 @@ describe('Check ContentPreparer', function () {
       StateConstant.PreparePublishContent, params, PackageType.folder
     );
 
-    // Clean up
-    unlinkSync(publishPath);
+    // Test
+    expect(publishPath).to.contains('.zip');
+  });
+
+  it('should remove unnecessary files according to .funcignore', async function() {
+    const preparer = new ContentPreparer();
+    const folderPath = `${_rootPath}/tests/samples/PythonAppFuncignoreFolder`;
+    process.env.RUNNER_TEMP = `${_rootPath}/tests/temp`;
+
+    const params = Builder.GetDefaultActionParameters();
+    params.packagePath = folderPath;
+    params.respectFuncignore = true;
+
+    // Create a file that should be ignored
+    await writeFile(`${folderPath}/env1`, 'This file should be removed');
+
+    // @ts-ignore
+    const publishPath = await preparer.generatePublishContent(
+      StateConstant.PreparePublishContent, params, PackageType.folder
+    );
+
+    // Test
     expect(publishPath).to.contains('.zip');
   });
 

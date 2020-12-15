@@ -21,6 +21,7 @@ export class ParameterValidator implements IOrchestratable {
     private _slot: string;
     private _publishProfile: string;
     private _respectPomXml: string;
+    private _respectFuncignore: string;
     private _scmCredentials: IScmCredentials
 
     constructor() {
@@ -35,6 +36,7 @@ export class ParameterValidator implements IOrchestratable {
         this._slot = core.getInput(ConfigurationConstant.ParamInSlot);
         this._publishProfile = core.getInput(ConfigurationConstant.ParamInPublishProfile);
         this._respectPomXml = core.getInput(ConfigurationConstant.ParamInRespectPomXml);
+        this._respectFuncignore = core.getInput(ConfigurationConstant.ParamInRespectFuncignore);
 
         // Validate field
         if (this._slot !== undefined && this._slot.trim() === "") {
@@ -52,6 +54,7 @@ export class ParameterValidator implements IOrchestratable {
         params.slot = this._slot;
         params.publishProfile = this._publishProfile;
         params.respectPomXml = Parser.IsTrueLike(this._respectPomXml);
+        params.respectFuncignore = Parser.IsTrueLike(this._respectFuncignore);
         return params;
     }
 

@@ -12,7 +12,7 @@ import { ValidationError, FileIOError } from "../exceptions";
 import { PublishMethodConstant } from "../constants/publish_method";
 import { FunctionSkuConstant } from "../constants/function_sku";
 import { RuntimeStackConstant } from "../constants/runtime_stack";
-import { Logger } from '../utils';
+import { Logger, FuncIgnore } from '../utils';
 import { AuthenticationType } from '../constants/authentication_type';
 
 export class ContentPreparer implements IOrchestratable {
@@ -62,13 +62,26 @@ export class ContentPreparer implements IOrchestratable {
     private async generatePublishContent(state: StateConstant, params: IActionParameters, packageType: PackageType): Promise<string> {
         const packagePath: string = params.packagePath;
         const respectPomXml: boolean = params.respectPomXml;
+        const respectFuncignore: boolean = params.respectFuncignore;
 
         switch (packageType) {
             case PackageType.zip:
                 Logger.Info(`Will directly deploy ${packagePath} as function app content`);
+                if (respectFuncignore) {
+                    Logger.Warn('The "respect-funcignore" is only available when "package" points to host.json folder');
+                }
+                if (respectPomXml) {
+                    Logger.Warn('The "respect-pom-xml" is only available when "package" points to host.json folder');
+                }
                 return packagePath;
             case PackageType.folder:
                 const tempoaryFilePath: string = generateTemporaryFolderOrZipPath(process.env.RUNNER_TEMP, false);
+                // Parse .funcignore and remove unwantted files
+                if (respectFuncignore) {
+                    await this.removeFilesDefinedInFuncignore(packagePath);
+                }
+
+                // Parse pom.xml for java function app
                 let sourceLocation: string = packagePath;
                 if (respectPomXml) {
                     sourceLocation = await this.getPomXmlSourceLocation(packagePath);
@@ -122,6 +135,22 @@ export class ContentPreparer implements IOrchestratable {
         const pomPackagePath: string = resolve(packagePath, 'target', 'azure-functions', functionAppName);
         Logger.Info(`Sucessfully parsed pom.xml. Using ${pomPackagePath} as source folder for packaging`);
         return pomPackagePath;
+    }
+
+    private removeFilesDefinedInFuncignore(packagePath: string): void {
+        if (!FuncIgnore.doesFuncignoreExist(packagePath)) {
+            Logger.Warn(`The .funcignore file does not exist in your path ${packagePath}. Nothing will be changed`);
+            return;
+        }
+
+        const funcignoreParser = FuncIgnore.readFuncignore(packagePath);
+        if (!funcignoreParser) {
+            Logger.Warn(`Failed to parse .funcignore. Nothing will be changed`);
+            return
+        }
+
+        FuncIgnore.removeFilesFromFuncIgnore(packagePath, funcignoreParser);
+        return;
     }
 
     private derivePublishMethod(

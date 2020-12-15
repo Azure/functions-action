@@ -18,7 +18,8 @@ export class Builder {
             packagePath: undefined,
             slot: undefined,
             publishProfile: undefined,
-            respectPomXml: false
+            respectPomXml: false,
+            respectFuncignore: false
         }
     }
 

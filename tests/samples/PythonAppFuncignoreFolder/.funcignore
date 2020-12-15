@@ -1,0 +1,29 @@
+# Ignore comment
+# Ignore following empty line
+
+# Ignore the file and directory defines below
+env1
+env2*
+/env3
+env4/
+
+# Ignore wildcard files
+*.log
+
+# Ignore this nonexistent file
+/nonexistent
+
+# Do not ignore this file
+!/nonexistent/foo
+
+# Ignore some files
+/baz
+/foo/*.wat
+/test1
+test2
+
+# Ignore some deep sub folders
+/othernonexistent/**/what
+
+# Unignore some other sub folders
+!/othernonexistent/**/what/foo

@@ -17,7 +17,12 @@ inputs:
     required: false
   respect-pom-xml:
     description: "Automatically look up Java function app artifact from pom.xml (default: 'false').
-                  When this is set to 'true', publish-profile should point to the folder of host.json."
+                  When this is set to 'true', 'package' should point to the folder of host.json."
+    required: false
+    default: 'false'
+  respect-funcignore:
+    description: "Remove unwanted files defined in .funcignore file (default: 'false').
+                  When this is set to 'true', 'package' should point to the folder of host.json."
     required: false
     default: 'false'
 outputs:

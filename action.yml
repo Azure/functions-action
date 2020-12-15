@@ -21,7 +21,7 @@ inputs:
     required: false
     default: 'false'
   respect-funcignore:
-    description: "Remove unwantted files defined in .funcignore file (default: 'false').
+    description: "Remove unwanted files defined in .funcignore file (default: 'false').
                   When this is set to 'true', 'package' should point to the folder of host.json."
     required: false
     default: 'false'

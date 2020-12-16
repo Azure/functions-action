@@ -6,7 +6,6 @@
         "outDir": "./lib",
         "strict": false,
         "strictFunctionTypes": true,
-        "esModuleInterop": true,
         "noImplicitAny" : true,
         "noUnusedParameters": true
     },

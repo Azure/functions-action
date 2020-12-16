@@ -7,6 +7,7 @@ export enum FunctionRuntimeConstant {
     Powershell,
     Java,
     Python,
+    Custom
 }
 
 export class FunctionRuntimeUtil {

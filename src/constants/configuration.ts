@@ -3,6 +3,9 @@ export class ConfigurationConstant {
     public static readonly ParamInPackagePath: string = 'package';
     public static readonly ParamInSlot: string = 'slot-name';
     public static readonly ParamInPublishProfile: string = 'publish-profile';
+    public static readonly ParamInRespectPomXml: string = 'respect-pom-xml';
+    public static readonly ParamInRespectFuncignore: string = 'respect-funcignore';
+
     public static readonly ParamOutResultName: string = 'app-url';
 
     public static readonly ActionName: string = 'DeployFunctionAppToAzure';

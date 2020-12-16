@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node lib/main.js",
     "build": "tsc --project tsconfig.prod.json",
-    "test": "mocha -r ts-node/register __tests__/**/*.spec.ts",
+    "test": "mocha -r ts-node/register tests/**/*.spec.ts",
     "test-file": "mocha -r ts-node/register",
     "coverage": "nyc -r lcov -e .ts -x \"**/*.spec.ts\" npm run test",
     "coverage-report": "nyc report --reporter=json"

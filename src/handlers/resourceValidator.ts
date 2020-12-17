@@ -86,7 +86,8 @@ export class ResourceValidator implements IOrchestratable {
         const scm: IScmCredentials = context.scmCredentials;
         this._kuduService = new Kudu(scm.uri, scm.username, scm.password);
         this._kuduServiceUtil = new KuduServiceUtility(this._kuduService);
-        this._appSettings = await this.getFunctionappSettingsScm(state, this._kuduService);
+        //Kudu API (GET {publishURL}/api/settings api is not available for kubeapp
+        this._appSettings = (scm.uri.indexOf("k4apps") === -1) ? await this.getFunctionappSettingsScm(state, this._kuduService) : null;
         this._appUrl = scm.appUrl;
         this._isLinux = null;
     }
@@ -99,7 +100,7 @@ export class ResourceValidator implements IOrchestratable {
 
         this._resourceGroupName = appDetails["resourceGroupName"];
         this._kind = appDetails["kind"];
-        this._isLinux = this._kind.indexOf('linux') >= 0;
+        this._isLinux = this._kind.indexOf('linux') >= 0 || this._kind.indexOf('kubeapp') >=0;
     }
 
     private getOsTypeFromIsLinux(isLinux: boolean) {
@@ -129,7 +130,7 @@ export class ResourceValidator implements IOrchestratable {
             Logger.Debug(`- ${key} = ${configSettings.properties[key]}`);
         }
 
-        const result: FunctionSkuConstant = FunctionSkuUtil.FromString(configSettings.properties.sku);
+        const result: FunctionSkuConstant = (!!configSettings.properties.sku) ? FunctionSkuUtil.FromString(configSettings.properties.sku) : undefined;
         Logger.Info(`Detected function app sku: ${FunctionSkuConstant[result]}`);
         return result;
     }

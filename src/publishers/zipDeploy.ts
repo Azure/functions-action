@@ -37,13 +37,13 @@ export class ZipDeploy {
 
     private static validateApplicationSettings(state: StateConstant, context: IActionContext) {
         const appSettings: IAppSettings = context.appSettings;
-        if (appSettings.WEBSITE_RUN_FROM_PACKAGE !== undefined &&
+        if (!!appSettings && appSettings.WEBSITE_RUN_FROM_PACKAGE !== undefined &&
             appSettings.WEBSITE_RUN_FROM_PACKAGE.trim().startsWith('http')) {
             throw new AzureResourceError(state, "zipDepoy", "WEBSITE_RUN_FROM_PACKAGE in your function app is " +
                 "set to an URL. Please remove WEBSITE_RUN_FROM_PACKAGE app setting from your function app.");
         }
 
-        if (appSettings.WEBSITE_RUN_FROM_PACKAGE !== undefined &&
+        if (!!appSettings && appSettings.WEBSITE_RUN_FROM_PACKAGE !== undefined &&
             appSettings.WEBSITE_RUN_FROM_PACKAGE.trim() === '1' &&
             (context.os === undefined || context.os === RuntimeStackConstant.Linux)) {
             Logger.Warn("Detected WEBSITE_RUN_FROM_PACKAGE is set to '1'. If you are deploying to a Linux " +
@@ -55,21 +55,21 @@ export class ZipDeploy {
     private static async patchApplicationSettings(context: IActionContext) {
         try {
             if (context.os === RuntimeStackConstant.Windows &&
-                context.authenticationType === AuthenticationType.Rbac &&
+                context.authenticationType === AuthenticationType.Rbac && !!context.appSettings &&
                 !Parser.IsTrueLike(context.appSettings.WEBSITE_RUN_FROM_PACKAGE)) {
                 Logger.Info('Setting WEBSITE_RUN_FROM_PACKAGE to 1');
                 await this._updateApplicationSettings(context, { 'WEBSITE_RUN_FROM_PACKAGE': '1' });
                 await this.checkAppSettingPropagatedToKudu(context, 'WEBSITE_RUN_FROM_PACKAGE', '1');
             }
 
-            if (context.authenticationType === AuthenticationType.Scm &&
+            if (context.authenticationType === AuthenticationType.Scm && !!context.appSettings &&
                 !Parser.IsFalseLike(context.appSettings.SCM_DO_BUILD_DURING_DEPLOYMENT)) {
                 Logger.Info('Setting SCM_DO_BUILD_DURING_DEPLOYMENT in Kudu container to false');
                 await this._updateApplicationSettings(context, { 'SCM_DO_BUILD_DURING_DEPLOYMENT': 'false' });
                 await this.checkAppSettingPropagatedToKudu(context, 'SCM_DO_BUILD_DURING_DEPLOYMENT', 'false');
             }
 
-            if (context.authenticationType === AuthenticationType.Scm &&
+            if (context.authenticationType === AuthenticationType.Scm && !!context.appSettings &&
                 !Parser.IsFalseLike(context.appSettings.ENABLE_ORYX_BUILD)) {
                 Logger.Info('Setting ENABLE_ORYX_BUILD in Kudu container to false');
                 await this._updateApplicationSettings(context, { 'ENABLE_ORYX_BUILD': 'false' });
@@ -85,17 +85,17 @@ export class ZipDeploy {
         try {
             if (context.authenticationType === AuthenticationType.Scm) {
                 // Restore previous app settings if they are temporarily changed
-                if (original.WEBSITE_RUN_FROM_PACKAGE) {
+                if (!!original && original.WEBSITE_RUN_FROM_PACKAGE) {
                     await Client.updateAppSettingViaKudu(context.scmCredentials, {
                         'WEBSITE_RUN_FROM_PACKAGE': original.WEBSITE_RUN_FROM_PACKAGE
                     }, 3, 3, false);
                 }
-                if (original.SCM_DO_BUILD_DURING_DEPLOYMENT) {
+                if (!!original && original.SCM_DO_BUILD_DURING_DEPLOYMENT) {
                     await Client.updateAppSettingViaKudu(context.scmCredentials, {
                         'SCM_DO_BUILD_DURING_DEPLOYMENT': original.SCM_DO_BUILD_DURING_DEPLOYMENT
                     }, 3, 3, false);
                 }
-                if (original.ENABLE_ORYX_BUILD) {
+                if (!!original && original.ENABLE_ORYX_BUILD) {
                     await Client.updateAppSettingViaKudu(context.scmCredentials, {
                         'ENABLE_ORYX_BUILD': original.ENABLE_ORYX_BUILD
                     }, 3, 3, false);
@@ -110,15 +110,15 @@ export class ZipDeploy {
         try {
             if (context.authenticationType === AuthenticationType.Scm) {
                 // Delete previous app settings if they are temporarily set
-                if (original.WEBSITE_RUN_FROM_PACKAGE === undefined) {
+                if (!!original && original.WEBSITE_RUN_FROM_PACKAGE === undefined) {
                     await Client.deleteAppSettingViaKudu(context.scmCredentials,
                         'WEBSITE_RUN_FROM_PACKAGE', 3, 3, false);
                 }
-                if (original.SCM_DO_BUILD_DURING_DEPLOYMENT === undefined) {
+                if (!!original && original.SCM_DO_BUILD_DURING_DEPLOYMENT === undefined) {
                     await Client.deleteAppSettingViaKudu(context.scmCredentials,
                         'SCM_DO_BUILD_DURING_DEPLOYMENT', 3, 3, false);
                 }
-                if (original.ENABLE_ORYX_BUILD === undefined) {
+                if (!!original && original.ENABLE_ORYX_BUILD === undefined) {
                     await Client.deleteAppSettingViaKudu(context.scmCredentials,
                         'ENABLE_ORYX_BUILD', 3, 3, false);
                 }
@@ -135,8 +135,8 @@ export class ZipDeploy {
         while (retryCount > 0) {
             await Sleeper.timeout(retryInterval);
             try {
-                const settings: any = await context.kuduService.getAppSettings();
-                if (settings && settings[key] && settings[key] === expectedValue) {
+                const settings: any = await context.appService.getApplicationSettings();
+                if (settings && settings.properties[key] && settings.properties[key] === expectedValue) {
                     isSuccess = true;
                     break;
                 }

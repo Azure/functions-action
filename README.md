@@ -70,6 +70,8 @@ You may want to create an [Azure Service Principal for RBAC](https://docs.micros
 5. Change variable values in `env:` section according to your function app.
 6. Commit and push your project to GitHub repository, you should see a new GitHub workflow initiated in **Actions** tab.
 
+Azure Functions GitHub Action is supported for the Azure public cloud as well as Azure government clouds ('AzureUSGovernment' or 'AzureChinaCloud') and Azure Stack ('AzureStack') Hub. Before running this action, login to the respective Azure Cloud  using [Azure Login](https://github.com/Azure/login) by setting appropriate value for the `environment` parameter.
+
 ## Dependencies on other GitHub Actions
 * [Checkout](https://github.com/actions/checkout) Checkout your Git repository content into GitHub Actions agent.
 * [Azure Login](https://github.com/Azure/actions) Login with your Azure credentials for function app deployment authentication.

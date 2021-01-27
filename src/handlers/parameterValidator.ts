@@ -14,6 +14,8 @@ import { parseString } from 'xml2js';
 import { Builder } from '../managers/builder';
 import { Logger } from '../utils/logger';
 import { Parser } from '../utils/parser';
+import { ScmBuildUtil } from '../constants/scm_build';
+import { EnableOryxBuildUtil } from '../constants/enable_oryx_build';
 
 export class ParameterValidator implements IOrchestratable {
     private _appName: string;
@@ -22,6 +24,8 @@ export class ParameterValidator implements IOrchestratable {
     private _publishProfile: string;
     private _respectPomXml: string;
     private _respectFuncignore: string;
+    private _scmDoBuildDuringDeployment: string;
+    private _enableOryxBuild: string;
     private _scmCredentials: IScmCredentials
 
     constructor() {
@@ -37,6 +41,8 @@ export class ParameterValidator implements IOrchestratable {
         this._publishProfile = core.getInput(ConfigurationConstant.ParamInPublishProfile);
         this._respectPomXml = core.getInput(ConfigurationConstant.ParamInRespectPomXml);
         this._respectFuncignore = core.getInput(ConfigurationConstant.ParamInRespectFuncignore);
+        this._scmDoBuildDuringDeployment = core.getInput(ConfigurationConstant.ParamInScmDoBuildDuringDeployment);
+        this._enableOryxBuild = core.getInput(ConfigurationConstant.ParamInEnableOryxBuild);
 
         // Validate field
         if (this._slot !== undefined && this._slot.trim() === "") {
@@ -55,6 +61,8 @@ export class ParameterValidator implements IOrchestratable {
         params.publishProfile = this._publishProfile;
         params.respectPomXml = Parser.IsTrueLike(this._respectPomXml);
         params.respectFuncignore = Parser.IsTrueLike(this._respectFuncignore);
+        params.scmDoBuildDuringDeployment = ScmBuildUtil.FromString(this._scmDoBuildDuringDeployment);
+        params.enableOryxBuild = EnableOryxBuildUtil.FromString(this._enableOryxBuild);
         return params;
     }
 
@@ -166,7 +174,7 @@ export class ParameterValidator implements IOrchestratable {
             if (lowercasedUri.indexOf(lowercasedAppName) === -1) {
                 throw new ValidationError(
                     state, ConfigurationConstant.ParamInSlot,
-                    `SCM credential does not match slot-name ${lowercasedAppName}`
+                    `SCM credential does not match slot-name ${this._slot}`
                 );
             }
         }

@@ -5,6 +5,8 @@ export class ConfigurationConstant {
     public static readonly ParamInPublishProfile: string = 'publish-profile';
     public static readonly ParamInRespectPomXml: string = 'respect-pom-xml';
     public static readonly ParamInRespectFuncignore: string = 'respect-funcignore';
+    public static readonly ParamInEnableOryxBuild: string = 'enable-oryx-build';
+    public static readonly ParamInScmDoBuildDuringDeployment: string = 'scm-do-build-during-deployment';
 
     public static readonly ParamOutResultName: string = 'app-url';
 

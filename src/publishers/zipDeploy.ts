@@ -5,9 +5,17 @@ import { Logger, Sleeper, Client, Parser } from "../utils";
 import { AuthenticationType } from "../constants/authentication_type";
 import { IAppSettings } from "../interfaces/IAppSettings";
 import { RuntimeStackConstant } from "../constants/runtime_stack";
+import { EnableOryxBuildConstant, EnableOryxBuildUtil } from "../constants/enable_oryx_build";
+import { ScmBuildConstant, ScmBuildUtil } from "../constants/scm_build";
+
 
 export class ZipDeploy {
-    public static async execute(state: StateConstant, context: IActionContext): Promise<string> {
+    public static async execute(
+        state: StateConstant,
+        context: IActionContext,
+        enableOryxBuild: EnableOryxBuildConstant,
+        scmDobuildDuringDeployment: ScmBuildConstant
+    ): Promise<string> {
         const filePath: string = context.publishContentPath;
         let deploymentId: string;
         let isDeploymentSucceeded: boolean = false;
@@ -15,7 +23,7 @@ export class ZipDeploy {
         const originalAppSettings: IAppSettings = context.appSettings;
 
         try {
-            await this.patchApplicationSettings(context);
+            await this.patchTemporaryAppSettings(context, enableOryxBuild, scmDobuildDuringDeployment);
             deploymentId = await context.kuduServiceUtil.deployUsingZipDeploy(filePath);
             isDeploymentSucceeded = true;
         } catch (expt) {
@@ -52,7 +60,11 @@ export class ZipDeploy {
         }
     }
 
-    private static async patchApplicationSettings(context: IActionContext) {
+    private static async patchTemporaryAppSettings(
+        context: IActionContext,
+        enableOryxBuild: EnableOryxBuildConstant,
+        scmDoBuildDuringDeployment: ScmBuildConstant
+    ) {
         try {
             if (context.os === RuntimeStackConstant.Windows &&
                 context.authenticationType === AuthenticationType.Rbac &&
@@ -63,21 +75,23 @@ export class ZipDeploy {
             }
 
             if (context.authenticationType === AuthenticationType.Scm &&
-                !Parser.IsFalseLike(context.appSettings.SCM_DO_BUILD_DURING_DEPLOYMENT)) {
-                Logger.Info('Setting SCM_DO_BUILD_DURING_DEPLOYMENT in Kudu container to false');
-                await this._updateApplicationSettings(context, { 'SCM_DO_BUILD_DURING_DEPLOYMENT': 'false' });
-                await this.checkAppSettingPropagatedToKudu(context, 'SCM_DO_BUILD_DURING_DEPLOYMENT', 'false');
+                scmDoBuildDuringDeployment !== ScmBuildConstant.NotSet) {
+                const scmValue = ScmBuildUtil.ToString(scmDoBuildDuringDeployment);
+                Logger.Info(`Setting SCM_DO_BUILD_DURING_DEPLOYMENT in Kudu container to ${scmValue}`);
+                await this._updateApplicationSettings(context, { 'SCM_DO_BUILD_DURING_DEPLOYMENT': scmValue });
+                await this.checkAppSettingPropagatedToKudu(context, 'SCM_DO_BUILD_DURING_DEPLOYMENT', scmValue);
             }
 
             if (context.authenticationType === AuthenticationType.Scm &&
-                !Parser.IsFalseLike(context.appSettings.ENABLE_ORYX_BUILD)) {
-                Logger.Info('Setting ENABLE_ORYX_BUILD in Kudu container to false');
-                await this._updateApplicationSettings(context, { 'ENABLE_ORYX_BUILD': 'false' });
-                await this.checkAppSettingPropagatedToKudu(context, 'ENABLE_ORYX_BUILD', 'false');
+                enableOryxBuild !== EnableOryxBuildConstant.NotSet) {
+                const oryxValue = EnableOryxBuildUtil.ToString(enableOryxBuild);
+                Logger.Info(`Setting ENABLE_ORYX_BUILD in Kudu container to ${oryxValue}`);
+                await this._updateApplicationSettings(context, { 'ENABLE_ORYX_BUILD': oryxValue });
+                await this.checkAppSettingPropagatedToKudu(context, 'ENABLE_ORYX_BUILD', oryxValue);
             }
 
         } catch (expt) {
-            Logger.Warn(`Patch Application Settings: Failed to change app settings. ${expt}`);
+            Logger.Warn(`Patch Temporary Application Settings: Failed to change app settings. ${expt}`);
         }
     }
 

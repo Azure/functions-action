@@ -119,6 +119,26 @@ describe('Check ParameterValidator', function () {
     );
   });
 
+  it('should allow named slot to use scm slot credential different casing', function () {
+    const scmCredential: IScmCredentials = {
+      appUrl: 'http://sample-app-stage.azurewebsites.net',
+      username: '$sample-app-stage',
+      password: 'password',
+      uri: 'https://$sample-app-stage:password@sample-app-stage.scm.azurewebsites.net'
+    };
+    const validator = new ParameterValidator();
+    // @ts-ignore
+    validator._appName = 'sample-app';
+    // @ts-ignore
+    validator._scmCredentials = scmCredential;
+    // @ts-ignore
+    validator._slot = 'STAGE';
+    assert.doesNotThrow(
+      // @ts-ignore
+      () => validator.validateScmCredentialsSlotName(StateConstant.ValidateParameter)
+    );
+  });
+
   it('should throw error if publishProfile is not a valid XML', async function () {
     const validator = new ParameterValidator();
     const publishProfile: string = '<not/a/valid/xml>';

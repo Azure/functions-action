@@ -153,7 +153,7 @@ export class ParameterValidator implements IOrchestratable {
     }
 
     private validateScmCredentialsSlotName(state: StateConstant): void {
-        if (this._scmCredentials && this._appName && this._slot) {
+        if (this._scmCredentials && this._scmCredentials && this._appName && this._slot) {
             let urlName: string = this._appName;
 
             // If slot name is 'production', the url name should not contain 'production' in it
@@ -161,8 +161,13 @@ export class ParameterValidator implements IOrchestratable {
                 urlName = `${this._appName}-${this._slot}`;
             }
 
-            if (this._scmCredentials.uri.indexOf(urlName) === -1) {
-                throw new ValidationError(state, ConfigurationConstant.ParamInSlot, 'SCM credential does not match slot-name');
+            const lowercasedUri = this._scmCredentials.uri.toLowerCase()
+            const lowercasedAppName = urlName.toLowerCase()
+            if (lowercasedUri.indexOf(lowercasedAppName) === -1) {
+                throw new ValidationError(
+                    state, ConfigurationConstant.ParamInSlot,
+                    `SCM credential does not match slot-name ${lowercasedAppName}`
+                );
             }
         }
     }

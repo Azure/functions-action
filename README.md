@@ -1,9 +1,18 @@
 # GitHub Actions for deploying to Azure Functions
 
-| Build Status | Unit Test | UT CodeCov |
-|--------------|-----------|------------|
-| dev          | ![dev unit test](https://github.com/Azure/functions-action/workflows/RUN_UNIT_TESTS/badge.svg?branch=dev) | ![dev coverage](https://codecov.io/gh/Azure/functions-action/branch/dev/graph/badge.svg)
-| master       | ![master unit test](https://github.com/Azure/functions-action/workflows/RUN_UNIT_TESTS/badge.svg?branch=master) | ![master coverage](https://codecov.io/gh/Azure/functions-action/branch/master/graph/badge.svg)
+|                    | master | dev |
+|--------------------|--------|-----|
+| Coverage           | ![master coverage](https://codecov.io/gh/Azure/functions-action/branch/master/graph/badge.svg) | ![dev coverage](https://codecov.io/gh/Azure/functions-action/branch/dev/graph/badge.svg) |
+| Unit Test          | ![master unit test](https://github.com/Azure/functions-action/workflows/RUN_UNIT_TESTS/badge.svg?branch=master) | ![dev unit test](https://github.com/Azure/functions-action/workflows/RUN_UNIT_TESTS/badge.svg?branch=dev) |
+| .NETCore Windows   | ![master .netcore windows e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_DOTNET3_WCON/badge.svg?branch=master) | ![dev .netcore windows e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_DOTNET3_WCON/badge.svg?branch=dev) |
+| .NETCore Linux     | ![master .netcore linux e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_DOTNET3_LCON/badge.svg?branch=master) | ![dev .netcore linux e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_DOTNET3_LCON/badge.svg?branch=dev) |
+| Java Windows       | ![master java windows e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_JAVA8_WCON/badge.svg?branch=master) | ![dev java windows e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_JAVA8_WCON/badge.svg?branch=dev) |
+| Java Linux         | ![master java linux e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_JAVA8_LCON/badge.svg?branch=master) | ![dev java linux e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_JAVA8_LCON/badge.svg?branch=dev) |
+| Node JS Windows    | ![master nodejs windows e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_NODE12_WCON/badge.svg?branch=master) | ![dev nodejs windows e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_NODE12_WCON/badge.svg?branch=dev) |
+| Node JS Linux      | ![master nodejs linux e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_NODE12_LCON/badge.svg?branch=master) | ![dev nodejs linux e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_NODE12_LCON/badge.svg?branch=dev) |
+| PowerShell Windows | ![master powershell windows e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_POWERSHELL6_WCON/badge.svg?branch=master) | ![dev powershell windows e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_POWERSHELL6_WCON/badge.svg?branch=dev) |
+| Python Linux       | ![master python linux e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_PYTHON37_LCON/badge.svg?branch=master) | ![dev python linux e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_PYTHON37_LCON/badge.svg?branch=dev) |
+
 
 With the Azure Functions GitHub Action, you can automate your workflow to deploy [Azure Functions](https://azure.microsoft.com/en-us/services/functions/).
 

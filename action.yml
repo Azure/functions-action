@@ -31,7 +31,7 @@ inputs:
                   To bypass this and use the existing settings from your function app, please set this to an empty
                   string ''.
                   To enable remote build for your project, please set this and 'enable-oryx-build' both to 'true'.
-                  By default, GitHub Action respsect the packages resolved in GitHub workflow, disabling the
+                  By default, GitHub Action respects the packages resolved in GitHub workflow, disabling the
                   redundant build action from Kudu endpoint. (default: 'false')."
     required: false
     default: 'false'
@@ -42,7 +42,7 @@ inputs:
                   string ''.
                   To enable remote build for your project, please set this and 'scm-do-build-during-deployment' both
                   to 'true'.
-                  By default, GitHub Action respsect the packages resolved in GitHub workflow, disabling the
+                  By default, GitHub Action respects the packages resolved in GitHub workflow, disabling the
                   redundant build action from Kudu endpoint. (default: 'false')."
     required: false
     default: 'false'

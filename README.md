@@ -44,7 +44,7 @@ Alternatively, you can add a `- run: dotnet build --output ./bin` step **before*
 
 ## Using Publish Profile as Deployment Credential (recommended)
 You may want to get the publish profile from your function app.
-Using publish profile as deployemnt credential is recommended if you are not the owner of your Azure subscription.
+Using publish profile as deployment credential is recommended if you are not the owner of your Azure subscription.
 
 1. In Azure portal, go to your function app.
 2. Click **Get publish profile** and download **.PublishSettings** file.

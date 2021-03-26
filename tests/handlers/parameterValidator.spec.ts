@@ -3,6 +3,7 @@ import { resolve } from 'path';
 import { StateConstant } from '../../src/constants/state';
 import { ParameterValidator } from '../../src/handlers/parameterValidator';
 import { IScmCredentials } from '../../src/interfaces/IScmCredentials';
+import { Builder } from '../../src/managers/builder';
 
 describe('Check ParameterValidator', function () {
   let _rootPath: string;
@@ -126,6 +127,21 @@ describe('Check ParameterValidator', function () {
       password: 'password',
       uri: 'https://$sample-app-stage:password@sample-app-stage.scm.azurewebsites.net'
     };
+    const validator = new ParameterValidator();
+    // @ts-ignore
+    validator._appName = 'sample-app';
+    // @ts-ignore
+    validator._scmCredentials = scmCredential;
+    // @ts-ignore
+    validator._slot = 'STAGE';
+    assert.doesNotThrow(
+      // @ts-ignore
+      () => validator.validateScmCredentialsSlotName(StateConstant.ValidateParameter)
+    );
+  });
+
+    it('should not throw a validation error if the default scm credential is used during slot deployment', function () {
+    const scmCredential = Builder.GetDefaultScmCredential();
     const validator = new ParameterValidator();
     // @ts-ignore
     validator._appName = 'sample-app';

@@ -30,7 +30,7 @@ export class FuncIgnore {
         }
 
         const sanitizedWorkingDir: string = FuncIgnore.sanitizeWorkingDir(working_dir);
-        const allFiles: string[] = glob.sync(`${sanitizedWorkingDir}/**/*`);
+        const allFiles: string[] = glob.sync(`${sanitizedWorkingDir}/**/*`, { dot: true });
         allFiles.forEach(name => {
             const filename = name.replace(`${sanitizedWorkingDir}/`, '');
             if (ignoreParser.ignores(filename)) {

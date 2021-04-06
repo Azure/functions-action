@@ -47,7 +47,11 @@ export class ContentPreparer implements IOrchestratable {
             case PackageType.folder:
                 break;
             default:
-                throw new ValidationError(state, "validatePackageType", "only accepts zip or folder");
+                throw new ValidationError(
+                    state, "validatePackageType",
+                    "only accepts zip or folder. Any other deployment sources such as URL or .jar file currently are " +
+                    "not supported in GitHub Action."
+                );
         }
     }
 
@@ -66,12 +70,12 @@ export class ContentPreparer implements IOrchestratable {
 
         switch (packageType) {
             case PackageType.zip:
-                Logger.Info(`Will directly deploy ${packagePath} as function app content`);
+                Logger.Info(`Will directly deploy ${packagePath} as function app content.`);
                 if (respectFuncignore) {
-                    Logger.Warn('The "respect-funcignore" is only available when "package" points to host.json folder');
+                    Logger.Warn('The "respect-funcignore" is only available when "package" points to host.json folder.');
                 }
                 if (respectPomXml) {
-                    Logger.Warn('The "respect-pom-xml" is only available when "package" points to host.json folder');
+                    Logger.Warn('The "respect-pom-xml" is only available when "package" points to host.json folder.');
                 }
                 return packagePath;
             case PackageType.folder:
@@ -100,8 +104,9 @@ export class ContentPreparer implements IOrchestratable {
     private async getPomXmlSourceLocation(packagePath: string): Promise<string> {
         const pomXmlPath: string = resolve(packagePath, 'pom.xml');
         if (!existsSync(pomXmlPath)) {
-            Logger.Warn(`The file ${pomXmlPath} does not exist. Please ensure your publish-profile setting points to a folder containing host.json.`);
-            Logger.Warn(`Using ${packagePath} as source folder for packaging`);
+            Logger.Warn(`The file ${pomXmlPath} does not exist. ` +
+                        "Please ensure your publish-profile setting points to a folder containing host.json.");
+            Logger.Warn(`Fall back on ${packagePath} as packaging source.`);
             return packagePath;
         }
 
@@ -109,7 +114,9 @@ export class ContentPreparer implements IOrchestratable {
         try {
             pomXmlContent = readFileSync(pomXmlPath, 'utf8');
         } catch (expt) {
-            Logger.Warn(`The file ${pomXmlPath} does not have valid content, using ${packagePath} as source folder for packaging`);
+            Logger.Warn(`The file ${pomXmlPath} does not have valid content. Please check if the pom.xml file is ` +
+                        "and have proper encoding (utf-8).");
+            Logger.Warn(`Fall back on ${packagePath} as packaging source.`);
             return packagePath
         }
 
@@ -120,7 +127,9 @@ export class ContentPreparer implements IOrchestratable {
             }
         });
         if (!pomXmlResult) {
-            Logger.Warn(`The xml file ${pomXmlPath} is invalid, using ${packagePath} as source folder for packaging`);
+            Logger.Warn(`The xml file ${pomXmlPath} is invalid. Please check if the pom.xml file contains proper ` +
+                        "content. Please visit https://maven.apache.org/pom.html#what-is-the-pom for more information.");
+            Logger.Warn(`Fall back on ${packagePath} as packaging source.`);
             return packagePath;
         }
 
@@ -128,7 +137,9 @@ export class ContentPreparer implements IOrchestratable {
         try {
             functionAppName = pomXmlResult.project.properties[0].functionAppName[0];
         } catch (expt) {
-            Logger.Warn(`Cannot find functionAppName section in pom.xml, using ${packagePath} as source folder for packaging`);
+            Logger.Warn(`Cannot find functionAppName section in pom.xml. Please ensure the pom.xml is properly ` +
+                        "generated from azure-functions maven plugin.");
+            Logger.Warn(`Fall back on ${packagePath} as packaging source.`);
             return packagePath;
         }
 
@@ -139,13 +150,17 @@ export class ContentPreparer implements IOrchestratable {
 
     private removeFilesDefinedInFuncignore(packagePath: string): void {
         if (!FuncIgnore.doesFuncignoreExist(packagePath)) {
-            Logger.Warn(`The .funcignore file does not exist in your path ${packagePath}. Nothing will be changed`);
+            Logger.Warn(`The .funcignore file does not exist in your path ${packagePath}. Nothing will be changed.`);
+            Logger.Warn("The .funcignore file shares the same format as .gitignore. " +
+                        "You can use it to exclude files from deployment.")
             return;
         }
 
         const funcignoreParser = FuncIgnore.readFuncignore(packagePath);
         if (!funcignoreParser) {
             Logger.Warn(`Failed to parse .funcignore. Nothing will be changed`);
+            Logger.Warn("The .funcignore file shares the same format as .gitignore. " +
+                        "You can use it to exclude files from deployment.")
             return
         }
 
@@ -162,23 +177,28 @@ export class ContentPreparer implements IOrchestratable {
     ): PublishMethodConstant {
         // Package Type Check early
         if (packageType !== PackageType.zip && packageType !== PackageType.folder) {
-            throw new ValidationError(state, "Derive Publish Method", "only accepts zip or folder");
+            throw new ValidationError(
+                state, "Derive Publish Method",
+                "only accepts zip or folder. Any other deployment sources such as URL or .jar file currently are " +
+                "not supported in GitHub Action."
+            );
         }
 
         // Uses api/zipdeploy endpoint if scm credential is provided
         if (authenticationType == AuthenticationType.Scm) {
-            Logger.Info('Will use api/zipdeploy to deploy (scm credential)');
+            Logger.Info('Will use Kudu https://<scmsite>/api/zipdeploy to deploy since publish-profile is detected.');
             return PublishMethodConstant.ZipDeploy;
         }
 
         // Linux Consumption sets WEBSITE_RUN_FROM_PACKAGE app settings when scm credential is not available
         if (osType === RuntimeStackConstant.Linux && sku === FunctionSkuConstant.Consumption) {
-            Logger.Info('Will use WEBSITE_RUN_FROM_PACKAGE to deploy');
+            Logger.Info('Will use WEBSITE_RUN_FROM_PACKAGE to deploy since RBAC is detected and your function app is ' +
+                        'on Linux Consumption.');
             return PublishMethodConstant.WebsiteRunFromPackageDeploy;
         }
 
         // Rest Skus which support api/zipdeploy endpoint
-        Logger.Info('Will use api/zipdeploy to deploy (rbac authentication)');
+        Logger.Info('Will use https://<scmsite>/api/zipdeploy to deploy since RBAC Azure credential is detected.');
         return PublishMethodConstant.ZipDeploy;
     }
 }

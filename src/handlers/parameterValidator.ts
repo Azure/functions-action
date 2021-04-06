@@ -82,17 +82,26 @@ export class ParameterValidator implements IOrchestratable {
         let xmlProfile: any = undefined;
         await parseString(publishProfile, (error, xmlResult) => {
             if (error) {
-                throw new ValidationError(state, ConfigurationConstant.ParamInPublishProfile, "should be a valid XML");
+                throw new ValidationError(
+                    state, ConfigurationConstant.ParamInPublishProfile,
+                    "should be a valid XML. Please ensure your publish-profile secret is set in your " +
+                    "GitHub repository by heading to GitHub repo -> Settings -> Secrets -> Repository secrets"
+                );
             }
             xmlProfile = xmlResult;
         });
 
         if (this.tryParseOldPublishProfile(xmlProfile, creds)) {
-            Logger.Info('Successfully parsed SCM credential from old publishProfile');
+            Logger.Info('Successfully parsed SCM credential from old publish-profile format.');
         } else if (this.tryParseNewPublishProfile(xmlProfile, creds)) {
-            Logger.Info('Successfully passed SCM crednetial from new publishProfile');
+            Logger.Info('Successfully passed SCM crednetial from new publish-profile format.');
         } else {
-            throw new ValidationError(state, ConfigurationConstant.ParamInPublishProfile, "should contain valid SCM credential");
+            throw new ValidationError(
+                state, ConfigurationConstant.ParamInPublishProfile,
+                "should contain valid SCM credentials. Please ensure your publish-profile contains 'MSDeploy' publish " +
+                "method. Ensure 'userName', 'userPWD', and 'publishUrl' exist in the section. You can always acquire " +
+                "the latest publish-profile from portal -> function app resource -> overview -> get publish profile"
+            );
         }
 
         core.setSecret(`${creds.username}`);
@@ -106,7 +115,7 @@ export class ParameterValidator implements IOrchestratable {
             return p.$.publishMethod === "MSDeploy"
         });
         if ((options || []).length == 0) {
-            Logger.Error('The old publish profile does not contain MSDeploy section');
+            Logger.Error('The old publish-profile does not contain MSDeploy publish method.');
             return false;
         }
         const msDeploy = options[0].$;
@@ -127,7 +136,7 @@ export class ParameterValidator implements IOrchestratable {
             return p.$.publishMethod === "MSDeploy"
         });
         if ((options || []).length == 0) {
-            Logger.Error('The new publish profile does not contain MSDeploy section');
+            Logger.Error('The new publish profile does not contain MSDeploy publish method.');
             return false;
         }
         const msDeploy = options[0].$;
@@ -174,7 +183,9 @@ export class ParameterValidator implements IOrchestratable {
             if (lowercasedUri.indexOf(lowercasedAppName) === -1) {
                 throw new ValidationError(
                     state, ConfigurationConstant.ParamInSlot,
-                    `SCM credential does not match slot-name ${this._slot}`
+                    `SCM credential does not match slot-name ${this._slot}. Please ensure the slot-name parameter has ` +
+                    "correct casing and the publish-profile is acquired from your function app's slot rather than " +
+                    "your main production site."
                 );
             }
         }

@@ -140,7 +140,7 @@ describe('Check ParameterValidator', function () {
     );
   });
 
-    it('should not throw a validation error if the default scm credential is used during slot deployment', function () {
+  it('should not throw a validation error if the default scm credential is used during slot deployment', function () {
     const scmCredential = Builder.GetDefaultScmCredential();
     const validator = new ParameterValidator();
     // @ts-ignore
@@ -162,7 +162,11 @@ describe('Check ParameterValidator', function () {
       // @ts-ignore
       await validator.parseScmCredentials(StateConstant.ValidateParameter, publishProfile);
     } catch (e) {
-      expect(e.message).to.equal('At ValidateParameter, publish-profile : should be a valid XML.');
+      expect(e.message).to.equal(
+        'At ValidateParameter, publish-profile : should be a valid XML. ' +
+        'Please ensure your publish-profile secret is set in your GitHub repository by heading to ' +
+        'GitHub repo -> Settings -> Secrets -> Repository secrets.'
+      );
     }
   });
 
@@ -182,7 +186,12 @@ describe('Check ParameterValidator', function () {
       // @ts-ignore
       await validator.parseScmCredentials(StateConstant.ValidateParameter, publishProfile);
     } catch (e) {
-      expect(e.message).to.equal('At ValidateParameter, publish-profile : should contain valid SCM credential.');
+      expect(e.message).to.equal(
+        "At ValidateParameter, publish-profile : should contain valid SCM credentials. " +
+        "Please ensure your publish-profile contains 'MSDeploy' publish method. " +
+        "Ensure 'userName', 'userPWD', and 'publishUrl' exist in the section. " +
+        "You can always acquire the latest publish-profile from portal -> function app resource -> overview -> get publish profile."
+      );
     }
   });
 

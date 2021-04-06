@@ -17,7 +17,7 @@ export class ContentPublisher implements IOrchestratable {
                 await WebsiteRunFromPackageDeploy.execute(state, context);
                 break;
             default:
-                throw new ValidationError(state, "publisher", "can only performs ZipDeploy and WebsiteRunFromPackageDeploy");
+                throw new ValidationError(state, "publisher", "can only performs ZipDeploy or WebsiteRunFromPackageDeploy");
         }
         return StateConstant.ValidatePublishedContent;
     }

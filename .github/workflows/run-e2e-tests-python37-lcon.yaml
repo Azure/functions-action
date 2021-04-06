@@ -18,7 +18,7 @@ env:
 jobs:
   run:
     name: Run E2E Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -39,7 +39,7 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
 
-    - name: E2E Resolve Project Dependencies Using Npm
+    - name: E2E Resolve Project Dependencies Using Pip
       shell: bash
       run: |
         pushd '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'

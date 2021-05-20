@@ -25,6 +25,27 @@ inputs:
                   When this is set to 'true', 'package' should point to the folder of host.json."
     required: false
     default: 'false'
+  scm-do-build-during-deployment:
+    description: "Enable build action from Kudu when the package is deployed onto the function app.
+                  This will temporarily change the SCM_DO_BUILD_DURING_DEPLOYMENT setting for this deployment.
+                  To bypass this and use the existing settings from your function app, please set this to an empty
+                  string ''.
+                  To enable remote build for your project, please set this and 'enable-oryx-build' both to 'true'.
+                  By default, GitHub Action respects the packages resolved in GitHub workflow, disabling the
+                  redundant build action from Kudu endpoint. (default: 'false')."
+    required: false
+    default: 'false'
+  enable-oryx-build:
+    description: "Use Oryx Build from Kudu when the package is deployed onto the function app. (Linux functions only).
+                  This will temporarily change the ENABLE_ORYX_BUILD setting from this deployment.
+                  To bypass this and use the existing settings from your function app, please set this to an empty
+                  string ''.
+                  To enable remote build for your project, please set this and 'scm-do-build-during-deployment' both
+                  to 'true'.
+                  By default, GitHub Action respects the packages resolved in GitHub workflow, disabling the
+                  redundant build action from Kudu endpoint. (default: 'false')."
+    required: false
+    default: 'false'
 outputs:
   app-url:
     description: 'URL to work with your function app'

@@ -1,6 +1,8 @@
 import { IActionParameters } from "../interfaces/IActionParameters";
 import { IActionContext } from "../interfaces/IActionContext";
 import { IScmCredentials } from "../interfaces/IScmCredentials";
+import { ScmBuildConstant } from "../constants/scm_build";
+import { EnableOryxBuildConstant } from "../constants/enable_oryx_build";
 
 export class Builder {
     public static GetDefaultScmCredential(): IScmCredentials {
@@ -19,7 +21,9 @@ export class Builder {
             slot: undefined,
             publishProfile: undefined,
             respectPomXml: false,
-            respectFuncignore: false
+            respectFuncignore: false,
+            scmDoBuildDuringDeployment: ScmBuildConstant.Disabled,
+            enableOryxBuild: EnableOryxBuildConstant.Disabled
         }
     }
 

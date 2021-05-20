@@ -8,16 +8,16 @@ import { ZipDeploy, WebsiteRunFromPackageDeploy } from "../publishers";
 
 export class ContentPublisher implements IOrchestratable {
 
-    public async invoke(state: StateConstant, _1: IActionParameters, context: IActionContext): Promise<StateConstant> {
+    public async invoke(state: StateConstant, params: IActionParameters, context: IActionContext): Promise<StateConstant> {
         switch (context.publishMethod) {
             case PublishMethodConstant.ZipDeploy:
-                await ZipDeploy.execute(state, context);
+                await ZipDeploy.execute(state, context, params.enableOryxBuild, params.scmDoBuildDuringDeployment);
                 break;
             case PublishMethodConstant.WebsiteRunFromPackageDeploy:
                 await WebsiteRunFromPackageDeploy.execute(state, context);
                 break;
             default:
-                throw new ValidationError(state, "publisher", "can only performs ZipDeploy and WebsiteRunFromPackageDeploy");
+                throw new ValidationError(state, "publisher", "can only performs ZipDeploy or WebsiteRunFromPackageDeploy");
         }
         return StateConstant.ValidatePublishedContent;
     }

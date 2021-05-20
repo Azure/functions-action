@@ -3,6 +3,7 @@ import { resolve } from 'path';
 import { StateConstant } from '../../src/constants/state';
 import { ParameterValidator } from '../../src/handlers/parameterValidator';
 import { IScmCredentials } from '../../src/interfaces/IScmCredentials';
+import { Builder } from '../../src/managers/builder';
 
 describe('Check ParameterValidator', function () {
   let _rootPath: string;
@@ -119,6 +120,41 @@ describe('Check ParameterValidator', function () {
     );
   });
 
+  it('should allow named slot to use scm slot credential different casing', function () {
+    const scmCredential: IScmCredentials = {
+      appUrl: 'http://sample-app-stage.azurewebsites.net',
+      username: '$sample-app-stage',
+      password: 'password',
+      uri: 'https://$sample-app-stage:password@sample-app-stage.scm.azurewebsites.net'
+    };
+    const validator = new ParameterValidator();
+    // @ts-ignore
+    validator._appName = 'sample-app';
+    // @ts-ignore
+    validator._scmCredentials = scmCredential;
+    // @ts-ignore
+    validator._slot = 'STAGE';
+    assert.doesNotThrow(
+      // @ts-ignore
+      () => validator.validateScmCredentialsSlotName(StateConstant.ValidateParameter)
+    );
+  });
+
+  it('should not throw a validation error if the default scm credential is used during slot deployment', function () {
+    const scmCredential = Builder.GetDefaultScmCredential();
+    const validator = new ParameterValidator();
+    // @ts-ignore
+    validator._appName = 'sample-app';
+    // @ts-ignore
+    validator._scmCredentials = scmCredential;
+    // @ts-ignore
+    validator._slot = 'STAGE';
+    assert.doesNotThrow(
+      // @ts-ignore
+      () => validator.validateScmCredentialsSlotName(StateConstant.ValidateParameter)
+    );
+  });
+
   it('should throw error if publishProfile is not a valid XML', async function () {
     const validator = new ParameterValidator();
     const publishProfile: string = '<not/a/valid/xml>';
@@ -126,7 +162,11 @@ describe('Check ParameterValidator', function () {
       // @ts-ignore
       await validator.parseScmCredentials(StateConstant.ValidateParameter, publishProfile);
     } catch (e) {
-      expect(e.message).to.equal('At ValidateParameter, publish-profile : should be a valid XML.');
+      expect(e.message).to.equal(
+        'At ValidateParameter, publish-profile : should be a valid XML. ' +
+        'Please ensure your publish-profile secret is set in your GitHub repository by heading to ' +
+        'GitHub repo -> Settings -> Secrets -> Repository secrets.'
+      );
     }
   });
 
@@ -146,7 +186,12 @@ describe('Check ParameterValidator', function () {
       // @ts-ignore
       await validator.parseScmCredentials(StateConstant.ValidateParameter, publishProfile);
     } catch (e) {
-      expect(e.message).to.equal('At ValidateParameter, publish-profile : should contain valid SCM credential.');
+      expect(e.message).to.equal(
+        "At ValidateParameter, publish-profile : should contain valid SCM credentials. " +
+        "Please ensure your publish-profile contains 'MSDeploy' publish method. " +
+        "Ensure 'userName', 'userPWD', and 'publishUrl' exist in the section. " +
+        "You can always acquire the latest publish-profile from portal -> function app resource -> overview -> get publish profile."
+      );
     }
   });
 

@@ -140,15 +140,26 @@ export class ResourceValidator implements IOrchestratable {
         try {
             appSettings = await appService.getApplicationSettings(true);
         } catch (expt) {
-            throw new AzureResourceError(state, 'Get Function App Settings', 'Failed to acquire app settings (RBAC)', expt);
+            throw new AzureResourceError(
+                state, 'Get Function App Settings',
+                'Failed to acquire app settings from Azure Resource Manager (RBAC credential).', expt
+            );
         }
 
         if (appSettings === undefined || appSettings.properties === undefined) {
-            throw new AzureResourceError(state, 'Get Function App Settings', 'Function app settings should not be empty (RBAC)');
+            throw new AzureResourceError(
+                state, 'Get Function App Settings',
+                'Function app settings should not be empty (fetched from Azure Resource Manager with RBAC credential).'
+            );
         }
 
         if (!appSettings.properties['AzureWebJobsStorage']) {
-            throw new AzureResourceError(state, 'Get Function App Settings', 'AzureWebJobsStorage cannot be empty');
+            Logger.Warn(
+                'AzureWebJobsStorage does not exist in app settings (from Azure Resource Manager with RBAC credential). ' +
+                'Please ensure the AzureWebJobsStorage app setting is configured as it is critical for function runtime. ' +
+                'For more information, please visit the function app settings reference page: ' +
+                'https://docs.microsoft.com/en-us/azure/azure-functions/functions-app-settings#azurewebjobsstorage'
+            );
         } else {
             console.log(`::add-mask::${appSettings.properties['AzureWebJobsStorage']}`);
         }
@@ -174,20 +185,31 @@ export class ResourceValidator implements IOrchestratable {
         try {
             appSettings = await kuduService.getAppSettings();
         } catch (expt) {
-            throw new AzureResourceError(state, 'Get Function App Settings', 'Failed to acquire app settings (SCM)', expt);
+            throw new AzureResourceError(
+                state, 'Get Function App Settings',
+                'Failed to acquire app settings from https://<scmsite>/api/settings with publish-profile', expt
+            );
         }
 
         if (appSettings === undefined) {
-            throw new AzureResourceError(state, 'Get Function App Settings', 'Function app settings should not be empty (SCM)');
+            throw new AzureResourceError(
+                state, 'Get Function App Settings',
+                'Function app settings should not be empty (fetched from Kudu SCM site with publish-profile credential).'
+            );
         }
 
         if (!appSettings['AzureWebJobsStorage']) {
-            throw new AzureResourceError(state, 'Get Function App Settings', 'AzureWebJobsStorage cannot be empty');
+            Logger.Warn(
+                'AzureWebJobsStorage does not exist in app settings (from Kudu SCM site with publish-profile credential). ' +
+                'Please ensure the AzureWebJobsStorage app setting is configured as it is critical for function runtime. ' +
+                'For more information, please visit the function app settings reference page: ' +
+                'https://docs.microsoft.com/en-us/azure/azure-functions/functions-app-settings#azurewebjobsstorage'
+            );
         } else {
             console.log(`::add-mask::${appSettings['AzureWebJobsStorage']}`);
         }
 
-        Logger.Info('Sucessfully acquired app settings from function app (SCM)!');
+        Logger.Info('Sucessfully acquired app settings from function app (with SCM credential)!');
         for (const key in appSettings) {
             Logger.Debug(`- ${key} = ${appSettings[key]}`);
         }

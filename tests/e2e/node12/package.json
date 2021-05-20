@@ -1,0 +1,12 @@
+{
+  "name": "node12",
+  "version": "1.0.0",
+  "description": "E2E Test for GitHub action",
+  "scripts": {
+    "test": "echo \"No tests yet...\""
+  },
+  "author": "",
+  "dependencies": {
+    "lodash": "^4.17.20"
+  }
+}

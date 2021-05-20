@@ -1,0 +1,75 @@
+name: RUN_E2E_TESTS_JAVA8_WCON
+on:
+  push:
+    branches:
+      - master
+      - dev
+      - releases/*
+    paths-ignore:
+      - '**.md'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+
+env:
+  AZURE_FUNCTIONAPP_NAME: gae-fa-java8-wcon
+  POM_XML_DIRECTORY: './tests/e2e/java8'
+  POM_FUNCTIONAPP_NAME: functionAppName
+  JAVA_VERSION: '1.8.x'
+
+jobs:
+  run:
+    name: Run E2E Tests
+    runs-on: windows-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Set Node.js 12.x for GitHub Action
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12.x
+
+    - name: Run Npm Install for GitHub Action
+      run: npm install
+
+    - name: Build GitHub Action
+      run: npm run build
+
+    - name: E2E Setup Java Sdk ${{ env.JAVA_VERSION }}
+      uses: actions/setup-java@v1
+      with:
+        java-version: ${{ env.JAVA_VERSION }}
+
+    - name: E2E Restore Project Dependencies Using Mvn
+      shell: bash
+      run: |
+        pushd '${{ env.POM_XML_DIRECTORY }}'
+        echo "$GITHUB_SHA" > sha.txt
+        mvn clean package
+        mvn azure-functions:package
+        popd
+
+    - name: E2E Run Azure Functions Action
+      uses: ./
+      id: fa
+      with:
+        app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+        package: './${{ env.POM_XML_DIRECTORY }}'
+        publish-profile: ${{ secrets.GAE_FA_JAVA8_WCON }}
+        respect-pom-xml: true
+
+    - name: E2E Check HttpTrigger Result
+      shell: pwsh
+      run: |
+        $i = 0
+        while ($i -lt 10) {
+          sleep 10
+          $RESPONSE = $(curl "${{ steps.fa.outputs.app-url }}/api/HttpTrigger")
+          $RESULT = ($RESPONSE -eq "$env:GITHUB_SHA")
+          if ($RESULT) {
+            exit 0
+          }
+          $i = $i + 1
+        }
+        exit 1

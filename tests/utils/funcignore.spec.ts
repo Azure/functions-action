@@ -56,6 +56,14 @@ describe('funcignore', function () {
     expect(await pathExists(`${_tempPath}/01.txt`)).to.be.false;
   });
 
+  it('should remove file with name starting with . (dot) in the root directory', async function() {
+    await writeFile(`${_tempPath}/.gitignore`, 'a');
+    await writeFile(`${_tempPath}/.funcignore`, '.gitignore')
+    const parser = FuncIgnore.readFuncignore(_tempPath);
+    FuncIgnore.removeFilesFromFuncIgnore(_tempPath, parser);
+    expect(await pathExists(`${_tempPath}/.gitignore`)).to.be.false;
+  });
+
   it('should remove multiple files in the root directory with wildcard', async function() {
     await writeFile(`${_tempPath}/01.txt`, 'a');
     await writeFile(`${_tempPath}/02.txt`, 'b');

@@ -124,7 +124,7 @@ export class ResourceValidator implements IOrchestratable {
             throw new AzureResourceError(state, 'Get Function App SKU', 'Function app sku should not be empty');
         }
 
-        Logger.Info('Sucessfully acquired site configs from function app!');
+        Logger.Info('Successfully acquired site configs from function app!');
         for (const key in configSettings.properties) {
             Logger.Debug(`- ${key} = ${configSettings.properties[key]}`);
         }
@@ -163,7 +163,7 @@ export class ResourceValidator implements IOrchestratable {
             console.log(`::add-mask::${appSettings.properties['AzureWebJobsStorage']}`);
         }
 
-        Logger.Info('Sucessfully acquired app settings from function app (RBAC)!');
+        Logger.Info('Successfully acquired app settings from function app (RBAC)!');
         for (const key in appSettings.properties) {
             Logger.Debug(`- ${key} = ${appSettings.properties[key]}`);
         }
@@ -208,7 +208,7 @@ export class ResourceValidator implements IOrchestratable {
             console.log(`::add-mask::${appSettings['AzureWebJobsStorage']}`);
         }
 
-        Logger.Info('Sucessfully acquired app settings from function app (with SCM credential)!');
+        Logger.Info('Successfully acquired app settings from function app (with SCM credential)!');
         for (const key in appSettings) {
             Logger.Debug(`- ${key} = ${appSettings[key]}`);
         }

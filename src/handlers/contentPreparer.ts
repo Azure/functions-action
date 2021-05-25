@@ -144,7 +144,7 @@ export class ContentPreparer implements IOrchestratable {
         }
 
         const pomPackagePath: string = resolve(packagePath, 'target', 'azure-functions', functionAppName);
-        Logger.Info(`Sucessfully parsed pom.xml. Using ${pomPackagePath} as source folder for packaging`);
+        Logger.Info(`Successfully parsed pom.xml. Using ${pomPackagePath} as source folder for packaging`);
         return pomPackagePath;
     }
 

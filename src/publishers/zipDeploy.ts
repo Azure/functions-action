@@ -144,7 +144,7 @@ export class ZipDeploy {
 
     private static async checkAppSettingPropagatedToKudu(context: IActionContext, key: string, expectedValue: string) {
         let isSuccess: boolean = false;
-        let retryCount: number = 20;
+        let retryCount: number = 3;
         const retryInterval: number = 5000;
         while (retryCount > 0) {
             await Sleeper.timeout(retryInterval);

@@ -152,7 +152,8 @@ export class ResourceValidator implements IOrchestratable {
             );
         }
 
-        if (!appSettings.properties['AzureWebJobsStorage']) {
+        const azureWebJobsStorage: string = appSettings.properties['AzureWebJobsStorage'] ?? !appSettings.properties['AZUREWEBJOBSSTORAGE'];
+        if (!azureWebJobsStorage) {
             Logger.Warn(
                 'AzureWebJobsStorage does not exist in app settings (from Azure Resource Manager with RBAC credential). ' +
                 'Please ensure the AzureWebJobsStorage app setting is configured as it is critical for function runtime. ' +
@@ -160,7 +161,7 @@ export class ResourceValidator implements IOrchestratable {
                 'https://docs.microsoft.com/en-us/azure/azure-functions/functions-app-settings#azurewebjobsstorage'
             );
         } else {
-            console.log(`::add-mask::${appSettings.properties['AzureWebJobsStorage']}`);
+            console.log(`::add-mask::${azureWebJobsStorage}`);
         }
 
         Logger.Info('Successfully acquired app settings from function app (RBAC)!');
@@ -169,7 +170,7 @@ export class ResourceValidator implements IOrchestratable {
         }
 
         const result: IAppSettings = {
-            AzureWebJobsStorage: appSettings.properties['AzureWebJobsStorage'],
+            AzureWebJobsStorage: azureWebJobsStorage,
             FUNCTIONS_WORKER_RUNTIME: appSettings.properties['FUNCTIONS_WORKER_RUNTIME'],
             ENABLE_ORYX_BUILD: appSettings.properties['ENABLE_ORYX_BUILD'],
             SCM_DO_BUILD_DURING_DEPLOYMENT: appSettings.properties['SCM_DO_BUILD_DURING_DEPLOYMENT'],
@@ -197,7 +198,8 @@ export class ResourceValidator implements IOrchestratable {
             );
         }
 
-        if (!appSettings['AzureWebJobsStorage']) {
+        const azureWebJobsStorage: string = appSettings['AzureWebJobsStorage'] ?? !appSettings['AZUREWEBJOBSSTORAGE'];
+        if (!azureWebJobsStorage) {
             Logger.Warn(
                 'AzureWebJobsStorage does not exist in app settings (from Kudu SCM site with publish-profile credential). ' +
                 'Please ensure the AzureWebJobsStorage app setting is configured as it is critical for function runtime. ' +
@@ -205,7 +207,7 @@ export class ResourceValidator implements IOrchestratable {
                 'https://docs.microsoft.com/en-us/azure/azure-functions/functions-app-settings#azurewebjobsstorage'
             );
         } else {
-            console.log(`::add-mask::${appSettings['AzureWebJobsStorage']}`);
+            console.log(`::add-mask::${azureWebJobsStorage}`);
         }
 
         Logger.Info('Successfully acquired app settings from function app (with SCM credential)!');
@@ -214,7 +216,7 @@ export class ResourceValidator implements IOrchestratable {
         }
 
         const result: IAppSettings = {
-            AzureWebJobsStorage: appSettings['AzureWebJobsStorage'],
+            AzureWebJobsStorage: azureWebJobsStorage,
             FUNCTIONS_WORKER_RUNTIME: appSettings['FUNCTIONS_WORKER_RUNTIME'],
             ENABLE_ORYX_BUILD: appSettings['ENABLE_ORYX_BUILD'],
             SCM_DO_BUILD_DURING_DEPLOYMENT: appSettings['SCM_DO_BUILD_DURING_DEPLOYMENT'],

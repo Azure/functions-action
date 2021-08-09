@@ -24,7 +24,7 @@ The definition of this GitHub Action is in [action.yml](https://github.com/Azure
 
 [Kudu zip deploy](https://github.com/projectkudu/kudu/wiki/Deploying-from-a-zip-file-or-url) method is used by the action for deployment of Functions.
 
-# End-to-End Workflow
+# End-to-End Sample workflow
 
 ## Workflow Templates
 

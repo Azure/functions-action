@@ -1,4 +1,4 @@
-# Azure Functions Github Action
+## Azure Functions Github Action
 name: 'Azure Functions Action'
 description: 'Deploy Function App to Azure Functions'
 inputs:

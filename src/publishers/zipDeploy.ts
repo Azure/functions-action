@@ -32,7 +32,7 @@ export class ZipDeploy {
             if (isDeploymentSucceeded) {
                 await context.kuduServiceUtil.postZipDeployOperation(deploymentId, deploymentId);
             }
-            await context.kuduServiceUtil.updateDeploymentStatus(isDeploymentSucceeded, null, {
+            await context.kuduServiceUtil.updateDeploymentStatus(isDeploymentSucceeded, deploymentId, {
                 'type': 'Deployment',
                 'slotName': context.appService ? context.appService.getSlot() : 'production'
             });
@@ -52,9 +52,9 @@ export class ZipDeploy {
         }
 
         if (appSettings.WEBSITE_RUN_FROM_PACKAGE !== undefined &&
-            appSettings.WEBSITE_RUN_FROM_PACKAGE.trim() === '1' &&
+            appSettings.WEBSITE_RUN_FROM_PACKAGE.trim() === '0' &&
             (context.os === undefined || context.os === RuntimeStackConstant.Linux)) {
-            Logger.Warn("Detected WEBSITE_RUN_FROM_PACKAGE is set to '1'. If you are deploying to a Linux " +
+            Logger.Warn("Detected WEBSITE_RUN_FROM_PACKAGE is set to '0'. If you are deploying to a Linux " +
                 "function app, you may need to remove this app setting.");
             return;
         }

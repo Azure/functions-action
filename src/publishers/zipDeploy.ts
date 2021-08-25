@@ -32,7 +32,7 @@ export class ZipDeploy {
             if (isDeploymentSucceeded) {
                 await context.kuduServiceUtil.postZipDeployOperation(deploymentId, deploymentId);
             }
-            await context.kuduServiceUtil.updateDeploymentStatus(isDeploymentSucceeded, deploymentId, {
+            await context.kuduServiceUtil.updateDeploymentStatus(isDeploymentSucceeded, null, {
                 'type': 'Deployment',
                 'slotName': context.appService ? context.appService.getSlot() : 'production'
             });

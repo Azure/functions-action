@@ -24,7 +24,9 @@ export class ZipDeploy {
 
         try {
             await this.patchTemporaryAppSettings(context, enableOryxBuild, scmDobuildDuringDeployment);
-            deploymentId = await context.kuduServiceUtil.deployUsingZipDeploy(filePath);
+            deploymentId = await context.kuduServiceUtil.deployUsingZipDeploy(filePath, {
+                'slotName': context.appService ? context.appService.getSlot() : 'production'
+            });
             isDeploymentSucceeded = true;
         } catch (expt) {
             throw new AzureResourceError(state, "zipDeploy", `Failed to use ${filePath} as ZipDeploy content`, expt);
@@ -32,10 +34,10 @@ export class ZipDeploy {
             if (isDeploymentSucceeded) {
                 await context.kuduServiceUtil.postZipDeployOperation(deploymentId, deploymentId);
             }
-            await context.kuduServiceUtil.updateDeploymentStatus(isDeploymentSucceeded, null, {
-                'type': 'Deployment',
-                'slotName': context.appService ? context.appService.getSlot() : 'production'
-            });
+            // await context.kuduServiceUtil.updateDeploymentStatus(isDeploymentSucceeded, null, {
+            //     'type': 'Deployment',
+            //     'slotName': context.appService ? context.appService.getSlot() : 'production'
+            // });
         }
 
         await this.restoreScmTemporarySettings(context, originalAppSettings);

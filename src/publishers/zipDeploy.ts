@@ -24,7 +24,9 @@ export class ZipDeploy {
 
         try {
             await this.patchTemporaryAppSettings(context, enableOryxBuild, scmDobuildDuringDeployment);
-            deploymentId = await context.kuduServiceUtil.deployUsingZipDeploy(filePath);
+            deploymentId = await context.kuduServiceUtil.deployUsingZipDeploy(filePath, {
+                'slotName': context.appService ? context.appService.getSlot() : 'production'
+            });
             isDeploymentSucceeded = true;
         } catch (expt) {
             throw new AzureResourceError(state, "zipDeploy", `Failed to use ${filePath} as ZipDeploy content`, expt);
@@ -32,10 +34,6 @@ export class ZipDeploy {
             if (isDeploymentSucceeded) {
                 await context.kuduServiceUtil.postZipDeployOperation(deploymentId, deploymentId);
             }
-            await context.kuduServiceUtil.updateDeploymentStatus(isDeploymentSucceeded, null, {
-                'type': 'Deployment',
-                'slotName': context.appService ? context.appService.getSlot() : 'production'
-            });
         }
 
         await this.restoreScmTemporarySettings(context, originalAppSettings);
@@ -149,11 +147,21 @@ export class ZipDeploy {
         while (retryCount > 0) {
             await Sleeper.timeout(retryInterval);
             try {
-                const settings: any = await context.kuduService.getAppSettings();
-                if (settings && settings[key] && settings[key] === expectedValue) {
-                    isSuccess = true;
-                    break;
+                if (context.authenticationType === AuthenticationType.Rbac) {
+                    const settings: any = await context.appService.getApplicationSettings();
+                    if (settings && settings.properties[key] && settings.properties[key] === expectedValue) {
+                        isSuccess = true;
+                        break;
+                    }
                 }
+                else{
+                    const settings: any = await context.kuduService.getAppSettings();
+                    if (settings && settings[key] && settings[key] === expectedValue) {
+                        isSuccess = true;
+                        break;
+                    }
+                }
+
             } catch (expt) {
                 Logger.Warn(`Failed to check app setting propagation for ${key}, remaining retry ${retryCount-1}`);
             }

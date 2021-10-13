@@ -93,7 +93,7 @@ Azure Functions GitHub Action is supported for the Azure public cloud as well as
 
 ## Dependencies on other GitHub Actions
 * [Checkout](https://github.com/actions/checkout) Checkout your Git repository content into GitHub Actions agent.
-* [Azure Login](https://github.com/Azure/actions) Login with your Azure credentials for function app deployment authentication.
+* [Azure Login](https://github.com/Azure/login) Login with your Azure credentials for function app deployment authentication.
 * Environment setup actions
   * [Setup DotNet](https://github.com/actions/setup-dotnet) Build your DotNet core function app or function app extensions.
   * [Setup Node](https://github.com/actions/setup-node) Resolve Node function app dependencies using npm.

@@ -36,26 +36,26 @@ The definition of this GitHub Action is in [action.yml](https://github.com/Azure
 | Java       | [windows-java-functionapp-on-azure.yml](https://github.com/Azure/actions-workflow-samples/tree/master/FunctionApp/windows-java-functionapp-on-azure.yml) | [linux-java-functionapp-on-azure.yml](https://github.com/Azure/actions-workflow-samples/tree/master/FunctionApp/linux-java-functionapp-on-azure.yml) |
 | Python     | - | [linux-python-functionapp-on-azure.yml](https://github.com/Azure/actions-workflow-samples/tree/master/FunctionApp/linux-python-functionapp-on-azure.yml) |
 
-If you are have extension project(s) in your repo, these templates will **NOT** resolve the **extensions.csproj** in your project. If you want to use binding extensions (e.g. Blob/Queue/EventHub Triggers), please consider [registering Azure Functions binding extensions](https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-register) in your host.json.
+If you have extension project(s) in your repo, these templates will **NOT** resolve the **extensions.csproj** in your project. If you want to use binding extensions (e.g. Blob/Queue/EventHub Triggers), please consider [registering Azure Functions binding extensions](https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-register) in your host.json.
 
 Alternatively, you can add a `- run: dotnet build --output ./bin` step **before** functions-action step.
 
-"Remove additional files at destination" is not supported by Kudu deploy method which is used in this action and should be handled separately. When a new build is deployed with zipdeploy, files and directories that were created by the previous deployment but are no longer present in the build will be deleted. Any other files and directories found in the site that aren't being overwritten by the deployment, such as those placed there via FTP or created by your app during runtime, will be preserved.
+"Remove additional files at destination" is not supported by Kudu deploy method used in this action and should be handled separately. When a new build is deployed with zipdeploy, files and directories that were created by the previous deployment but are no longer present in the build will be deleted. Any other files and directories found in the site that aren't being overwritten by the deployment, such as those placed there via FTP or created by your app during runtime, will be preserved.
 
 ## Using Publish Profile as Deployment Credential (recommended)
-You may want to get the publish profile from your function app.
-Using publish profile as deployment credential is recommended if you are not the owner of your Azure subscription.
+Using publish profile as deployment credential is recommended if you are not the owner of your Azure subscription. Follow these steps to configure your workflow to use the publish profile from your function app.
 
 1. In Azure portal, go to your function app.
 2. Click **Get publish profile** and download **.PublishSettings** file.
 3. Open the **.PublishSettings** file and copy the content.
 4. Paste the XML content to your GitHub Repository > Settings > Secrets > Add a new secret > **AZURE_FUNCTIONAPP_PUBLISH_PROFILE**
-5. Use the above template to create the `.github/workflows/your-workflow.yml` file in your project repository.
+5. Use one of the above workflow templates as a reference to build your workflow in `.github/workflows/` directory.
 6. Change variable values in `env:` section according to your function app.
 7. Commit and push your project to GitHub repository, you should see a new GitHub workflow initiated in **Actions** tab.
 
 ## Using Azure Service Principal for RBAC as Deployment Credential
-You may want to create an [Azure Service Principal for RBAC](https://docs.microsoft.com/en-us/azure/role-based-access-control/overview) and add them as a GitHub Secret in your repository.
+Follow these steps to configure your workflow to use an [Azure Service Principal for RBAC](https://docs.microsoft.com/en-us/azure/role-based-access-control/overview).
+
 1. Download Azure CLI from [here](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest), run `az login` to login with your Azure credentials.
 2. Run Azure CLI command
 ```
@@ -93,7 +93,7 @@ Azure Functions GitHub Action is supported for the Azure public cloud as well as
 
 ## Dependencies on other GitHub Actions
 * [Checkout](https://github.com/actions/checkout) Checkout your Git repository content into GitHub Actions agent.
-* [Azure Login](https://github.com/Azure/actions) Login with your Azure credentials for function app deployment authentication.
+* [Azure Login](https://github.com/Azure/login) Login with your Azure credentials for function app deployment authentication.
 * Environment setup actions
   * [Setup DotNet](https://github.com/actions/setup-dotnet) Build your DotNet core function app or function app extensions.
   * [Setup Node](https://github.com/actions/setup-node) Resolve Node function app dependencies using npm.

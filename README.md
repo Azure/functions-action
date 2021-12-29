@@ -54,7 +54,11 @@ Using publish profile as deployment credential is recommended if you are not the
 7. Commit and push your project to GitHub repository, you should see a new GitHub workflow initiated in **Actions** tab.
 
 ## Using Azure Service Principal for RBAC as Deployment Credential
-Follow these steps to configure your workflow to use an [Azure Service Principal for RBAC](https://docs.microsoft.com/en-us/azure/role-based-access-control/overview).
+
+Note:  
+If you want to deploy to Linux Consumption plan and your app contains executable file(custom handler, `chrome` in [Puppeteer](https://github.com/puppeteer/puppeteer)/[Playwright](https://github.com/microsoft/playwright) etc), you need to use this way in order to keep executable permission.
+
+Follow these steps to configure your workflow to use an [Azure Service Principal for RBAC](https://docs.microsoft.com/en-us/azure/role-based-access-control/overview) and add them as a GitHub Secret in your repository.
 
 1. Download Azure CLI from [here](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest), run `az login` to login with your Azure credentials.
 2. Run Azure CLI command

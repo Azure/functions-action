@@ -188,7 +188,7 @@ describe('Check ParameterValidator', function () {
     } catch (e) {
       expect(e.message).to.equal(
         "At ValidateParameter, publish-profile : should contain valid SCM credentials. " +
-        "Please ensure your publish-profile contains 'MSDeploy' publish method. " +
+        "Please ensure your publish-profile contains 'ZipDeploy' publish or 'MSDeploy' publish method. " +
         "Ensure 'userName', 'userPWD', and 'publishUrl' exist in the section. " +
         "You can always acquire the latest publish-profile from portal -> function app resource -> overview -> get publish profile."
       );

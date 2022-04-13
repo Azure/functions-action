@@ -253,13 +253,5 @@ export class ResourceValidator implements IOrchestratable {
                     "Python Function App on Windows is not yet supported");
             }
         }
-
-        // Linux Java and Linux Powershell is not supported
-        if (context.os === RuntimeStackConstant.Linux) {
-            if (context.language === FunctionRuntimeConstant.Powershell) {
-                throw new ValidationError(state, 'Function Runtime',
-                    "PowerShell Function App on Windows is not yet supported");
-            }
-        }
     }
 }

@@ -91,14 +91,16 @@ export class ParameterValidator implements IOrchestratable {
             xmlProfile = xmlResult;
         });
 
-        if (this.tryParseOldPublishProfile(xmlProfile, creds)) {
+        if (this.tryParsePublishProfileZipDeploy(xmlProfile, creds)) {
+            Logger.Info('Successfully parsed SCM credential from publish-profile format.');
+        } else if (this.tryParseOldPublishProfile(xmlProfile, creds)) {
             Logger.Info('Successfully parsed SCM credential from old publish-profile format.');
         } else if (this.tryParseNewPublishProfile(xmlProfile, creds)) {
             Logger.Info('Successfully passed SCM crednetial from new publish-profile format.');
         } else {
             throw new ValidationError(
                 state, ConfigurationConstant.ParamInPublishProfile,
-                "should contain valid SCM credentials. Please ensure your publish-profile contains 'MSDeploy' publish " +
+                "should contain valid SCM credentials. Please ensure your publish-profile contains 'ZipDeploy' publish or 'MSDeploy' publish " +
                 "method. Ensure 'userName', 'userPWD', and 'publishUrl' exist in the section. You can always acquire " +
                 "the latest publish-profile from portal -> function app resource -> overview -> get publish profile"
             );
@@ -107,6 +109,27 @@ export class ParameterValidator implements IOrchestratable {
         core.setSecret(`${creds.username}`);
         core.setSecret(`${creds.password}`);
         return creds;
+    }
+    
+    private tryParsePublishProfileZipDeploy(xmlResult: any, out: IScmCredentials): boolean {
+        // uri: cp-win-dotnet.scm.azurewebsites.net
+        const options = xmlResult.publishData.publishProfile.filter((p: any) => {
+            return p.$.publishMethod === "ZipDeploy"
+        });
+        if ((options || []).length == 0) {
+            Logger.Error('The publish profile does not contain ZipDeploy publish method.');
+            return false;
+        }
+        const zipDeploy = options[0].$;
+        const publishUrl: string = zipDeploy.publishUrl.split(":")[0];
+        if (publishUrl.indexOf(".scm.") >= 0) {
+            out.uri = `https://${zipDeploy.userName}:${zipDeploy.userPWD}@${publishUrl}`;
+            out.username = zipDeploy.userName;
+            out.password = zipDeploy.userPWD;
+            out.appUrl = zipDeploy.destinationAppUrl;
+            return true;
+        }
+        return false;
     }
 
     private tryParseOldPublishProfile(xmlResult: any, out: IScmCredentials): boolean {

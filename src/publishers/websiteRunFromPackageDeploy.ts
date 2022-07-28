@@ -67,7 +67,8 @@ export class WebsiteRunFromPackageDeploy {
     private static createBlobName(): string {
         const now: Date = new Date();
         const time: string = `${now.getUTCFullYear()}${now.getUTCMonth() + 1}${now.getUTCDate()}${now.getUTCHours()}${now.getUTCMinutes()}${now.getUTCSeconds()}`;
-        return `${ConfigurationConstant.BlobNamePrefix}_${time}.zip`;
+        const randStr = Math.random().toString(36).slice(2, 7);
+        return `${ConfigurationConstant.BlobNamePrefix}_${time}_${randStr}.zip`;
     }
 
     private static async uploadBlobFromFile(state: StateConstant, containerUrl: ContainerURL, blobName:string, filePath: string): Promise<BlobURL> {

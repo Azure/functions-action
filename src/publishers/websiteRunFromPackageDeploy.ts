@@ -112,7 +112,15 @@ export class WebsiteRunFromPackageDeploy {
         }
 
         try {
-            await appService.syncFunctionTriggersViaHostruntime();
+            // wait 30 second before calling sync trigger
+            const retryInterval: number = 30000; 
+            
+            Logger.Info("##[debug]Starting 30 seconds wait time.");
+            await Sleeper.timeout(retryInterval);  
+            Logger.Info("##[debug]Finished wait time.");
+
+            await appService.syncFunctionTriggersViaHostruntime();            
+            Logger.Info("Sync Trigger call was successful.");
         } catch (expt) {
             throw new AzureResourceError(state, "Sync Trigger Functionapp", "Failed to perform sync trigger on function app." +
                 " Function app may have malformed content. Please manually restart your function app and" +

@@ -24,6 +24,7 @@ export class ZipDeploy {
 
         try {
             await this.patchTemporaryAppSettings(context, enableOryxBuild, scmDobuildDuringDeployment);
+            await Client.validateZipDeploy(context, filePath); 
             deploymentId = await context.kuduServiceUtil.deployUsingZipDeploy(filePath, {
                 'slotName': context.appService ? context.appService.getSlot() : 'production'
             });

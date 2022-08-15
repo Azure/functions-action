@@ -1,0 +1,153 @@
+//Shahbaz Chaudhary
+//shahbazc gmail com
+
+//Persistent variables (survive session crash)
+expectedInSeqNum = 1
+expectedOutSeqNum = 1 (assume automatically set)
+
+//Session level variables (do not survive session crash)
+isLoggedIn = false;
+isResendRequested = false;
+
+timeOfLastIn = none
+timeOfLastOut = none (assume automatically set)
+
+sender = nothing
+target = nothing
+version = nothing
+
+msg = valid message arrives
+timeOfLastIn = now
+
+//==================INCOMING=============================
+//-------------FRAME DECODING & MSG VALIDATION-----------------------------
+decode frame
+if checksum not matches
+    ignore msg
+    warn "corrupt msg, checksum didn't match"
+
+
+//-------------LOGON PROCSSING (acceptor)-----------------------------
+
+//first message must be logon [initiator and acceptor behave differently]
+if not isLoggedIn
+    if msg is not [logon]
+        ignore msg
+        error "first message must be [logon]"
+        disconnect connection
+    else msg is [logon]
+        if isAcceptor
+            isAuth = authenticate(msg,remoteIP) //potentially blocking
+            if <isAuth>
+                isLoggedIn = true;
+                initSession{
+                    sender = msg[senderCompID]
+                    target = msg[targetCompID]
+                    version = msg[version]
+                    archiveMsgs = getOldSession(version,sender,target) //potenetially blocking
+                    expectedInSeqnum = getExectedIn(archiveMsgs)
+                    expectedOutSeqnum = getExectedOut(archiveMsgs)
+                }
+                scheduleTimer{
+                	every heartBeatInt seconds call
+		        if (now - timeOfLastOut) > heartBeatInt
+		            send [heartbeat]
+		        if (now - timeOfLastIn) > heartBeatInt
+		            send [test request]
+		        if (now - timeOfLastIn) > (1.5 * heartBeantInt)
+		            error "no heartbeats from counter party, time to die"
+                            disconnect session
+                }
+                send [logon ack]
+            else <not Auth>
+                ignore msg
+                error "unknown connection"
+                disconnect connection
+        else isInitiator
+            isLoggedIn = true;
+            //initSession is done when logon msg is being sent
+            scheduleTimer{
+                	every heartBeatInt seconds call
+		        if (now - timeOfLastOut) > heartBeatInt
+		            send [heartbeat]
+		        if (now - timeOfLastIn) > heartBeatInt
+		            send [test request]
+		        if (now - timeOfLastIn) > (1.5 * heartBeantInt)
+		            error "no heartbeats from counter party, time to die"
+                            disconnect session
+                }
+    
+//-------------COMMON SESSION PROCSSING-----------------------------
+//record msg (needed for resend request)
+record msg
+
+//duplicate logon (CORRECTION: check this in logon logic)
+if isLoggedIn and msg is [logon]
+    ignore msg
+    error "already logged in"
+    send [session reject]
+
+if msg is [sequence-reset] and gap-fill is undefined or N
+    if newseqnum >= expectedInSeqNum
+        expectedInSeqNum = newseqnum
+    else
+        ignore msg
+        error "can't reduce seqnums! manual intervention needed"
+        disconnect connection
+
+//check seqnums
+if inSeqNum = expectedInSeqNum
+    increment expectedInSeqNum
+    isResendRequested = false
+else if inSeqNum < expectedInSeqNum and posdup is Y
+    ignore msg
+else if inSeqNum < expectedInSeqNum and posdup is undefined or N
+    ignore msg
+    error "manual intervention needed!"
+    send [logout] with error reason
+    disconnect connection
+else if inSeqNum > expectedInSeqNum
+    ignore msg
+    if msg is [resend-request] (CONFUSION: check this against spec)
+        for list of requested messages from record
+            if msg is [logon, logout, resendreq, heartbeat, testreq, seqreset]
+                send [seq-reset] with gap-fill Y
+            send msg with posdup = Y
+    if isResendRequested is false
+        isResendRequested = true
+        send [resend-request] for missing messages
+
+if msg is [sequence-reset] and gap-fill is Y
+    if newseqnum >= expectedInSeqNum
+        expectedinSeqNum = newseqnum
+    else
+        ignore msg
+        error "can't reduce seqnums! manual intervention needed"
+        disconnect connection
+
+//check compids and version
+if sender, target or version don't match
+    ignore msg
+    error "sender, target and version must match logon"
+    send [session-reject]
+
+
+//real session logic
+
+//[initiator and acceptor behave differently]
+if msg is [logout]
+    send [logout ack]
+
+if msg is [test request]
+    send [heartbeat] with test request id
+
+if msg is [resend request]
+    for list of requested messages from record
+        if msg is [logon, logout, resendreq, heartbeat, testreq, seqreset]
+            send [seq-reset] with gap-fill Y
+        send msg with posdup = Y
+
+//==================OUTGOING=============================
+fix-string = converToFIX(fix-map, version, sender, target, timestamp, seqnum)
+increment outgoing seqnum
+send fix-string

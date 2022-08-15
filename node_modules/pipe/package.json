@@ -1,0 +1,11 @@
+{
+  "name": "pipe",
+  "description": "An implementation of bi-directional intercepting filter, such as those found in Java's MINA and Netty",
+  "version": "0.0.2",
+  "homepage": "https://github.com/falconair/nodepipe",
+  "author": "Shahbaz Chaudhary <shahbazc@gmail.com>",
+  "main": "./nodepipe",
+  "engines": {
+    "node": ">=0.4.8"
+  }
+}

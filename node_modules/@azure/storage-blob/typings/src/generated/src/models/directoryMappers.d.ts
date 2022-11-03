@@ -1,0 +1,2 @@
+export { DataLakeStorageError, DataLakeStorageErrorError, DirectoryCreateHeaders, DirectoryDeleteHeaders, DirectoryGetAccessControlHeaders, DirectoryRenameHeaders, DirectorySetAccessControlHeaders } from "../models/mappers";
+//# sourceMappingURL=directoryMappers.d.ts.map

@@ -1,2 +1,0 @@
--keep seqnums for all sessions in memory, avoid reading files for every acceptor connection, avoid doing asyc stuff, keep all session logic together!
--watch data directory, whenever a file changes, reload its seqnums

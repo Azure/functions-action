@@ -116,13 +116,15 @@ export class Client {
                     uri = publishingCredentials.properties["scmUri"];
                 }                
 
+                var stats = fs.statSync(webPackage);
+                var fileSizeInBytes = stats.size;
                 const base64Cred: string = Buffer.from(`${username}:${password}`).toString('base64');
                 let request: WebRequest = {
                     method: 'POST',
                     uri: `${uri}/api/zipdeploy/validate`,
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Basic ${base64Cred}`
+                        'Authorization': `Basic ${base64Cred}`,
+                        'Content-Length': fileSizeInBytes
                     },
                     body: fs.createReadStream(webPackage)
                 };

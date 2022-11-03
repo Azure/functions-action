@@ -24,6 +24,11 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
+    - name: Set Node.js 16.x for GitHub Action
+      uses: actions/setup-node@v1
+      with:
+        node-version: 16.x
+
     - name: Setup Python ${{ env.PYTHON_VERSION }} Environment
       uses: actions/setup-python@v1
       with:
@@ -34,11 +39,6 @@ jobs:
 
     - name: Build GitHub Action
       run: npm run build
-
-    - name: E2E Setup Node ${{ env.NODE_VERSION }} Environment
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ env.NODE_VERSION }}
 
     - name: E2E Resolve Project Dependencies Using Pip
       shell: bash

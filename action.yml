@@ -53,5 +53,5 @@ branding:
   icon: 'functionapp.svg'
   color: 'blue'
 runs:
-  using: 'node12'
+  using: 'node16'
   main: 'lib/main.js'

@@ -49,6 +49,8 @@ Alternatively, you can add a `- run: dotnet build --output ./bin` step **before*
 ## Using Publish Profile as Deployment Credential (recommended)
 Using publish profile as deployment credential is recommended if you are not the owner of your Azure subscription. Follow these steps to configure your workflow to use the publish profile from your function app.
 
+**NOTE:** If you are using a Custom handler with the Linux consumption SKU, this deployment process *will not work* . You must use a Service Principal and authenticate with the `azure/login` action.
+
 1. In Azure portal, go to your function app.
 2. Click **Get publish profile** and download **.PublishSettings** file.
 3. Open the **.PublishSettings** file and copy the content.
@@ -59,8 +61,7 @@ Using publish profile as deployment credential is recommended if you are not the
 
 ## Using Azure Service Principal for RBAC as Deployment Credential
 
-Note:  
-If you want to deploy to Linux Consumption plan and your app contains executable file(custom handler, `chrome` in [Puppeteer](https://github.com/puppeteer/puppeteer)/[Playwright](https://github.com/microsoft/playwright) etc), you need to use this way in order to keep executable permission.
+**NOTE:** If you want to deploy to Linux Consumption plan and your app contains executable file(custom handler, `chrome` in [Puppeteer](https://github.com/puppeteer/puppeteer)/[Playwright](https://github.com/microsoft/playwright) etc), you need to use this way in order to keep executable permission.
 
 Follow these steps to configure your workflow to use an [Azure Service Principal for RBAC](https://docs.microsoft.com/en-us/azure/role-based-access-control/overview) and add them as a GitHub Secret in your repository.
 
@@ -83,7 +84,7 @@ Follow these steps to configure your workflow to use an [Azure Service Principal
   }
 ```
 3. Copy and paste the json response from above Azure CLI to your GitHub Repository > Settings > Secrets > Add a new secret > **AZURE_RBAC_CREDENTIALS**
-4. Use [Windows DotNet Function App RBAC](https://github.com/Azure/actions-workflow-samples/blob/master/FunctionApp/windows-dotnet-functionapp-on-azure-rbac.yml) template as a reference to build your workflow in `.github/workflows/` directory.
+4. Use [Windows DotNet Function App RBAC](https://github.com/Azure/actions-workflow-samples/blob/master/FunctionApp/windows-dotnet-functionapp-on-azure-rbac.yml) template as a reference to build your workflow in `.github/workflows/` directory. Ensure that you use `azure/login` action and that you _are not_ using the `publish-profile` parameter
 5. Change variable values in `env:` section according to your function app.
 6. Commit and push your project to GitHub repository, you should see a new GitHub workflow initiated in **Actions** tab.
 

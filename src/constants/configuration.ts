@@ -9,6 +9,7 @@ export class ConfigurationConstant {
     public static readonly ParamInScmDoBuildDuringDeployment: string = 'scm-do-build-during-deployment';
 
     public static readonly ParamOutResultName: string = 'app-url';
+    public static readonly ParamOutPackageUrl: string = 'package-url';
 
     public static readonly ActionName: string = 'DeployFunctionAppToAzure';
     public static readonly BlobContainerName: string = 'github-actions-deploy';

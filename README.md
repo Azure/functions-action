@@ -90,6 +90,12 @@ Follow these steps to configure your workflow to use an [Azure Service Principal
 
 Azure Functions GitHub Action is supported for the Azure public cloud as well as Azure government clouds ('AzureUSGovernment' or 'AzureChinaCloud') and Azure Stack ('AzureStack') Hub. Before running this action, login to the respective Azure Cloud  using [Azure Login](https://github.com/Azure/login) by setting appropriate value for the `environment` parameter.
 
+### Manged Identities for Storage Account Access and Package Deployments
+
+If the function app uses managed identities for accessing the storage account (i.e. `AzureWebJobsStorage` is not set) then the action will use the RBAC account to publish a package deployment to the storage account defined in `AzureWebJobsStorage__accountName`.
+
+If `WEBSITE_RUN_FROM_PACKAGE_BLOB_MI_RESOURCE_ID` is defined then `WEBSITE_RUN_FROM_PACKAGE` will not include a SAS token, otherwise one will be generated. The RBAC account will require [Microsoft.Storage/storageAccounts/listkeys/action](https://learn.microsoft.com/en-us/azure/storage/blobs/authorize-data-operations-portal#use-the-account-access-key) if `AzureWebJobsStorage` is not set.
+
 ## GitHub Action Parameters
 - **app-name**: The function app name on Azure. (e.g. if your function app can be accessed via https://your-site-name.azurewebsites.net/, then **app-name** should be `your-site-name`).
 - **package**: This is the location in your project to be published. By default, this value is set to `.`, which means all files and folders in the GitHub repository will be deployed.

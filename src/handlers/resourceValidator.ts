@@ -152,14 +152,14 @@ export class ResourceValidator implements IOrchestratable {
             );
         }
 
-        if (!appSettings.properties['AzureWebJobsStorage']) {
+        if (!appSettings.properties['AzureWebJobsStorage'] && !appSettings.properties['AzureWebJobsStorage__accountName']) {
             Logger.Warn(
-                'AzureWebJobsStorage does not exist in app settings (from Azure Resource Manager with RBAC credential). ' +
-                'Please ensure the AzureWebJobsStorage app setting is configured as it is critical for function runtime. ' +
+                'Neither AzureWebJobsStorage nor AzureWebJobsStorage__accountName exist in app settings (from Azure Resource Manager with RBAC credential). ' +
+                'Please ensure one of them is configured as it is critical for function runtime. ' +
                 'For more information, please visit the function app settings reference page: ' +
                 'https://docs.microsoft.com/en-us/azure/azure-functions/functions-app-settings#azurewebjobsstorage'
             );
-        } else {
+        } else if (appSettings.properties['AzureWebJobsStorage']) {
             console.log(`::add-mask::${appSettings.properties['AzureWebJobsStorage']}`);
         }
 
@@ -170,10 +170,12 @@ export class ResourceValidator implements IOrchestratable {
 
         const result: IAppSettings = {
             AzureWebJobsStorage: appSettings.properties['AzureWebJobsStorage'],
+            AzureWebJobsStorage__accountName: appSettings.properties['AzureWebJobsStorage__accountName'],
             FUNCTIONS_WORKER_RUNTIME: appSettings.properties['FUNCTIONS_WORKER_RUNTIME'],
             ENABLE_ORYX_BUILD: appSettings.properties['ENABLE_ORYX_BUILD'],
             SCM_DO_BUILD_DURING_DEPLOYMENT: appSettings.properties['SCM_DO_BUILD_DURING_DEPLOYMENT'],
             WEBSITE_RUN_FROM_PACKAGE: appSettings.properties['WEBSITE_RUN_FROM_PACKAGE'],
+            WEBSITE_RUN_FROM_PACKAGE_BLOB_MI_RESOURCE_ID: appSettings.properties['WEBSITE_RUN_FROM_PACKAGE_BLOB_MI_RESOURCE_ID'],
             SCM_RUN_FROM_PACKAGE: appSettings.properties['SCM_RUN_FROM_PACKAGE']
         };
         return result;
@@ -197,14 +199,14 @@ export class ResourceValidator implements IOrchestratable {
             );
         }
 
-        if (!appSettings['AzureWebJobsStorage']) {
+        if (!appSettings.properties['AzureWebJobsStorage'] && !appSettings.properties['AzureWebJobsStorage__accountName']) {
             Logger.Warn(
-                'AzureWebJobsStorage does not exist in app settings (from Kudu SCM site with publish-profile credential). ' +
-                'Please ensure the AzureWebJobsStorage app setting is configured as it is critical for function runtime. ' +
+                'Neither AzureWebJobsStorage nor AzureWebJobsStorage__accountName exist in app settings (from Kudu SCM site with publish-profile credential). ' +
+                'Please ensure one of them is configured as it is critical for function runtime. ' +
                 'For more information, please visit the function app settings reference page: ' +
                 'https://docs.microsoft.com/en-us/azure/azure-functions/functions-app-settings#azurewebjobsstorage'
             );
-        } else {
+        } else if (appSettings.properties['AzureWebJobsStorage']) {
             console.log(`::add-mask::${appSettings['AzureWebJobsStorage']}`);
         }
 
@@ -215,10 +217,12 @@ export class ResourceValidator implements IOrchestratable {
 
         const result: IAppSettings = {
             AzureWebJobsStorage: appSettings['AzureWebJobsStorage'],
+            AzureWebJobsStorage__accountName: appSettings.properties['AzureWebJobsStorage__accountName'],
             FUNCTIONS_WORKER_RUNTIME: appSettings['FUNCTIONS_WORKER_RUNTIME'],
             ENABLE_ORYX_BUILD: appSettings['ENABLE_ORYX_BUILD'],
             SCM_DO_BUILD_DURING_DEPLOYMENT: appSettings['SCM_DO_BUILD_DURING_DEPLOYMENT'],
             WEBSITE_RUN_FROM_PACKAGE: appSettings['WEBSITE_RUN_FROM_PACKAGE'],
+            WEBSITE_RUN_FROM_PACKAGE_BLOB_MI_RESOURCE_ID: appSettings.properties['WEBSITE_RUN_FROM_PACKAGE_BLOB_MI_RESOURCE_ID'],
             SCM_RUN_FROM_PACKAGE: appSettings['SCM_RUN_FROM_PACKAGE']
         };
         return result

@@ -1,7 +1,7 @@
 import { StateConstant } from "../constants/state";
 import { IActionContext } from "../interfaces/IActionContext";
 import { AzureResourceError } from "../exceptions";
-import { Logger, Sleeper, Client, Parser } from "../utils";
+import { Logger, Sleeper, Parser } from "../utils";
 import { AuthenticationType } from "../constants/authentication_type";
 import { IAppSettings } from "../interfaces/IAppSettings";
 import { RuntimeStackConstant } from "../constants/runtime_stack";
@@ -24,7 +24,9 @@ export class ZipDeploy {
 
         try {
             await this.patchTemporaryAppSettings(context, enableOryxBuild, scmDobuildDuringDeployment);
-            await Client.validateZipDeploy(context, filePath); 
+            if (context.authenticationType === AuthenticationType.Rbac && context.os === RuntimeStackConstant.Windows) {
+                await context.kuduService.validateZipDeploy(filePath); 
+            }
             deploymentId = await context.kuduServiceUtil.deployUsingZipDeploy(filePath, {
                 'slotName': context.appService ? context.appService.getSlot() : 'production'
             });
@@ -98,19 +100,14 @@ export class ZipDeploy {
         try {
             if (context.authenticationType === AuthenticationType.Scm) {
                 // Restore previous app settings if they are temporarily changed
-                if (original.WEBSITE_RUN_FROM_PACKAGE) {
-                    await Client.updateAppSettingViaKudu(context.scmCredentials, {
-                        'WEBSITE_RUN_FROM_PACKAGE': original.WEBSITE_RUN_FROM_PACKAGE
-                    }, 3, 3, false);
-                }
                 if (original.SCM_DO_BUILD_DURING_DEPLOYMENT) {
-                    await Client.updateAppSettingViaKudu(context.scmCredentials, {
-                        'SCM_DO_BUILD_DURING_DEPLOYMENT': original.SCM_DO_BUILD_DURING_DEPLOYMENT
+                    Logger.Info(`Restoring SCM_DO_BUILD_DURING_DEPLOYMENT in Kudu container to ${original.SCM_DO_BUILD_DURING_DEPLOYMENT}`);
+                    await context.kuduService.updateAppSettingViaKudu({'SCM_DO_BUILD_DURING_DEPLOYMENT': original.SCM_DO_BUILD_DURING_DEPLOYMENT
                     }, 3, 3, false);
                 }
                 if (original.ENABLE_ORYX_BUILD) {
-                    await Client.updateAppSettingViaKudu(context.scmCredentials, {
-                        'ENABLE_ORYX_BUILD': original.ENABLE_ORYX_BUILD
+                    Logger.Info(`Restoring ENABLE_ORYX_BUILD in Kudu container to ${original.ENABLE_ORYX_BUILD}`);
+                    await context.kuduService.updateAppSettingViaKudu({'ENABLE_ORYX_BUILD': original.ENABLE_ORYX_BUILD
                     }, 3, 3, false);
                 }
             }
@@ -123,17 +120,13 @@ export class ZipDeploy {
         try {
             if (context.authenticationType === AuthenticationType.Scm) {
                 // Delete previous app settings if they are temporarily set
-                if (original.WEBSITE_RUN_FROM_PACKAGE === undefined) {
-                    await Client.deleteAppSettingViaKudu(context.scmCredentials,
-                        'WEBSITE_RUN_FROM_PACKAGE', 3, 3, false);
-                }
                 if (original.SCM_DO_BUILD_DURING_DEPLOYMENT === undefined) {
-                    await Client.deleteAppSettingViaKudu(context.scmCredentials,
-                        'SCM_DO_BUILD_DURING_DEPLOYMENT', 3, 3, false);
+                    Logger.Info(`Deleting SCM_DO_BUILD_DURING_DEPLOYMENT in Kudu container`);
+                    await context.kuduService.deleteAppSettingViaKudu('SCM_DO_BUILD_DURING_DEPLOYMENT', 3, 3, false);
                 }
                 if (original.ENABLE_ORYX_BUILD === undefined) {
-                    await Client.deleteAppSettingViaKudu(context.scmCredentials,
-                        'ENABLE_ORYX_BUILD', 3, 3, false);
+                    Logger.Info(`Deleting ENABLE_ORYX_BUILD in Kudu container`);
+                    await context.kuduService.deleteAppSettingViaKudu('ENABLE_ORYX_BUILD', 3, 3, false);
                 }
             }
         } catch (expt) {
@@ -184,8 +177,8 @@ export class ZipDeploy {
             return await context.appService.patchApplicationSettings(settings);
         }
         if (context.authenticationType === AuthenticationType.Scm) {
-            Logger.Info("Update using Client.updateAppSettingViaKudu");
-            return await Client.updateAppSettingViaKudu(context.scmCredentials, settings, 3);
+            Logger.Info("Update using context.kuduService.updateAppSettingViaKudu");
+            return await context.kuduService.updateAppSettingViaKudu(settings, 3);
         }
     }
 }

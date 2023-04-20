@@ -1,15 +1,15 @@
 import { Package, PackageType } from 'azure-actions-utility/packageUtility';
 
 import { AuthenticationType } from '../constants/authentication_type';
-import { AzureAppService } from 'azure-actions-appservice-rest/Arm/azure-app-service';
-import { AzureAppServiceUtility } from 'azure-actions-appservice-rest/Utilities/AzureAppServiceUtility';
+import { AzureAppService } from '../appservice-rest/Arm/azure-app-service';
+import { AzureAppServiceUtility } from '../appservice-rest/Utilities/AzureAppServiceUtility';
 import { FunctionRuntimeConstant } from '../constants/function_runtime';
 import { FunctionSkuConstant } from '../constants/function_sku';
 import { IAppSettings } from './IAppSettings';
 import { IAuthorizer } from 'azure-actions-webclient/Authorizer/IAuthorizer';
 import { IScmCredentials } from './IScmCredentials';
-import { Kudu } from 'azure-actions-appservice-rest/Kudu/azure-app-kudu-service';
-import { KuduServiceUtility } from 'azure-actions-appservice-rest/Utilities/KuduServiceUtility';
+import { Kudu } from '../appservice-rest/Kudu/azure-app-kudu-service';
+import { KuduServiceUtility } from '../appservice-rest/Utilities/KuduServiceUtility';
 import { PublishMethodConstant } from '../constants/publish_method';
 import { RuntimeStackConstant } from '../constants/runtime_stack';
 

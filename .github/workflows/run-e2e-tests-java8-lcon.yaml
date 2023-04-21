@@ -50,13 +50,17 @@ jobs:
         mvn azure-functions:package
         popd
 
+    - name: 'Login via Azure CLI'
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.RBAC_GAE_FA_JAVA8_LCON }}
+
     - name: E2E Run Azure Functions Action
       uses: ./
       id: fa
       with:
         app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
         package: './${{ env.POM_XML_DIRECTORY }}'
-        publish-profile: ${{ secrets.GAE_FA_JAVA8_LCON }}
         respect-pom-xml: true
 
     - name: E2E Check HttpTrigger Result

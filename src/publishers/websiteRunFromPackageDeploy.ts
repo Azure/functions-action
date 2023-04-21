@@ -1,9 +1,9 @@
 import { Aborter, ContainerURL, IBlobSASSignatureValues, ServiceURL, SharedKeyCredential, StorageURL } from '@azure/storage-blob';
 import { AzureResourceError, ValidationError } from '../exceptions';
 import { BlobURL, BlockBlobURL, Pipeline, generateBlobSASQueryParameters, uploadFileToBlockBlob } from '@azure/storage-blob';
-import { Client, Logger, Parser, Sleeper } from '../utils';
+import { Logger, Parser, Sleeper } from '../utils';
 
-import { AzureAppService } from 'azure-actions-appservice-rest/Arm/azure-app-service';
+import { AzureAppService } from '../appservice-rest/Arm/azure-app-service';
 import { ConfigurationConstant } from '../constants/configuration';
 import { IActionContext } from '../interfaces/IActionContext';
 import { IStorageAccount } from '../interfaces/IStorageAccount';

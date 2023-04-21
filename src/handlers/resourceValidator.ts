@@ -4,8 +4,8 @@ import { FunctionSkuConstant, FunctionSkuUtil } from '../constants/function_sku'
 
 import { AuthenticationType } from '../constants/authentication_type';
 import { AuthorizerFactory } from 'azure-actions-webclient/AuthorizerFactory';
-import { AzureAppService } from 'azure-actions-appservice-rest/Arm/azure-app-service';
-import { AzureAppServiceUtility } from 'azure-actions-appservice-rest/Utilities/AzureAppServiceUtility';
+import { AzureAppService } from '../appservice-rest/Arm/azure-app-service';
+import { AzureAppServiceUtility } from '../appservice-rest/Utilities/AzureAppServiceUtility';
 import { AzureResourceFilterUtility } from 'azure-actions-appservice-rest/Utilities/AzureResourceFilterUtility';
 import { ConfigurationConstant } from '../constants/configuration';
 import { IActionContext } from '../interfaces/IActionContext';
@@ -14,8 +14,8 @@ import { IAppSettings } from '../interfaces/IAppSettings';
 import { IAuthorizer } from 'azure-actions-webclient/Authorizer/IAuthorizer';
 import { IOrchestratable } from '../interfaces/IOrchestratable';
 import { IScmCredentials } from '../interfaces/IScmCredentials';
-import { Kudu } from 'azure-actions-appservice-rest/Kudu/azure-app-kudu-service';
-import { KuduServiceUtility } from 'azure-actions-appservice-rest/Utilities/KuduServiceUtility';
+import { Kudu } from '../appservice-rest/Kudu/azure-app-kudu-service';
+import { KuduServiceUtility } from '../appservice-rest/Utilities/KuduServiceUtility';
 import { Logger } from '../utils';
 import { RuntimeStackConstant } from '../constants/runtime_stack';
 import { StateConstant } from '../constants/state';
@@ -73,7 +73,7 @@ export class ResourceValidator implements IOrchestratable {
         this._endpoint = await AuthorizerFactory.getAuthorizer();
         await this.getResourceDetails(state, this._endpoint, params.appName);
         this._appService = new AzureAppService(this._endpoint, this._resourceGroupName, params.appName, params.slot);
-        this._appServiceUtil = new AzureAppServiceUtility(this._appService);
+        this._appServiceUtil = new AzureAppServiceUtility(this._appService, this._endpoint);
         this._kuduService = await this._appServiceUtil.getKuduService();
         this._kuduServiceUtil = new KuduServiceUtility(this._kuduService);
         this._sku = await this.getFunctionappSku(state, this._appService);

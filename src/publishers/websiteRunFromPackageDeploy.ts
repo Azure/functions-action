@@ -6,7 +6,7 @@ import { DefaultAzureCredential } from '@azure/identity';
 
 import { AzureResourceError } from '../exceptions';
 import { Logger, Sleeper } from '../utils';
-import { AzureAppService } from 'azure-actions-appservice-rest/Arm/azure-app-service';
+import { AzureAppService } from '../appservice-rest/Arm/azure-app-service';
 import { ConfigurationConstant } from '../constants/configuration';
 import { IActionContext } from '../interfaces/IActionContext';
 import { StateConstant } from '../constants/state';

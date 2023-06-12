@@ -1,67 +1,52 @@
-import { Aborter, ContainerURL, IBlobSASSignatureValues, ServiceURL, SharedKeyCredential, StorageURL } from '@azure/storage-blob';
-import { AzureResourceError, ValidationError } from '../exceptions';
-import { BlobURL, BlockBlobURL, Pipeline, generateBlobSASQueryParameters, uploadFileToBlockBlob } from '@azure/storage-blob';
-import { Logger, Parser, Sleeper } from '../utils';
+import * as core from '@actions/core';
+import { BlobServiceClient, ContainerClient, BlockBlobClient, BlobSASPermissions, BlobGenerateSasUrlOptions } from '@azure/storage-blob';
+import { generateBlobSASQueryParameters, StorageSharedKeyCredential, SASQueryParameters, BlobSASSignatureValues, SASProtocol } from '@azure/storage-blob';
+import { StorageManagementClient, StorageAccountListKeysResult } from '@azure/arm-storage';
+import { DefaultAzureCredential } from '@azure/identity';
 
+import { AzureResourceError } from '../exceptions';
+import { Logger, Sleeper } from '../utils';
 import { AzureAppService } from '../appservice-rest/Arm/azure-app-service';
 import { ConfigurationConstant } from '../constants/configuration';
 import { IActionContext } from '../interfaces/IActionContext';
-import { IStorageAccount } from '../interfaces/IStorageAccount';
 import { StateConstant } from '../constants/state';
 
 export class WebsiteRunFromPackageDeploy {
     public static async execute(state: StateConstant, context: IActionContext) {
-        const storage: IStorageAccount = await this.getStorageCredential(state, context.appSettings.AzureWebJobsStorage);
-        const blobServiceCredential: SharedKeyCredential = new SharedKeyCredential(storage.AccountName, storage.AccountKey);
-        const blobServicePipeline: Pipeline = StorageURL.newPipeline(blobServiceCredential, {
-            retryOptions: {
-                maxTries: 3
-            }
-        });
-        const blobServiceUrl: ServiceURL = new ServiceURL(
-            `https://${storage.AccountName}.blob.core.windows.net`,
-            blobServicePipeline
-        );
-        const containerUrl: ContainerURL = await this.createBlobContainerIfNotExists(state, blobServiceUrl);
+        let blobServiceClient: BlobServiceClient;
+
+        if (context.appSettings.AzureWebJobsStorage) {
+            Logger.Info("Using AzureWebJobsStorage for Blob access.");
+            blobServiceClient = BlobServiceClient.fromConnectionString(context.appSettings.AzureWebJobsStorage);
+        } else {
+            Logger.Info("Using AzureWebJobsStorage__accountName and RBAC for Blob access.");
+            blobServiceClient = new BlobServiceClient(
+                `https://${context.appSettings.AzureWebJobsStorage__accountName}.blob.core.windows.net`,
+                new DefaultAzureCredential()
+            );
+        }
+        const containerClient: ContainerClient = blobServiceClient.getContainerClient(ConfigurationConstant.BlobContainerName);
+        await containerClient.createIfNotExists();
         const blobName: string = this.createBlobName();
-        const blobUrl: BlobURL = await this.uploadBlobFromFile(state, containerUrl, blobName, context.publishContentPath);
-        const blobSasParams: string = this.getBlobSasQueryParams(blobName, blobServiceCredential);
-        await this.publishToFunctionapp(state, context.appService, `${blobUrl.url}?${blobSasParams}`);
-    }
+        let blockBlobClient: BlockBlobClient = containerClient.getBlockBlobClient(blobName);
+        await blockBlobClient.uploadFile(context.publishContentPath);
 
-    private static async getStorageCredential(state: StateConstant, storageString: string): Promise<IStorageAccount> {
-        let storageData: IStorageAccount;
-        let dictionary: { [key: string]: string };
-        try {
-            dictionary = Parser.GetAzureWebjobsStorage(storageString);
-        } catch (expt) {
-            throw new ValidationError(state, 'AzureWebjobsStorage', 'Failed to convert by semicolon delimeter', expt);
-        }
-
-        storageData = {
-            AccountKey: dictionary["AccountKey"],
-            AccountName: dictionary["AccountName"]
-        };
-
-        if (!storageData.AccountKey || !storageData.AccountName) {
-            throw new ValidationError(state, 'AzureWebjobsStorage', 'Failed to fetch AccountKey or AccountName');
-        }
-
-        return storageData;
-    }
-
-    private static async createBlobContainerIfNotExists(state: StateConstant, blobServiceUrl: ServiceURL): Promise<ContainerURL> {
-        const containerName: string = ConfigurationConstant.BlobContainerName;
-        const containerURL = ContainerURL.fromServiceURL(blobServiceUrl, containerName);
-        try {
-            await containerURL.create(Aborter.timeout(ConfigurationConstant.BlobServiceTimeoutMs));
-        } catch (expt) {
-            if (expt instanceof Error && expt.message.indexOf('ContainerAlreadyExists') >= 0) {
-                return containerURL;
+        const packageUrl: string = blockBlobClient.url;
+        core.setOutput(ConfigurationConstant.ParamOutPackageUrl, packageUrl);
+        let bobUrl: string;
+        if (context.appSettings.WEBSITE_RUN_FROM_PACKAGE_BLOB_MI_RESOURCE_ID) {
+            Logger.Info("Package Url will use RBAC.");
+            bobUrl = packageUrl;
+        } else {
+            Logger.Info("Package Url will use SAS.");
+            if (context.appSettings.AzureWebJobsStorage) {
+                bobUrl = await this.getBlobSasUrl(blockBlobClient);
+            } else {
+                const sasParams: string = await this.getBlobSasParams(blobServiceClient.accountName, blobName, containerClient.containerName, context);
+                bobUrl = `${packageUrl}?${sasParams}`;
             }
-            throw new AzureResourceError(state, "Create Blob Container", `Failed to create container ${containerName}`, expt);
         }
-        return containerURL;
+        await this.publishToFunctionapp(state, context.appService, bobUrl);
     }
 
     private static createBlobName(): string {
@@ -70,36 +55,44 @@ export class WebsiteRunFromPackageDeploy {
         return `${ConfigurationConstant.BlobNamePrefix}_${time}.zip`;
     }
 
-    private static async uploadBlobFromFile(state: StateConstant, containerUrl: ContainerURL, blobName:string, filePath: string): Promise<BlobURL> {
-        // Upload blob to storage account
-        const blobURL: BlobURL = BlobURL.fromContainerURL(containerUrl, blobName);
-        const blockBlobURL: BlockBlobURL = BlockBlobURL.fromBlobURL(blobURL);
-        try {
-            uploadFileToBlockBlob(Aborter.timeout(ConfigurationConstant.BlobUploadTimeoutMs), filePath, blockBlobURL, {
-                blockSize: ConfigurationConstant.BlobUploadBlockSizeByte,
-                parallelism: ConfigurationConstant.BlobUplaodBlockParallel,
-            });
-        } catch (expt) {
-            throw new AzureResourceError(state, "Upload File to Blob", `Failed when uploading ${filePath}`, expt);
-        }
-        return blockBlobURL;
+    private static async getBlobSasUrl(client: BlockBlobClient): Promise<string> {
+        const now: Date = new Date();
+        const startTime: Date = new Date();
+        startTime.setMinutes(now.getMinutes() - 5);
+        const expiryTime: Date = new Date();
+        expiryTime.setFullYear(now.getFullYear() + 1);
+        const options: BlobGenerateSasUrlOptions = {
+            permissions: BlobSASPermissions.parse("r"),
+            startsOn: startTime,
+            expiresOn: expiryTime
+        };
+
+        return client.generateSasUrl(options);
     }
 
-    private static getBlobSasQueryParams(blobName: string, credential: SharedKeyCredential): string {
+    private static async getBlobSasParams(accountName: string, blobName: string, containerName: string, context: IActionContext): Promise<string> {
+        Logger.Info("Looking up storage account Keys");
+
+        const storageClient: StorageManagementClient = new StorageManagementClient(new DefaultAzureCredential(), context.endpoint.subscriptionID);
+        const keys: StorageAccountListKeysResult = await storageClient.storageAccounts.listKeys(context.resourceGroupName, accountName);
+        const key = keys.keys?.[0].value;
+
         const now: Date = new Date();
         const startTime: Date = new Date();
         startTime.setMinutes(now.getMinutes() - 5);
         const expiryTime: Date = new Date();
         expiryTime.setFullYear(now.getFullYear() + 1);
 
-        const blobSasValues: IBlobSASSignatureValues = {
-            blobName: blobName,
-            containerName: ConfigurationConstant.BlobContainerName,
-            startTime: startTime,
-            expiryTime: expiryTime,
-            permissions: ConfigurationConstant.BlobPermission
-        }
-        return generateBlobSASQueryParameters(blobSasValues, credential).toString();
+        const sasOptions: BlobSASSignatureValues = {
+            blobName,
+            containerName,
+            permissions: BlobSASPermissions.parse("r"),
+            protocol: SASProtocol.Https,
+            startsOn: startTime,
+            expiresOn: expiryTime
+        };
+        const sasParams: SASQueryParameters = generateBlobSASQueryParameters(sasOptions, new StorageSharedKeyCredential(accountName, key));
+        return sasParams.toString();
     }
 
     private static async publishToFunctionapp(state: StateConstant,
@@ -113,13 +106,13 @@ export class WebsiteRunFromPackageDeploy {
 
         try {
             // wait 30 second before calling sync trigger
-            const retryInterval: number = 30000; 
-            
+            const retryInterval: number = 30000;
+
             Logger.Info("##[debug]Starting 30 seconds wait time.");
-            await Sleeper.timeout(retryInterval);  
+            await Sleeper.timeout(retryInterval);
             Logger.Info("##[debug]Finished wait time.");
 
-            await appService.syncFunctionTriggersViaHostruntime();            
+            await appService.syncFunctionTriggersViaHostruntime();
             Logger.Info("Sync Trigger call was successful.");
         } catch (expt) {
             throw new AzureResourceError(state, "Sync Trigger Functionapp", "Failed to perform sync trigger on function app." +

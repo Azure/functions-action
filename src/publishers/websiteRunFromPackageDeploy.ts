@@ -43,7 +43,8 @@ export class WebsiteRunFromPackageDeploy {
                 bobUrl = await this.getBlobSasUrl(blockBlobClient);
             } else {
                 const sasParams: string = await this.getBlobSasParams(blobServiceClient.accountName, blobName, containerClient.containerName, context);
-                bobUrl = `${packageUrl}?${sasParams}`;
+                //bobUrl = `${packageUrl}?${sasParams}`;
+                bobUrl = packageUrl;
             }
         }
         await this.publishToFunctionapp(state, context.appService, bobUrl);

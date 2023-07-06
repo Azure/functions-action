@@ -34,18 +34,28 @@ export class WebsiteRunFromPackageDeploy {
         const packageUrl: string = blockBlobClient.url;
         core.setOutput(ConfigurationConstant.ParamOutPackageUrl, packageUrl);
         let bobUrl: string;
-        if (context.appSettings.WEBSITE_RUN_FROM_PACKAGE_BLOB_MI_RESOURCE_ID) {
-            Logger.Info("Package Url will use RBAC.");
-            bobUrl = packageUrl;
-        } else {
+        // if (context.appSettings.WEBSITE_RUN_FROM_PACKAGE_BLOB_MI_RESOURCE_ID) {
+        //     Logger.Info("Package Url will use RBAC.");
+        //     bobUrl = packageUrl;
+        // } else {
+        //     Logger.Info("Package Url will use SAS.");
+        //     if (context.appSettings.AzureWebJobsStorage) {
+        //         bobUrl = await this.getBlobSasUrl(blockBlobClient);
+        //     } else {
+        //         const sasParams: string = await this.getBlobSasParams(blobServiceClient.accountName, blobName, containerClient.containerName, context);
+        //         bobUrl = `${packageUrl}?${sasParams}`;
+        //     }
+        // }
+        if (context.appSettings.AzureWebJobsStorage) {
             Logger.Info("Package Url will use SAS.");
-            if (context.appSettings.AzureWebJobsStorage) {
-                bobUrl = await this.getBlobSasUrl(blockBlobClient);
+            bobUrl = await this.getBlobSasUrl(blockBlobClient);
+        } else {
+            if (context.appSettings.WEBSITE_RUN_FROM_PACKAGE_BLOB_MI_RESOURCE_ID) {
+                Logger.Info("Package Url will use RBAC with User-assigned managed identity because WEBSITE_RUN_FROM_PACKAGE_BLOB_MI_RESOURCE_ID app setting is present.");
             } else {
-                //const sasParams: string = await this.getBlobSasParams(blobServiceClient.accountName, blobName, containerClient.containerName, context);
-                //bobUrl = `${packageUrl}?${sasParams}`;
-                bobUrl = packageUrl;
-            }
+                Logger.Info("Package Url will use RBAC with System-assigned managed identity.");
+            }            
+            bobUrl = packageUrl;
         }
         await this.publishToFunctionapp(state, context.appService, bobUrl);
     }

@@ -42,34 +42,12 @@ module.exports = function parse (text, reviver) {
 function internalize (holder, name, reviver) {
     const value = holder[name]
     if (value != null && typeof value === 'object') {
-        if (Array.isArray(value)) {
-            for (let i = 0; i < value.length; i++) {
-                const key = String(i)
-                const replacement = internalize(value, key, reviver)
-                if (replacement === undefined) {
-                    delete value[key]
-                } else {
-                    Object.defineProperty(value, key, {
-                        value: replacement,
-                        writable: true,
-                        enumerable: true,
-                        configurable: true,
-                    })
-                }
-            }
-        } else {
-            for (const key in value) {
-                const replacement = internalize(value, key, reviver)
-                if (replacement === undefined) {
-                    delete value[key]
-                } else {
-                    Object.defineProperty(value, key, {
-                        value: replacement,
-                        writable: true,
-                        enumerable: true,
-                        configurable: true,
-                    })
-                }
+        for (const key in value) {
+            const replacement = internalize(value, key, reviver)
+            if (replacement === undefined) {
+                delete value[key]
+            } else {
+                value[key] = replacement
             }
         }
     }
@@ -995,12 +973,7 @@ function push () {
         if (Array.isArray(parent)) {
             parent.push(value)
         } else {
-            Object.defineProperty(parent, key, {
-                value,
-                writable: true,
-                enumerable: true,
-                configurable: true,
-            })
+            parent[key] = value
         }
     }
 

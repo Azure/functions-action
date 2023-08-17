@@ -49,6 +49,8 @@ inputs:
 outputs:
   app-url:
     description: 'URL to work with your function app'
+  package-url:
+    description: 'URL to the package zip file if using package deployment'
 branding:
   icon: 'functionapp.svg'
   color: 'blue'

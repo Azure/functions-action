@@ -1,0 +1,35 @@
+name: VERIFY_DIST
+
+on:
+  push: {}
+
+env:
+  NODE_VERSION: '16.x'
+
+jobs:
+  check-dist:
+    runs-on: ubuntu-latest
+    steps:
+    - name: 'Checkout GitHub Action'
+      uses: actions/checkout@master
+
+    - name: Setup Node ${{ env.NODE_VERSION }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
+    - name: 'Re-package release'
+      shell: bash
+      run: |
+        ./release.sh
+
+    
+    - name: 'Compare releases'
+      shell: bash
+      run: |
+        changes=$(git diff dist/)
+        if [ "$changes" ]
+        then
+          echo "$changes"
+          exit -1
+        fi

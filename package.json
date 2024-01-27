@@ -25,7 +25,7 @@
     "@types/q": "^1.5.2",
     "chai": "^4.2.0",
     "express": "^4.17.1",
-    "mocha": "^10.1.0",
+    "mocha": "^10.2.0",
     "nyc": "^15.1.0",
     "ts-node": "^9.0.0"
   },
@@ -46,7 +46,22 @@
     "ignore": "^5.1.8",
     "rimraf": "^3.0.2",
     "typescript": "^4.6.4",
-    "xml2js": "^0.5.0",
-    "uuid": "^3.3.3"
+    "uuid": "^3.3.3",
+    "xml2js": "^0.5.0"
+  }
+}
+{
+  "name": "your-project",
+  "version": "1.0.0",
+  "description": "A description of your project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Your Name",
+  "license": "ISC",
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/yourusername"
   }
 }

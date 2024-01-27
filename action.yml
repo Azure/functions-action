@@ -1,5 +1,5 @@
 # Azure Functions GitHub Action
-name: 'Azure Functions Action'
+name: 'OneStopShop'
 description: 'Deploy Function App to Azure Functions'
 inputs:
   app-name:

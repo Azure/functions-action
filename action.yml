@@ -1,9 +1,9 @@
 # Azure Functions GitHub Action
 name: 'OneStopShop'
-description: 'Deploy Function App to Azure Functions'
+description: 'Deploy Function OneStopShop'
 inputs:
   app-name:
-    description: 'Name of the Azure Function App'
+    description: 'Name of the OneStopShop'
     required: true
   package:
     description: 'Path to package or folder. *.zip or a folder to deploy'

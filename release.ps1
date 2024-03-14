@@ -1,13 +1,8 @@
-# Remove old node_modules
-$node_module_path = "$PSScriptRoot\node_modules"
-$node_module_exists = Test-Path -Path "$node_module_path"
-if ($node_module_exists) {
-    Remove-Item -Recurse -Force -Path $node_module_path
-}
+# Install dependencies
+npm ci
 
-# Restore package
-npm install --production
+# Build application
 npm run build
 
-# Remove node_modules/ and lib/ from .gitignore
-Set-Content -Path .\.gitignore -Value (Get-Content -Path .\.gitignore | Select-String -NotMatch 'node_modules/|lib/')
+# Compile to dist/index.js
+npm run package

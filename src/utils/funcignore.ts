@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "fs";
 import { resolve, normalize } from "path";
-import { glob, globSync } from "glob";
-import * as rimraf from "rimraf";
+import { globSync } from "glob";
+import { rimrafSync } from "rimraf";
 import * as ignore from "ignore";
 import { Logger } from "./logger";
 
@@ -46,7 +46,7 @@ export class FuncIgnore {
             const filename = name.replace(`${sanitizedWorkingDir}/`, "");
             if (ignoreParser.ignores(filename)) {
                 try {
-                    rimraf.sync(name, { maxBusyTries: 1 });
+                    rimrafSync(name);
                 } catch (error) {
                     Logger.Warn(
                         `Failed to remove ${filename} (file defined in .gitignore)`

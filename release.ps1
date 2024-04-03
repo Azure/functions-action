@@ -7,6 +7,8 @@ if ($node_module_exists) {
 
 # Restore package
 npm install --production
+# added 'npm i --save-dev @types/q' as the build was failing with the error 'Cannot find name 'Q''
+npm i --save-dev @types/q
 npm run build
 
 # Remove node_modules/ and lib/ from .gitignore

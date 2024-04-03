@@ -1,0 +1,29 @@
+jobs:
+  - job: "Build_AND_Start_CodeQL_Reporting"
+    variables:
+      ApplicationInsightAgentVersion: 3.4.16
+      Codeql.Enabled: true
+      Codeql.Language: javascript
+
+    pool:
+      name: '1ES-Hosted-AzFunc'
+      demands:
+        - ImageOverride -equals MMS2019TLS
+    
+    steps:
+    - checkout: self
+    - task: CodeQL3000Init@0
+      inputs:
+        ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/master') }}:
+          Enabled: true
+          Language: javascript 
+        ${{ else }}:
+          Enabled: false
+
+    # Build tasks
+    # CodeQL WILL NOT WORK for compiled languages if there are no build tasks here
+    - pwsh: '& .\release.ps1'
+      displayName: 'Build project with javascript library'
+
+    - task: CodeQL3000Finalize@0
+      condition: always()

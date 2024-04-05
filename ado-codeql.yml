@@ -14,11 +14,8 @@ jobs:
     - checkout: self
     - task: CodeQL3000Init@0
       inputs:
-        ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/master') }}:
-          Enabled: true
-          Language: javascript 
-        ${{ else }}:
-          Enabled: false
+        Enabled: true
+        Language: javascript 
 
     # Build tasks
     # CodeQL WILL NOT WORK for compiled languages if there are no build tasks here

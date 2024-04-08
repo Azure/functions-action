@@ -16,7 +16,7 @@ jobs:
       inputs:
         Enabled: true
         Language: javascript
-        ExcludePathPatterns: $(Build.SourcesDirectory)/tests/**/*.java, $(Build.SourcesDirectory)/tests/**/*.py, $(Build.SourcesDirectory)/tests
+        ExcludePathPatterns: $(Build.SourcesDirectory)/tests
 
     # Build tasks no needed for javascript
     # CodeQL WILL NOT WORK for compiled languages if there are no build tasks here

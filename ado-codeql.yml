@@ -4,6 +4,7 @@ jobs:
       ApplicationInsightAgentVersion: 3.4.16
       Codeql.Enabled: true
       Codeql.Language: javascript
+      Codeql.Cadence: 0
 
     pool:
       name: '1ES-Hosted-AzFunc'
@@ -16,7 +17,8 @@ jobs:
       inputs:
         Enabled: true
         Language: javascript
-        ExcludePathPatterns: $(Build.SourcesDirectory)\tests
+        Cadence: 0
+    #    ExcludePathPatterns: $(Build.SourcesDirectory)\tests
 
     # Build tasks no needed for javascript
     # CodeQL WILL NOT WORK for compiled languages if there are no build tasks here

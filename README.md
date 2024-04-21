@@ -1,3 +1,5 @@
+// Merging and creating branches to main. 
+
 # GitHub Actions for deploying to Azure Functions
 
 |                    | master | dev |

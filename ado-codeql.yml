@@ -1,9 +1,9 @@
 jobs:
-  - job: "Build_AND_Start_CodeQL_Reporting"
+  - job: "Javascript_AND_Powershell_CodeQL_Reporting"
     variables:
       ApplicationInsightAgentVersion: 3.4.16
       Codeql.Enabled: true
-      Codeql.Language: javascript
+      Codeql.Language: javascript, powershell
       Codeql.Cadence: 0
 
     pool:
@@ -16,14 +16,148 @@ jobs:
     - task: CodeQL3000Init@0
       inputs:
         Enabled: true
-        Language: javascript
+        Language: javascript, powershell
         Cadence: 0
     #    ExcludePathPatterns: $(Build.SourcesDirectory)\tests
 
-    # Build tasks no needed for javascript
+    - task: CodeQL3000Finalize@0
+      condition: always()
+
+  - job: "Java_CodeQL_Reporting"
+    variables:
+      ApplicationInsightAgentVersion: 3.4.16
+      Codeql.Enabled: true
+      Codeql.Language: java
+      Codeql.Cadence: 0
+
+    pool:
+      name: '1ES-Hosted-AzFunc'
+      demands:
+        - ImageOverride -equals MMS2022TLS
+    
+    steps:
+    - checkout: self
+    - task: CodeQL3000Init@0
+      inputs:
+        Enabled: true
+        Language: java
+        Cadence: 0
+    #    ExcludePathPatterns: $(Build.SourcesDirectory)\tests
+
+    # Build tasks needed for java
+    - bash: |
+        echo $BuildFolderPath
+        cd $BuildFolderPath
+        mvn clean package
+        mvn azure-functions:package
+      displayName: 'Build project for java language'
+      env:
+        BuildFolderPath: '$(Build.Repository.LocalPath)\tests\e2e\java8'
+
+    - task: CodeQL3000Finalize@0
+      condition: always()
+
+  - job: "Csharp_CodeQL_Reporting"
+    variables:
+      ApplicationInsightAgentVersion: 3.4.16
+      Codeql.Enabled: true
+      Codeql.Language: csharp
+      Codeql.Cadence: 0
+
+    pool:
+      name: '1ES-Hosted-AzFunc'
+      demands:
+        - ImageOverride -equals MMS2022TLS
+    
+    steps:
+    - checkout: self
+    - task: CodeQL3000Init@0
+      inputs:
+        Enabled: true
+        Language: csharp
+        Cadence: 0
+    #    ExcludePathPatterns: $(Build.SourcesDirectory)\tests
+
+    # Build task needed for csharp
     # CodeQL WILL NOT WORK for compiled languages if there are no build tasks here
-    #- pwsh: '& .\release.ps1'
-    #  displayName: 'Build project with javascript library'
+    - task: UseDotNet@2
+      displayName: 'Use .NET Core sdk'
+      inputs:
+        packageType: sdk
+        version: 3.1.x
+        installationPath: $(Agent.ToolsDirectory)\dotnet
+
+    - pwsh: |
+        echo $env:BuildFolderPath
+        cd $env:BuildFolderPath
+        dotnet --version
+        dotnet build
+      displayName: 'Build project for csharp language'
+      env:
+        BuildFolderPath: '$(Build.Repository.LocalPath)\tests\e2e\dotnet3'
+
+    - task: CodeQL3000Finalize@0
+      condition: always()
+
+
+  - job: "Python_CodeQL_Reporting"
+    variables:
+      ApplicationInsightAgentVersion: 3.4.16
+      BuildFolderPath: '$(Build.Repository.LocalPath)\tests\e2e\python3'
+      Codeql.Enabled: true
+      Codeql.Language: python
+      Codeql.Cadence: 0
+
+    pool:
+      name: '1ES-Hosted-AzFunc'
+      demands:
+        - ImageOverride -equals MMS2022TLS
+      
+    steps:
+    - checkout: self
+    - task: CodeQL3000Init@0
+      inputs:
+        Enabled: true
+        Language: python
+        Cadence: 0
+    #    ExcludePathPatterns: $(Build.SourcesDirectory)\tests
+
+    # Build task needed for python
+    # CodeQL WILL NOT WORK for compiled languages if there are no build tasks here
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '3.7'
+    
+    - bash: |
+        echo $BuildFolderPy37Path
+        pushd $BuildFolderPy37Path
+        python --version
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt --target=".python_packages/lib/site-packages"
+        popd
+
+        cd $BuildFolderPath
+        python --version
+        # Add your build commands here
+
+      displayName: 'Build project for python language'
+      env:
+        BuildFolderPy37Path: '$(Build.Repository.LocalPath)\tests\e2e\python37'
+    
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '3.10'
+    
+    - bash: |
+        echo $BuildFolderPy310Path
+        pushd $BuildFolderPy310Path
+        python --version
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt --target=".python_packages/lib/site-packages"
+        popd
+      displayName: 'Build project for python 3.10'
+      env:
+        BuildFolderPy310Path: '$(Build.Repository.LocalPath)\tests\e2e\python310'
 
     - task: CodeQL3000Finalize@0
       condition: always()

@@ -25,10 +25,10 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Set Node.js 16.x for GitHub Action
+    - name: Set Node.js 20.x for GitHub Action
       uses: actions/setup-node@v1
       with:
-        node-version: 16.x
+        node-version: 20.x
 
     - name: Run Npm Install for GitHub Action
       run: npm install

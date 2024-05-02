@@ -5,9 +5,14 @@
         "rootDir": "./src",
         "outDir": "./lib",
         "strict": false,
+        "strictNullChecks": false,
+        "strictPropertyInitialization": false,
         "strictFunctionTypes": true,
         "noImplicitAny" : true,
-        "noUnusedParameters": true
+        "noUnusedParameters": true,
+        "types": [
+            "mocha"
+        ]
     },
     "include": ["src/**/*"],
     "exclude": ["node_modules", "**/*.spec.ts"]

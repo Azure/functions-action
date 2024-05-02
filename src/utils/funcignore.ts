@@ -28,14 +28,19 @@ export class FuncIgnore {
             Logger.Warn(`The ignore parser is undefined. Nothing will be removed.`);
             return;
         }
+        Logger.Warn(`working_dir ==> ${working_dir}`);
 
         const sanitizedWorkingDir: string = FuncIgnore.sanitizeWorkingDir(working_dir);
+        Logger.Warn(`sanitizedWorkingDir ==> ${sanitizedWorkingDir}`);
+
         const allFiles: string[] = glob.sync(`${sanitizedWorkingDir}/**/*`, { dot: true });
         allFiles.forEach(name => {
-            const filename = name.replace(`${sanitizedWorkingDir}/`, '');
+            const filename = name.replace(`${working_dir}\\`, '');
+            Logger.Warn(`filename ==> ${filename}`);
+
             if (ignoreParser.ignores(filename)) {
                 try {
-                    rimraf.sync(name, { maxBusyTries: 1 });
+                    rimraf.sync(name);
                 } catch (error) {
                     Logger.Warn(`Failed to remove ${filename} (file defined in .gitignore)`);
                 }

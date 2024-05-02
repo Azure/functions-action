@@ -1,6 +1,7 @@
+import 'mocha';
 import { expect, assert } from 'chai';
 import { resolve } from 'path';
-import * as rimraf from 'rimraf';
+import { rimraf } from "rimraf";
 import { writeFile } from 'fs-extra';
 import { PackageType, Package } from "azure-actions-utility/packageUtility";
 import { StateConstant } from '../../src/constants/state';
@@ -22,7 +23,7 @@ describe('Check ContentPreparer', function () {
 
   afterEach(() => {
     process.env = _envBackup;
-    rimraf(`${_rootPath}/tests/temp/*.zip`, (_) => {});
+    rimraf(`${_rootPath}/tests/temp/*.zip`);
   });
 
   it('should throw error if package path is not found', function () {
@@ -113,7 +114,7 @@ describe('Check ContentPreparer', function () {
 
   it('should remove unnecessary files according to .funcignore', async function() {
     const preparer = new ContentPreparer();
-    const folderPath = `${_rootPath}/tests/samples/PythonAppFuncignoreFolder`;
+    const folderPath = `${_rootPath}\\tests\\samples\\PythonAppFuncignoreFolder`;
     process.env.RUNNER_TEMP = `${_rootPath}/tests/temp`;
 
     const params = Builder.GetDefaultActionParameters();
@@ -146,7 +147,7 @@ describe('Check ContentPreparer', function () {
         StateConstant.PreparePublishContent, params, PackageType.folder
       );
     } catch (e) {
-      expect(e.message).to.contains('Failed to archive');
+      expect((e as Error).message).to.contains('Failed to archive');
     }
   });
 
@@ -163,7 +164,7 @@ describe('Check ContentPreparer', function () {
         StateConstant.PreparePublishContent, params, PackageType.jar
       );
     } catch (e) {
-      expect(e.message).to.contains('only accepts zip or folder');
+      expect((e as Error).message).to.contains('only accepts zip or folder');
     }
   });
 

@@ -163,7 +163,7 @@ export class ContentPreparer implements IOrchestratable {
                         "You can use it to exclude files from deployment.")
             return
         }
-        Logger.Warn(`packagePath  ==> ${packagePath}`)
+        
         FuncIgnore.removeFilesFromFuncIgnore(packagePath, funcignoreParser);
         return;
     }

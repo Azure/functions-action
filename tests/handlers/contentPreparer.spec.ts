@@ -1,7 +1,7 @@
 import 'mocha';
 import { expect, assert } from 'chai';
 import { resolve } from 'path';
-import { rimraf } from "rimraf";
+import { rimraf } from 'rimraf';
 import { writeFile } from 'fs-extra';
 import { PackageType, Package } from "azure-actions-utility/packageUtility";
 import { StateConstant } from '../../src/constants/state';

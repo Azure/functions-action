@@ -147,7 +147,7 @@ describe('Check ContentPreparer', function () {
         StateConstant.PreparePublishContent, params, PackageType.folder
       );
     } catch (e) {
-      expect((e as Error).message).to.contains('Failed to archive');
+      expect(e.message).to.contains('Failed to archive');
     }
   });
 
@@ -164,7 +164,7 @@ describe('Check ContentPreparer', function () {
         StateConstant.PreparePublishContent, params, PackageType.jar
       );
     } catch (e) {
-      expect((e as Error).message).to.contains('only accepts zip or folder');
+      expect(e.message).to.contains('only accepts zip or folder');
     }
   });
 

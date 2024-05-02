@@ -114,7 +114,7 @@ describe('Check ContentPreparer', function () {
 
   it('should remove unnecessary files according to .funcignore', async function() {
     const preparer = new ContentPreparer();
-    const folderPath = `${_rootPath}\\tests\\samples\\PythonAppFuncignoreFolder`;
+    const folderPath = `${_rootPath}/tests/samples/PythonAppFuncignoreFolder`;
     process.env.RUNNER_TEMP = `${_rootPath}/tests/temp`;
 
     const params = Builder.GetDefaultActionParameters();

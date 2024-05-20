@@ -58,6 +58,28 @@ export class KuduServiceUtility {
         }
     }
 
+    public async deployUsingOneDeployFlex(packagePath: string, remoteBuild: string, customMessage?: any): Promise<string> {
+        try {
+            console.log('Package deployment using One Deploy initiated.');
+
+            let queryParameters: Array<string> = [
+                'remoteBuild=' + remoteBuild,
+                'deployer=' + GITHUB_ZIP_DEPLOY
+            ];
+            var deploymentMessage = this._getUpdateHistoryRequest(null, null, customMessage).message;
+            queryParameters.push('message=' + encodeURIComponent(deploymentMessage));
+            let deploymentDetails = await this._webAppKuduService.oneDeployFlex(packagePath, queryParameters);
+            await this._processDeploymentResponse(deploymentDetails);
+
+            console.log('Successfully deployed web package to Function App.');
+            return deploymentDetails.id;
+        }
+        catch(error) {
+            core.error('Failed to deploy web package to Function App.');
+            throw error;
+        }
+    }
+
     public async deployUsingWarDeploy(packagePath: string, customMessage?: any, targetFolderName?: any): Promise<string> {
         try {
             console.log('Package deployment using WAR Deploy initiated.');

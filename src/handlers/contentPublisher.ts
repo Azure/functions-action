@@ -4,7 +4,7 @@ import { IActionParameters } from "../interfaces/IActionParameters";
 import { IActionContext } from "../interfaces/IActionContext";
 import { PublishMethodConstant } from "../constants/publish_method";
 import { ValidationError } from "../exceptions";
-import { ZipDeploy, WebsiteRunFromPackageDeploy } from "../publishers";
+import { ZipDeploy, WebsiteRunFromPackageDeploy, OneDeployFlex } from "../publishers";
 
 export class ContentPublisher implements IOrchestratable {
 
@@ -16,8 +16,11 @@ export class ContentPublisher implements IOrchestratable {
             case PublishMethodConstant.WebsiteRunFromPackageDeploy:
                 await WebsiteRunFromPackageDeploy.execute(state, context);
                 break;
+            case PublishMethodConstant.OneDeployFlex:
+                await OneDeployFlex.execute(state, context, params.remoteBuild);
+                break;
             default:
-                throw new ValidationError(state, "publisher", "can only performs ZipDeploy or WebsiteRunFromPackageDeploy");
+                throw new ValidationError(state, "publisher", "can only performs ZipDeploy or WebsiteRunFromPackageDeploy or OneDeploy (for Flex Consumption plan only)");
         }
         return StateConstant.ValidatePublishedContent;
     }

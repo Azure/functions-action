@@ -3,5 +3,8 @@ export enum PublishMethodConstant {
     ZipDeploy = 1,
 
     // Setting WEBSITE_RUN_FROM_PACKAGE app setting
-    WebsiteRunFromPackageDeploy
+    WebsiteRunFromPackageDeploy,
+    
+    // OneDeploy for function apps on Flex consumption plan
+    OneDeployFlex
 }

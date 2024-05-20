@@ -185,6 +185,7 @@ describe('Check ContentPreparer', function () {
 
   it('should use zipdeploy for all other skus', function () {
     const preparer = new ContentPreparer();
+    const params = Builder.GetDefaultActionParameters();
 
     [PackageType.folder, PackageType.zip].forEach(p => {
       [RuntimeStackConstant.Linux, RuntimeStackConstant.Windows].forEach(r => {
@@ -193,7 +194,7 @@ describe('Check ContentPreparer', function () {
             // @ts-ignore
             const result = preparer.derivePublishMethod(
               StateConstant.PreparePublishContent,
-              p, r, f, a
+              p, r, f, a, params
             );
 
             if (r !== RuntimeStackConstant.Linux && f !== FunctionSkuConstant.Consumption) {

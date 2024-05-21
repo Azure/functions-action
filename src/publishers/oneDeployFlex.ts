@@ -1,7 +1,7 @@
 import { StateConstant } from "../constants/state";
 import { IActionContext } from "../interfaces/IActionContext";
 import { AzureResourceError } from "../exceptions";
-import { ScmBuildConstant, ScmBuildUtil } from "../constants/scm_build";
+import { Logger, Sleeper, Parser } from "../utils";
 
 export class OneDeployFlex {
     public static async execute(
@@ -14,6 +14,7 @@ export class OneDeployFlex {
         let isDeploymentSucceeded: boolean = false;
 
         try {
+            Logger.Info('Will use parameter remote build = ' + remoteBuild.toString());
             deploymentId = await context.kuduServiceUtil.deployUsingOneDeployFlex(filePath, remoteBuild.toString(), {
                 'slotName': context.appService ? context.appService.getSlot() : 'production'
             });

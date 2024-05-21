@@ -14,7 +14,7 @@ export class OneDeployFlex {
         let isDeploymentSucceeded: boolean = false;
 
         try {
-            Logger.Info('Will use parameter remote build = ' + remoteBuild.toString());
+            Logger.Info('Will use parameter remote-build: ' + remoteBuild.toString());
             deploymentId = await context.kuduServiceUtil.deployUsingOneDeployFlex(filePath, remoteBuild.toString(), {
                 'slotName': context.appService ? context.appService.getSlot() : 'production'
             });

@@ -11,6 +11,9 @@ on:
     paths-ignore:
       - '**.md'
 
+permissions:
+  id-token: write
+
 env:
   AZURE_FUNCTIONAPP_NAME: gae-fa-node20-lcon
   AZURE_FUNCTIONAPP_PACKAGE_PATH: './tests/e2e/node20'
@@ -53,7 +56,9 @@ jobs:
     - name: 'Login via Azure CLI'
       uses: azure/login@v1
       with:
-        creds: ${{ secrets.RBAC_GAE_FA_NODE20_LCON }}
+        client-id: ${{ secrets.AZURE_CLIENT_ID_FA_NODE20_LCON }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID_FA_E2E_TESTS }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID_FA_E2E_TESTS }}
 
     - name: E2E Run Azure Functions Action
       uses: ./

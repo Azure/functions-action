@@ -56,8 +56,8 @@ jobs:
       uses: azure/login@v1
       with:
         client-id: ${{ secrets.AZURE_CLIENT_ID_FA_PYTHON310_LCON_MSI }}
-        tenant-id: ${{ secrets.AZURE_TENANT_ID_FA_PYTHON310_LCON_MSI }}
-        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID_FA_PYTHON310_LCON_MSI }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID_FA_E2E_TESTS }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID_FA_E2E_TESTS }}
 
     - name: E2E Run Azure Functions Action
       uses: ./

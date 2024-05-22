@@ -25,10 +25,10 @@ export class ParameterValidator implements IOrchestratable {
     private _respectPomXml: string;
     private _respectFuncignore: string;
     private _scmDoBuildDuringDeployment: string;
-    private _remoteBuild: string;
     private _enableOryxBuild: string;
     private _scmCredentials: IScmCredentials
     private _sku: string;
+    private _remoteBuild: string;
 
     constructor() {
         this.parseScmCredentials = this.parseScmCredentials.bind(this);
@@ -44,9 +44,9 @@ export class ParameterValidator implements IOrchestratable {
         this._respectPomXml = core.getInput(ConfigurationConstant.ParamInRespectPomXml);
         this._respectFuncignore = core.getInput(ConfigurationConstant.ParamInRespectFuncignore);
         this._scmDoBuildDuringDeployment = core.getInput(ConfigurationConstant.ParamInScmDoBuildDuringDeployment);
-        this._remoteBuild = core.getInput(ConfigurationConstant.ParamInRemoteBuild);
         this._enableOryxBuild = core.getInput(ConfigurationConstant.ParamInEnableOryxBuild);
         this._sku = core.getInput(ConfigurationConstant.ParamInSku);
+        this._remoteBuild = core.getInput(ConfigurationConstant.ParamInRemoteBuild);
 
         // Validate field
         if (this._slot !== undefined && this._slot.trim() === "") {
@@ -66,9 +66,9 @@ export class ParameterValidator implements IOrchestratable {
         params.respectPomXml = Parser.IsTrueLike(this._respectPomXml);
         params.respectFuncignore = Parser.IsTrueLike(this._respectFuncignore);
         params.scmDoBuildDuringDeployment = ScmBuildUtil.FromString(this._scmDoBuildDuringDeployment);
-        params.remoteBuild = Parser.IsTrueLike(this._remoteBuild);
         params.enableOryxBuild = EnableOryxBuildUtil.FromString(this._enableOryxBuild);
         params.sku = this._sku.toLowerCase();
+        params.remoteBuild = Parser.IsTrueLike(this._remoteBuild);
         return params;
     }
 

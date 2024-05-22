@@ -6,7 +6,6 @@ import { KuduServiceClient } from './KuduServiceClient';
 import { exists } from '@actions/io/lib/io-util';
 
 import core = require('@actions/core');
-import { CANCELLED } from 'dns';
 
 export const KUDU_DEPLOYMENT_CONSTANTS = {
     CANCELLED: -1,

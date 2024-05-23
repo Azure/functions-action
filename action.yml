@@ -46,6 +46,18 @@ inputs:
                   redundant build action from Kudu endpoint. (default: 'false')."
     required: false
     default: 'false'
+  sku:
+    description: "For function app on Flex Consumption plan, set this to 'flexconsumption'. You can skip this parameter for function app on other plans.
+                  If using RBAC credentials, then by default, GitHub Action will resolve the value for this paramter. But if using 'publish-profile', 
+                  then you must set this for function app on Flex Consumption plan."
+    required: false
+  remote-build:
+    description: "For function app on Flex Consumption plan, enable build action from Kudu when the package is deployed onto the function app by setting this to 'true'.
+                  For function app on Flex Consumption plan, do not set 'scm-do-build-during-deployment' and 'enable-oryx-build'.
+                  By default, GitHub Action respects the packages resolved in GitHub workflow, disabling the
+                  redundant build action from Kudu endpoint. (default: 'false')."
+    required: false
+    default: 'false'
 outputs:
   app-url:
     description: 'URL to work with your function app'
@@ -55,5 +67,5 @@ branding:
   icon: 'functionapp.svg'
   color: 'blue'
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'lib/main.js'

@@ -23,7 +23,9 @@ export class Builder {
             respectPomXml: false,
             respectFuncignore: false,
             scmDoBuildDuringDeployment: ScmBuildConstant.Disabled,
-            enableOryxBuild: EnableOryxBuildConstant.Disabled
+            enableOryxBuild: EnableOryxBuildConstant.Disabled,
+            sku: undefined,
+            remoteBuild: false
         }
     }
 

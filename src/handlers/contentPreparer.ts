@@ -10,7 +10,7 @@ import { IActionContext } from "../interfaces/IActionContext";
 import { IActionParameters } from "../interfaces/IActionParameters";
 import { ValidationError, FileIOError } from "../exceptions";
 import { PublishMethodConstant } from "../constants/publish_method";
-import { FunctionSkuConstant } from "../constants/function_sku";
+import { FunctionSkuConstant, FunctionSkuUtil } from '../constants/function_sku';
 import { RuntimeStackConstant } from "../constants/runtime_stack";
 import { Logger, FuncIgnore } from '../utils';
 import { AuthenticationType } from '../constants/authentication_type';
@@ -25,7 +25,7 @@ export class ContentPreparer implements IOrchestratable {
         this.validatePackageType(state, context.package);
         this._packageType = context.package.getPackageType();
         this._publishContentPath = await this.generatePublishContent(state, params, this._packageType);
-        this._publishMethod = this.derivePublishMethod(state, this._packageType, context.os, context.sku, context.authenticationType);
+        this._publishMethod = this.derivePublishMethod(state, this._packageType, context.os, context.sku, context.authenticationType, params);
 
         // Warm up instances
         await this.warmUpInstance(params, context);
@@ -173,7 +173,8 @@ export class ContentPreparer implements IOrchestratable {
         packageType: PackageType,
         osType: RuntimeStackConstant,
         sku: FunctionSkuConstant,
-        authenticationType: AuthenticationType
+        authenticationType: AuthenticationType,
+        params: IActionParameters
     ): PublishMethodConstant {
         // Package Type Check early
         if (packageType !== PackageType.zip && packageType !== PackageType.folder) {
@@ -184,12 +185,25 @@ export class ContentPreparer implements IOrchestratable {
             );
         }
 
-        // Uses api/zipdeploy endpoint if scm credential is provided
         if (authenticationType == AuthenticationType.Scm) {
-            Logger.Info('Will use Kudu https://<scmsite>/api/zipdeploy to deploy since publish-profile is detected.');
-            return PublishMethodConstant.ZipDeploy;
+            // Flex Consumption plan uses api/publish endpoint
+            if (!!params.sku && FunctionSkuUtil.FromString(params.sku) === FunctionSkuConstant.FlexConsumption) {
+                Logger.Info('Will use Kudu https://<scmsite>/api/publish to deploy since Flex consumption plan is detected.');
+                return PublishMethodConstant.OneDeployFlex;
+            }
+            // Uses api/zipdeploy endpoint if scm credential is provided
+            else{
+                Logger.Info('Will use Kudu https://<scmsite>/api/zipdeploy to deploy since publish-profile is detected.');
+                return PublishMethodConstant.ZipDeploy;
+            }
         }
 
+        // Flex Consumption plan uses api/publish endpoint
+        if (osType === RuntimeStackConstant.Linux && sku === FunctionSkuConstant.FlexConsumption) {
+            Logger.Info('Will use Kudu https://<scmsite>/api/publish to deploy since Flex consumption plan is detected.');
+            return PublishMethodConstant.OneDeployFlex;
+        }
+        
         // Linux Consumption sets WEBSITE_RUN_FROM_PACKAGE app settings when scm credential is not available
         if (osType === RuntimeStackConstant.Linux && sku === FunctionSkuConstant.Consumption) {
             Logger.Info('Will use WEBSITE_RUN_FROM_PACKAGE to deploy since RBAC is detected and your function app is ' +

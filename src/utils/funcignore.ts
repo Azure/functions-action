@@ -32,10 +32,10 @@ export class FuncIgnore {
         const sanitizedWorkingDir: string = FuncIgnore.sanitizeWorkingDir(working_dir);
         const allFiles: string[] = glob.sync(`${sanitizedWorkingDir}/**/*`, { dot: true });
         allFiles.forEach(name => {
-            const filename = name.replace(`${sanitizedWorkingDir}/`, '');
+            const filename = name.replace(`${working_dir}/`, '');
             if (ignoreParser.ignores(filename)) {
                 try {
-                    rimraf.sync(name, { maxBusyTries: 1 });
+                    rimraf.sync(name);
                 } catch (error) {
                     Logger.Warn(`Failed to remove ${filename} (file defined in .gitignore)`);
                 }

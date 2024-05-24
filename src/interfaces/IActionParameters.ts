@@ -10,4 +10,6 @@ export interface IActionParameters {
     respectFuncignore: boolean;
     scmDoBuildDuringDeployment: ScmBuildConstant;
     enableOryxBuild: EnableOryxBuildConstant;
+    sku: string;
+    remoteBuild: boolean;
 }

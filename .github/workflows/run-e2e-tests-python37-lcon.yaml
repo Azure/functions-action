@@ -11,6 +11,9 @@ on:
     paths-ignore:
       - '**.md'
 
+permissions:
+  id-token: write
+
 env:
   AZURE_FUNCTIONAPP_NAME: gae-fa-python37-lcon
   AZURE_FUNCTIONAPP_PACKAGE_PATH: './tests/e2e/python37'
@@ -24,10 +27,10 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Set Node.js 16.x for GitHub Action
+    - name: Set Node.js 20.x for GitHub Action
       uses: actions/setup-node@v1
       with:
-        node-version: 16.x
+        node-version: 20.x
 
     - name: Setup Python ${{ env.PYTHON_VERSION }} Environment
       uses: actions/setup-python@v1
@@ -52,7 +55,9 @@ jobs:
     - name: 'Login via Azure CLI'
       uses: azure/login@v1
       with:
-        creds: ${{ secrets.RBAC_GAE_FA_PYTHON37_LCON }}
+        client-id: ${{ secrets.AZURE_CLIENT_ID_FA_PYTHON37_LCON }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID_FA_E2E_TESTS }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID_FA_E2E_TESTS }}
 
     - name: E2E Run Azure Functions Action
       uses: ./

@@ -11,7 +11,7 @@ on:
       - dev
 
 env:
-  NODE_VERSION: '16.x'
+  NODE_VERSION: '20.x'
 
 jobs:
   run-unit-tests:

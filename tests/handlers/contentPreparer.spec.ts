@@ -1,6 +1,7 @@
+import 'mocha';
 import { expect, assert } from 'chai';
 import { resolve } from 'path';
-import * as rimraf from 'rimraf';
+import { rimraf } from 'rimraf';
 import { writeFile } from 'fs-extra';
 import { PackageType, Package } from "azure-actions-utility/packageUtility";
 import { StateConstant } from '../../src/constants/state';
@@ -22,7 +23,7 @@ describe('Check ContentPreparer', function () {
 
   afterEach(() => {
     process.env = _envBackup;
-    rimraf(`${_rootPath}/tests/temp/*.zip`, (_) => {});
+    rimraf(`${_rootPath}/tests/temp/*.zip`);
   });
 
   it('should throw error if package path is not found', function () {
@@ -184,6 +185,7 @@ describe('Check ContentPreparer', function () {
 
   it('should use zipdeploy for all other skus', function () {
     const preparer = new ContentPreparer();
+    const params = Builder.GetDefaultActionParameters();
 
     [PackageType.folder, PackageType.zip].forEach(p => {
       [RuntimeStackConstant.Linux, RuntimeStackConstant.Windows].forEach(r => {
@@ -192,7 +194,7 @@ describe('Check ContentPreparer', function () {
             // @ts-ignore
             const result = preparer.derivePublishMethod(
               StateConstant.PreparePublishContent,
-              p, r, f, a
+              p, r, f, a, params
             );
 
             if (r !== RuntimeStackConstant.Linux && f !== FunctionSkuConstant.Consumption) {

@@ -7,6 +7,8 @@ export class ConfigurationConstant {
     public static readonly ParamInRespectFuncignore: string = 'respect-funcignore';
     public static readonly ParamInEnableOryxBuild: string = 'enable-oryx-build';
     public static readonly ParamInScmDoBuildDuringDeployment: string = 'scm-do-build-during-deployment';
+    public static readonly ParamInRemoteBuild: string = 'remote-build';
+    public static readonly ParamInSku: string = 'sku';
 
     public static readonly ParamOutResultName: string = 'app-url';
     public static readonly ParamOutPackageUrl: string = 'package-url';

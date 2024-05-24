@@ -3,7 +3,8 @@ import { UnexpectedConversion } from "../exceptions";
 export enum FunctionSkuConstant {
     Consumption = 1,
     Dedicated,
-    ElasticPremium
+    ElasticPremium,
+    FlexConsumption
 }
 
 export class FunctionSkuUtil {
@@ -14,6 +15,9 @@ export class FunctionSkuUtil {
         }
         if (skuLowercasedString.startsWith('elasticpremium')) {
             return FunctionSkuConstant.ElasticPremium;
+        }
+        if (skuLowercasedString.startsWith('flexconsumption')) {
+            return FunctionSkuConstant.FlexConsumption;
         }
         return FunctionSkuConstant.Dedicated;
     }

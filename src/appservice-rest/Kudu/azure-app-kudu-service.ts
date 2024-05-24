@@ -8,8 +8,11 @@ import { exists } from '@actions/io/lib/io-util';
 import core = require('@actions/core');
 
 export const KUDU_DEPLOYMENT_CONSTANTS = {
+    CANCELLED: -1,
+    FAILED: 3,
     SUCCESS: 4,
-    FAILED: 3
+    CONFLICT: 5,
+    PARTIALSUCCESS: 6
 }
 
 export class Kudu {
@@ -231,6 +234,42 @@ export class Kudu {
         }
         catch(error) {
             const deploymentError = new Error("Failed to deploy web package to App Service.\n" + this._getFormattedError(error));
+            (deploymentError as any).statusCode = error.statusCode;
+            throw deploymentError;
+        }
+    }
+
+    public async oneDeployFlex(webPackage: string, queryParameters?: Array<string>): Promise<any> {
+        let httpRequest: WebRequest = {
+            method: 'POST',
+            uri: this._client.getRequestUri(`/api/publish`, queryParameters),
+            body: fs.createReadStream(webPackage)
+        };
+
+        try {
+            let response = await this._client.beginRequest(httpRequest, null, 'application/zip');
+            core.debug(`One Deploy response: ${JSON.stringify(response)}`);
+            if(response.statusCode == 200) {
+                core.debug('Deployment passed');
+                return null;
+            }
+            else if(response.statusCode == 202) {
+                let deploymentId: string = response.body;
+                if(!!deploymentId) {
+                    core.debug(`Polling for deployment ID: ${deploymentId}`);
+                    return await this._getDeploymentDetailsFromDeploymentID(deploymentId);
+                }
+                else {
+                    core.debug('one deploy returned 202 without deployment ID.');
+                    return null;
+                }
+            }
+            else {
+                throw response;
+            }
+        }
+        catch(error) {
+            const deploymentError = new Error("Failed to deploy web package to Function App.\n" + this._getFormattedError(error));
             (deploymentError as any).statusCode = error.statusCode;
             throw deploymentError;
         }
@@ -472,6 +511,35 @@ export class Kudu {
                 var result = response.body;
                 core.debug(`POLL URL RESULT: ${JSON.stringify(response)}`);
                 if(result.status == KUDU_DEPLOYMENT_CONSTANTS.SUCCESS || result.status == KUDU_DEPLOYMENT_CONSTANTS.FAILED) {
+                    return result;
+                }
+                else {
+                    core.debug(`Deployment status: ${result.status} '${result.status_text}'. retry after 5 seconds`);
+                    await this._sleep(5);
+                    continue;
+                }
+            }
+            else {
+                throw response;
+            }
+        }
+    }
+
+    private async _getDeploymentDetailsFromDeploymentID(deploymentId: string):Promise<any> {
+        let httpRequest: WebRequest = {
+            method: 'GET',
+            uri: this._client.getRequestUri(`/api/deployments/${deploymentId}`),
+            headers: {}
+        };
+
+        while(true) {
+            let response = await this._client.beginRequest(httpRequest);
+            if(response.statusCode == 200 || response.statusCode == 202) {
+                var result = response.body;
+                core.debug(`POLL URL RESULT: ${JSON.stringify(response)}`);
+                if(result.status == KUDU_DEPLOYMENT_CONSTANTS.SUCCESS || result.status == KUDU_DEPLOYMENT_CONSTANTS.PARTIALSUCCESS
+                    || result.status == KUDU_DEPLOYMENT_CONSTANTS.CANCELLED || result.status == KUDU_DEPLOYMENT_CONSTANTS.CONFLICT
+                    || result.status == KUDU_DEPLOYMENT_CONSTANTS.FAILED) {
                     return result;
                 }
                 else {

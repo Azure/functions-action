@@ -1,5 +1,5 @@
 import { Logger } from "@azure/msal-common";
-import { IAsyncStorage } from "./IAsyncMemoryStorage";
+import { IAsyncStorage } from "./IAsyncStorage";
 /**
  * This class allows MSAL to store artifacts asynchronously using the DatabaseStorage IndexedDB wrapper,
  * backed up with the more volatile MemoryStorage object for cases in which IndexedDB may be unavailable.
@@ -8,8 +8,7 @@ export declare class AsyncMemoryStorage<T> implements IAsyncStorage<T> {
     private inMemoryCache;
     private indexedDBCache;
     private logger;
-    private storeName;
-    constructor(logger: Logger, storeName: string);
+    constructor(logger: Logger);
     private handleDatabaseAccessError;
     /**
      * Get the item matching the given key. Tries in-memory cache first, then in the asynchronous

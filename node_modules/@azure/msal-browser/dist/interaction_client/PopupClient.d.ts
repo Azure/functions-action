@@ -1,4 +1,4 @@
-import { AuthenticationResult, CommonEndSessionRequest, IPerformanceClient, Logger, ICrypto } from "@azure/msal-common";
+import { CommonEndSessionRequest, IPerformanceClient, Logger, ICrypto } from "@azure/msal-common";
 import { StandardInteractionClient } from "./StandardInteractionClient";
 import { EndSessionPopupRequest } from "../request/EndSessionPopupRequest";
 import { PopupRequest } from "../request/PopupRequest";
@@ -7,9 +7,9 @@ import { INavigationClient } from "../navigation/INavigationClient";
 import { EventHandler } from "../event/EventHandler";
 import { BrowserCacheManager } from "../cache/BrowserCacheManager";
 import { BrowserConfiguration } from "../config/Configuration";
-import { InteractionParams } from "../interaction_handler/InteractionHandler";
 import { PopupWindowAttributes } from "../request/PopupWindowAttributes";
-export declare type PopupParams = InteractionParams & {
+import { AuthenticationResult } from "../response/AuthenticationResult";
+export type PopupParams = {
     popup?: Window | null;
     popupName: string;
     popupWindowAttributes: PopupWindowAttributes;
@@ -59,12 +59,6 @@ export declare class PopupClient extends StandardInteractionClient {
      * @param timeout - timeout for processing hash once popup is redirected back to application
      */
     monitorPopupForHash(popupWindow: Window): Promise<string>;
-    /**
-     * Waits for user interaction in logout popup window
-     * @param popupWindow
-     * @returns
-     */
-    waitForLogoutPopup(popupWindow: Window): Promise<void>;
     /**
      * @hidden
      *

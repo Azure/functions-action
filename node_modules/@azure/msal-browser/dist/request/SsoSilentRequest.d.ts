@@ -1,4 +1,4 @@
-import { CommonAuthorizationUrlRequest } from "@azure/msal-common";
+import { CommonAuthorizationUrlRequest, StringDict } from "@azure/msal-common";
 /**
  * Request object passed by user to ssoSilent to retrieve a Code from the server (first leg of authorization code grant flow)
  *
@@ -20,8 +20,11 @@ import { CommonAuthorizationUrlRequest } from "@azure/msal-common";
  * - sid                        - Session ID, unique identifier for the session. Available as an optional claim on ID tokens.
  * - domainHint                 - Provides a hint about the tenant or domain that the user should use to sign in. The value of the domain hint is a registered domain for the tenant.
  * - extraQueryParameters       - String to string map of custom query parameters added to the /authorize call
+ * - tokenBodyParameters        - String to string map of custom token request body parameters added to the /token call. Only used when renewing access tokens.
  * - tokenQueryParameters       - String to string map of custom query parameters added to the /token call
  * - nonce                      - A value included in the request that is returned in the id token. A randomly generated unique value is typically used to mitigate replay attacks.
  */
-export declare type SsoSilentRequest = Partial<Omit<CommonAuthorizationUrlRequest, "responseMode" | "codeChallenge" | "codeChallengeMethod" | "requestedClaimsHash" | "nativeBroker">>;
+export type SsoSilentRequest = Partial<Omit<CommonAuthorizationUrlRequest, "responseMode" | "codeChallenge" | "codeChallengeMethod" | "requestedClaimsHash" | "nativeBroker">> & {
+    tokenBodyParameters?: StringDict;
+};
 //# sourceMappingURL=SsoSilentRequest.d.ts.map

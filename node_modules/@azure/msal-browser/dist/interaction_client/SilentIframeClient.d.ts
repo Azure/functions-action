@@ -1,4 +1,4 @@
-import { AuthenticationResult, ICrypto, Logger, AuthorizationCodeClient, IPerformanceClient } from "@azure/msal-common";
+import { ICrypto, Logger, AuthorizationCodeClient, IPerformanceClient } from "@azure/msal-common";
 import { StandardInteractionClient } from "./StandardInteractionClient";
 import { AuthorizationUrlRequest } from "../request/AuthorizationUrlRequest";
 import { BrowserConfiguration } from "../config/Configuration";
@@ -8,6 +8,7 @@ import { INavigationClient } from "../navigation/INavigationClient";
 import { ApiId } from "../utils/BrowserConstants";
 import { SsoSilentRequest } from "../request/SsoSilentRequest";
 import { NativeMessageHandler } from "../broker/nativeBroker/NativeMessageHandler";
+import { AuthenticationResult } from "../response/AuthenticationResult";
 export declare class SilentIframeClient extends StandardInteractionClient {
     protected apiId: ApiId;
     protected nativeStorage: BrowserCacheManager;

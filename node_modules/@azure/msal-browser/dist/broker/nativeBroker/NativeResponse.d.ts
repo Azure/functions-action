@@ -1,7 +1,7 @@
 /**
  * Account properties returned by Native Platform e.g. WAM
  */
-export declare type NativeAccountInfo = {
+export type NativeAccountInfo = {
     id: string;
     properties: object;
     userName: string;
@@ -9,7 +9,7 @@ export declare type NativeAccountInfo = {
 /**
  * Token response returned by Native Platform e.g. WAM
  */
-export declare type NativeResponse = {
+export type NativeResponse = {
     access_token: string;
     account: NativeAccountInfo;
     client_info: string;
@@ -24,13 +24,13 @@ export declare type NativeResponse = {
 /**
  * Properties returned under "properties" of the NativeResponse
  */
-export declare type NativeResponseProperties = {
+export type NativeResponseProperties = {
     MATS?: string;
 };
 /**
  * The native token broker can optionally include additional information about operations it performs. If that data is returned, MSAL.js will include the following properties in the telemetry it collects.
  */
-export declare type MATS = {
+export type MATS = {
     is_cached?: number;
     broker_version?: string;
     account_join_on_start?: string;

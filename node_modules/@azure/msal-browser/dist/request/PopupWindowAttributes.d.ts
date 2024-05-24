@@ -1,15 +1,15 @@
 /**
  * Popup configurations for setting dimensions and position of popup window
  */
-export declare type PopupWindowAttributes = {
+export type PopupWindowAttributes = {
     popupSize?: PopupSize;
     popupPosition?: PopupPosition;
 };
-export declare type PopupSize = {
+export type PopupSize = {
     height: number;
     width: number;
 };
-export declare type PopupPosition = {
+export type PopupPosition = {
     top: number;
     left: number;
 };

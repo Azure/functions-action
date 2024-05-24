@@ -1,5 +1,6 @@
 import { StandardInteractionClient } from "./StandardInteractionClient";
-import { CommonSilentFlowRequest, AuthenticationResult, ServerTelemetryManager, RefreshTokenClient, AzureCloudOptions } from "@azure/msal-common";
+import { CommonSilentFlowRequest, ServerTelemetryManager, RefreshTokenClient, AzureCloudOptions, AccountInfo } from "@azure/msal-common";
+import { AuthenticationResult } from "../response/AuthenticationResult";
 export declare class SilentRefreshClient extends StandardInteractionClient {
     /**
      * Exchanges the refresh token for new tokens
@@ -15,6 +16,6 @@ export declare class SilentRefreshClient extends StandardInteractionClient {
      * @param serverTelemetryManager
      * @param authorityUrl
      */
-    protected createRefreshTokenClient(serverTelemetryManager: ServerTelemetryManager, authorityUrl?: string, azureCloudOptions?: AzureCloudOptions): Promise<RefreshTokenClient>;
+    protected createRefreshTokenClient(serverTelemetryManager: ServerTelemetryManager, authorityUrl?: string, azureCloudOptions?: AzureCloudOptions, account?: AccountInfo): Promise<RefreshTokenClient>;
 }
 //# sourceMappingURL=SilentRefreshClient.d.ts.map

@@ -6,7 +6,6 @@ export declare class NativeMessageHandler {
     private extensionVersion;
     private logger;
     private readonly handshakeTimeoutMs;
-    private responseId;
     private timeoutId;
     private resolvers;
     private handshakeResolvers;
@@ -25,6 +24,7 @@ export declare class NativeMessageHandler {
      * @param {Logger} logger
      * @param {number} handshakeTimeoutMs
      * @param {IPerformanceClient} performanceClient
+     * @param {ICrypto} crypto
      */
     static createProvider(logger: Logger, handshakeTimeoutMs: number, performanceClient: IPerformanceClient): Promise<NativeMessageHandler>;
     /**

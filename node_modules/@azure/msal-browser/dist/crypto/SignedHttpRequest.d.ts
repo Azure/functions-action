@@ -1,5 +1,5 @@
 import { LoggerOptions, SignedHttpRequestParameters } from "@azure/msal-common";
-export declare type SignedHttpRequestOptions = {
+export type SignedHttpRequestOptions = {
     loggerOptions: LoggerOptions;
 };
 export declare class SignedHttpRequest {

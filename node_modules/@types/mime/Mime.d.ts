@@ -1,11 +1,10 @@
-import type { TypeMap } from './index';
+import { TypeMap } from "./index";
 
-declare class Mime {
-    constructor(typeMap: TypeMap, ...mimes: TypeMap[]);
+export default class Mime {
+    constructor(mimes: TypeMap);
 
-    getType(path: string): string | null;
-    getExtension(mime: string): string | null;
-    define(typeMap: TypeMap, force?: boolean): void;
+    lookup(path: string, fallback?: string): string;
+    extension(mime: string): string | undefined;
+    load(filepath: string): void;
+    define(mimes: TypeMap): void;
 }
-
-export = Mime;

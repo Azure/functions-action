@@ -1,6 +1,7 @@
-import { AuthorizationCodePayload, CommonAuthorizationCodeRequest, AuthenticationResult, AuthorizationCodeClient, Authority, INetworkModule, CcsCredential, Logger, IPerformanceClient } from "@azure/msal-common";
+import { AuthorizationCodePayload, CommonAuthorizationCodeRequest, AuthorizationCodeClient, CcsCredential, Logger, IPerformanceClient, ServerAuthorizationCodeResponse } from "@azure/msal-common";
 import { BrowserCacheManager } from "../cache/BrowserCacheManager";
-export declare type InteractionParams = {};
+import { AuthenticationResult } from "../response/AuthenticationResult";
+import { AuthorizationUrlRequest } from "../request/AuthorizationUrlRequest";
 /**
  * Abstract class which defines operations for a browser interaction handling class.
  */
@@ -15,7 +16,7 @@ export declare class InteractionHandler {
      * Function to handle response parameters from hash.
      * @param locationHash
      */
-    handleCodeResponseFromHash(locationHash: string, state: string, authority: Authority, networkModule: INetworkModule): Promise<AuthenticationResult>;
+    handleCodeResponse(response: ServerAuthorizationCodeResponse, request: AuthorizationUrlRequest): Promise<AuthenticationResult>;
     /**
      * Process auth code response from AAD
      * @param authCodeResponse
@@ -24,17 +25,10 @@ export declare class InteractionHandler {
      * @param networkModule
      * @returns
      */
-    handleCodeResponseFromServer(authCodeResponse: AuthorizationCodePayload, state: string, authority: Authority, networkModule: INetworkModule, validateNonce?: boolean): Promise<AuthenticationResult>;
+    handleCodeResponseFromServer(authCodeResponse: AuthorizationCodePayload, request: AuthorizationUrlRequest, validateNonce?: boolean): Promise<AuthenticationResult>;
     /**
-     * Updates authority based on cloudInstanceHostname
-     * @param cloudInstanceHostname
-     * @param authority
-     * @param networkModule
+     * Build ccs creds if available
      */
-    protected updateTokenEndpointAuthority(cloudInstanceHostname: string, authority: Authority, networkModule: INetworkModule): Promise<void>;
-    /**
-     * Looks up ccs creds in the cache
-     */
-    protected checkCcsCredentials(): CcsCredential | null;
+    protected createCcsCredentials(request: AuthorizationUrlRequest): CcsCredential | null;
 }
 //# sourceMappingURL=InteractionHandler.d.ts.map

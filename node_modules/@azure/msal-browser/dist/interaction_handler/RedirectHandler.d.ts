@@ -1,16 +1,20 @@
-import { AuthorizationCodeClient, CommonAuthorizationCodeRequest, ICrypto, AuthenticationResult, Authority, INetworkModule, Logger, IPerformanceClient } from "@azure/msal-common";
+import { AuthorizationCodeClient, CommonAuthorizationCodeRequest, Logger, IPerformanceClient, CcsCredential, ServerAuthorizationCodeResponse } from "@azure/msal-common";
 import { BrowserCacheManager } from "../cache/BrowserCacheManager";
-import { InteractionHandler, InteractionParams } from "./InteractionHandler";
 import { INavigationClient } from "../navigation/INavigationClient";
-export declare type RedirectParams = InteractionParams & {
+import { AuthenticationResult } from "../response/AuthenticationResult";
+export type RedirectParams = {
     navigationClient: INavigationClient;
     redirectTimeout: number;
     redirectStartPage: string;
     onRedirectNavigate?: (url: string) => void | boolean;
 };
-export declare class RedirectHandler extends InteractionHandler {
-    private browserCrypto;
-    constructor(authCodeModule: AuthorizationCodeClient, storageImpl: BrowserCacheManager, authCodeRequest: CommonAuthorizationCodeRequest, logger: Logger, browserCrypto: ICrypto, performanceClient: IPerformanceClient);
+export declare class RedirectHandler {
+    authModule: AuthorizationCodeClient;
+    browserStorage: BrowserCacheManager;
+    authCodeRequest: CommonAuthorizationCodeRequest;
+    logger: Logger;
+    performanceClient: IPerformanceClient;
+    constructor(authCodeModule: AuthorizationCodeClient, storageImpl: BrowserCacheManager, authCodeRequest: CommonAuthorizationCodeRequest, logger: Logger, performanceClient: IPerformanceClient);
     /**
      * Redirects window to given URL.
      * @param urlNavigate
@@ -20,6 +24,10 @@ export declare class RedirectHandler extends InteractionHandler {
      * Handle authorization code response in the window.
      * @param hash
      */
-    handleCodeResponseFromHash(locationHash: string, state: string, authority: Authority, networkModule: INetworkModule): Promise<AuthenticationResult>;
+    handleCodeResponse(response: ServerAuthorizationCodeResponse, state: string): Promise<AuthenticationResult>;
+    /**
+     * Looks up ccs creds in the cache
+     */
+    protected checkCcsCredentials(): CcsCredential | null;
 }
 //# sourceMappingURL=RedirectHandler.d.ts.map

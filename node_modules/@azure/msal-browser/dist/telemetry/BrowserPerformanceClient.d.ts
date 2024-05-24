@@ -1,14 +1,10 @@
-import { Logger, PerformanceEvents, IPerformanceClient, PerformanceClient, IPerformanceMeasurement, InProgressPerformanceEvent, ApplicationTelemetry } from "@azure/msal-common";
-import { CryptoOptions } from "../config/Configuration";
+import { InProgressPerformanceEvent, IPerformanceClient, PerformanceClient, PerformanceEvents } from "@azure/msal-common";
+import { Configuration } from "../config/Configuration";
 export declare class BrowserPerformanceClient extends PerformanceClient implements IPerformanceClient {
-    private browserCrypto;
-    private guidGenerator;
-    constructor(clientId: string, authority: string, logger: Logger, libraryName: string, libraryVersion: string, applicationTelemetry: ApplicationTelemetry, cryptoOptions: CryptoOptions);
-    startPerformanceMeasuremeant(measureName: string, correlationId: string): IPerformanceMeasurement;
+    constructor(configuration: Configuration, intFields?: Set<string>, abbreviations?: Map<string, string>);
     generateId(): string;
     private getPageVisibility;
     private deleteIncompleteSubMeasurements;
-    supportsBrowserPerformanceNow(): boolean;
     /**
      * Starts measuring performance for a given operation. Returns a function that should be used to end the measurement.
      * Also captures browser page visibilityState.
@@ -17,7 +13,7 @@ export declare class BrowserPerformanceClient extends PerformanceClient implemen
      * @param {?string} [correlationId]
      * @returns {((event?: Partial<PerformanceEvent>) => PerformanceEvent| null)}
      */
-    startMeasurement(measureName: PerformanceEvents, correlationId?: string): InProgressPerformanceEvent;
+    startMeasurement(measureName: string, correlationId?: string): InProgressPerformanceEvent;
     /**
      * Adds pre-queue time to preQueueTimeByCorrelationId map.
      * @param {PerformanceEvents} eventName
@@ -34,6 +30,6 @@ export declare class BrowserPerformanceClient extends PerformanceClient implemen
      * @param {?boolean} manuallyCompleted - indicator for manually completed queue measurements
      * @returns
      */
-    addQueueMeasurement(eventName: PerformanceEvents, correlationId?: string, queueTime?: number, manuallyCompleted?: boolean): void;
+    addQueueMeasurement(eventName: string, correlationId?: string, queueTime?: number, manuallyCompleted?: boolean): void;
 }
 //# sourceMappingURL=BrowserPerformanceClient.d.ts.map

@@ -1,9 +1,10 @@
-import { ICrypto, Logger, ExternalTokenResponse, AuthenticationResult } from "@azure/msal-common";
+import { ICrypto, Logger, ExternalTokenResponse } from "@azure/msal-common";
 import { BrowserConfiguration } from "../config/Configuration";
 import { SilentRequest } from "../request/SilentRequest";
 import { BrowserCacheManager } from "./BrowserCacheManager";
 import { ITokenCache } from "./ITokenCache";
-export declare type LoadTokenOptions = {
+import { AuthenticationResult } from "../response/AuthenticationResult";
+export type LoadTokenOptions = {
     clientInfo?: string;
     expiresOn?: number;
     extendedExpiresOn?: number;

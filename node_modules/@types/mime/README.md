@@ -5,12 +5,11 @@
 This package contains type definitions for mime (https://github.com/broofa/node-mime).
 
 # Details
-Files were exported from https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/mime.
+Files were exported from https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/mime/v1.
 
 ### Additional Details
- * Last updated: Thu, 04 Aug 2022 21:02:19 GMT
+ * Last updated: Tue, 07 Nov 2023 20:08:00 GMT
  * Dependencies: none
- * Global values: `mime`, `mimelite`
 
 # Credits
 These definitions were written by [Jeff Goddard](https://github.com/jedigo), and [Daniel Hritzkiv](https://github.com/dhritzkiv).

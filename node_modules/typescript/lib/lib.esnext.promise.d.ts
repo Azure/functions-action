@@ -14,30 +14,22 @@ and limitations under the License.
 ***************************************************************************** */
 
 
-
 /// <reference no-default-lib="true"/>
 
-
-interface AggregateError extends Error {
-    errors: any[]
+interface PromiseWithResolvers<T> {
+    promise: Promise<T>;
+    resolve: (value: T | PromiseLike<T>) => void;
+    reject: (reason?: any) => void;
 }
 
-interface AggregateErrorConstructor {
-    new(errors: Iterable<any>, message?: string): AggregateError;
-    (errors: Iterable<any>, message?: string): AggregateError;
-    readonly prototype: AggregateError;
-}
-
-declare var AggregateError: AggregateErrorConstructor;
-
-/**
- * Represents the completion of an asynchronous operation
- */
 interface PromiseConstructor {
     /**
-     * The any function returns a promise that is fulfilled by the first given promise to be fulfilled, or rejected with an AggregateError containing an array of rejection reasons if all of the given promises are rejected. It resolves all elements of the passed iterable to promises as it runs this algorithm.
-     * @param values An array or iterable of Promises.
-     * @returns A new Promise.
+     * Creates a new Promise and returns it in an object, along with its resolve and reject functions.
+     * @returns An object with the properties `promise`, `resolve`, and `reject`.
+     *
+     * ```ts
+     * const { promise, resolve, reject } = Promise.withResolvers<T>();
+     * ```
      */
-    any<T>(values: (T | PromiseLike<T>)[] | Iterable<T | PromiseLike<T>>): Promise<T>
+    withResolvers<T>(): PromiseWithResolvers<T>;
 }

@@ -1,4 +1,4 @@
-import { ServerTelemetryManager, CommonAuthorizationCodeRequest, AuthorizationCodeClient, ClientConfiguration, Authority, ServerAuthorizationCodeResponse, CommonEndSessionRequest, AccountInfo, AzureCloudOptions } from "@azure/msal-common";
+import { ServerTelemetryManager, CommonAuthorizationCodeRequest, AuthorizationCodeClient, ClientConfiguration, CommonEndSessionRequest, AccountInfo, AzureCloudOptions } from "@azure/msal-common";
 import { BaseInteractionClient } from "./BaseInteractionClient";
 import { AuthorizationUrlRequest } from "../request/AuthorizationUrlRequest";
 import { InteractionType } from "../utils/BrowserConstants";
@@ -31,25 +31,14 @@ export declare abstract class StandardInteractionClient extends BaseInteractionC
      * @param serverTelemetryManager
      * @param authorityUrl
      */
-    protected createAuthCodeClient(serverTelemetryManager: ServerTelemetryManager, authorityUrl?: string, requestAzureCloudOptions?: AzureCloudOptions): Promise<AuthorizationCodeClient>;
+    protected createAuthCodeClient(serverTelemetryManager: ServerTelemetryManager, authorityUrl?: string, requestAzureCloudOptions?: AzureCloudOptions, account?: AccountInfo): Promise<AuthorizationCodeClient>;
     /**
      * Creates a Client Configuration object with the given request authority, or the default authority.
      * @param serverTelemetryManager
      * @param requestAuthority
      * @param requestCorrelationId
      */
-    protected getClientConfiguration(serverTelemetryManager: ServerTelemetryManager, requestAuthority?: string, requestAzureCloudOptions?: AzureCloudOptions): Promise<ClientConfiguration>;
-    /**
-     * @param hash
-     * @param interactionType
-     */
-    protected validateAndExtractStateFromHash(serverParams: ServerAuthorizationCodeResponse, interactionType: InteractionType, requestCorrelationId?: string): string;
-    /**
-     * Used to get a discovered version of the default authority.
-     * @param requestAuthority
-     * @param requestCorrelationId
-     */
-    protected getDiscoveredAuthority(requestAuthority?: string, requestAzureCloudOptions?: AzureCloudOptions): Promise<Authority>;
+    protected getClientConfiguration(serverTelemetryManager: ServerTelemetryManager, requestAuthority?: string, requestAzureCloudOptions?: AzureCloudOptions, account?: AccountInfo): Promise<ClientConfiguration>;
     /**
      * Helper to initialize required request parameters for interactive APIs and ssoSilent()
      * @param request

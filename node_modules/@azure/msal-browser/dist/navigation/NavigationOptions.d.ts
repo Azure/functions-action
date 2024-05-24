@@ -2,7 +2,7 @@ import { ApiId } from "../utils/BrowserConstants";
 /**
  * Additional information passed to the navigateInternal and navigateExternal functions
  */
-export declare type NavigationOptions = {
+export type NavigationOptions = {
     /** The Id of the API that initiated navigation */
     apiId: ApiId;
     /** Suggested timeout (ms) based on the configuration provided to PublicClientApplication */

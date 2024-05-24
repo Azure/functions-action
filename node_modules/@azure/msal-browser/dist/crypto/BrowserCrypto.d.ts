@@ -1,62 +1,53 @@
-import { Logger } from "@azure/msal-common";
-import { CryptoOptions } from "../config/Configuration";
+import { IPerformanceClient, Logger } from "@azure/msal-common";
 /**
- * This class implements functions used by the browser library to perform cryptography operations such as
- * hashing and encoding. It also has helper functions to validate the availability of specific APIs.
+ * Check whether browser crypto is available.
  */
-export declare class BrowserCrypto {
-    private keygenAlgorithmOptions;
-    private subtleCrypto;
-    private logger;
-    private cryptoOptions?;
-    constructor(logger: Logger, cryptoOptions?: CryptoOptions);
-    /**
-     * Check whether IE crypto or other browser cryptography is available.
-     */
-    private hasIECrypto;
-    /**
-     * Check whether browser crypto is available.
-     */
-    private hasBrowserCrypto;
-    /**
-     * Check whether MSR crypto polyfill is available
-     */
-    private hasMsrCrypto;
-    /**
-     * Returns a sha-256 hash of the given dataString as an ArrayBuffer.
-     * @param dataString
-     */
-    sha256Digest(dataString: string): Promise<ArrayBuffer>;
-    /**
-     * Populates buffer with cryptographically random values.
-     * @param dataBuffer
-     */
-    getRandomValues(dataBuffer: Uint8Array): Uint8Array;
-    /**
-     * Generates a keypair based on current keygen algorithm config.
-     * @param extractable
-     * @param usages
-     */
-    generateKeyPair(extractable: boolean, usages: Array<KeyUsage>): Promise<CryptoKeyPair>;
-    /**
-     * Export key as Json Web Key (JWK)
-     * @param key
-     * @param format
-     */
-    exportJwk(key: CryptoKey): Promise<JsonWebKey>;
-    /**
-     * Imports key as Json Web Key (JWK), can set extractable and usages.
-     * @param key
-     * @param format
-     * @param extractable
-     * @param usages
-     */
-    importJwk(key: JsonWebKey, extractable: boolean, usages: Array<KeyUsage>): Promise<CryptoKey>;
-    /**
-     * Signs given data with given key
-     * @param key
-     * @param data
-     */
-    sign(key: CryptoKey, data: ArrayBuffer): Promise<ArrayBuffer>;
-}
+export declare function validateCryptoAvailable(logger: Logger): void;
+/**
+ * Returns a sha-256 hash of the given dataString as an ArrayBuffer.
+ * @param dataString {string} data string
+ * @param performanceClient {?IPerformanceClient}
+ * @param correlationId {?string} correlation id
+ */
+export declare function sha256Digest(dataString: string, performanceClient?: IPerformanceClient, correlationId?: string): Promise<ArrayBuffer>;
+/**
+ * Populates buffer with cryptographically random values.
+ * @param dataBuffer
+ */
+export declare function getRandomValues(dataBuffer: Uint8Array): Uint8Array;
+/**
+ * Creates a UUID v7 from the current timestamp.
+ * Implementation relies on the system clock to guarantee increasing order of generated identifiers.
+ * @returns {number}
+ */
+export declare function createNewGuid(): string;
+/**
+ * Generates a keypair based on current keygen algorithm config.
+ * @param extractable
+ * @param usages
+ */
+export declare function generateKeyPair(extractable: boolean, usages: Array<KeyUsage>): Promise<CryptoKeyPair>;
+/**
+ * Export key as Json Web Key (JWK)
+ * @param key
+ */
+export declare function exportJwk(key: CryptoKey): Promise<JsonWebKey>;
+/**
+ * Imports key as Json Web Key (JWK), can set extractable and usages.
+ * @param key
+ * @param extractable
+ * @param usages
+ */
+export declare function importJwk(key: JsonWebKey, extractable: boolean, usages: Array<KeyUsage>): Promise<CryptoKey>;
+/**
+ * Signs given data with given key
+ * @param key
+ * @param data
+ */
+export declare function sign(key: CryptoKey, data: ArrayBuffer): Promise<ArrayBuffer>;
+/**
+ * Returns the SHA-256 hash of an input string
+ * @param plainText
+ */
+export declare function hashString(plainText: string): Promise<string>;
 //# sourceMappingURL=BrowserCrypto.d.ts.map

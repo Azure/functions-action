@@ -2,13 +2,13 @@
 > `npm install --save @types/glob`
 
 # Summary
-This package contains type definitions for Glob (https://github.com/isaacs/node-glob).
+This package contains type definitions for glob (https://github.com/isaacs/node-glob).
 
 # Details
 Files were exported from https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/glob.
 
 ### Additional Details
- * Last updated: Tue, 19 Oct 2021 22:01:22 GMT
+ * Last updated: Wed, 22 Feb 2023 22:32:38 GMT
  * Dependencies: [@types/minimatch](https://npmjs.com/package/@types/minimatch), [@types/node](https://npmjs.com/package/@types/node)
  * Global values: none
 

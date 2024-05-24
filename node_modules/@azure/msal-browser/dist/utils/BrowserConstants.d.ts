@@ -38,72 +38,79 @@ export declare const NativeConstants: {
     PREFERRED_EXTENSION_ID: string;
     MATS_TELEMETRY: string;
 };
-export declare enum NativeExtensionMethod {
-    HandshakeRequest = "Handshake",
-    HandshakeResponse = "HandshakeResponse",
-    GetToken = "GetToken",
-    Response = "Response"
-}
-export declare enum BrowserCacheLocation {
-    LocalStorage = "localStorage",
-    SessionStorage = "sessionStorage",
-    MemoryStorage = "memoryStorage"
-}
+export declare const NativeExtensionMethod: {
+    readonly HandshakeRequest: "Handshake";
+    readonly HandshakeResponse: "HandshakeResponse";
+    readonly GetToken: "GetToken";
+    readonly Response: "Response";
+};
+export type NativeExtensionMethod = (typeof NativeExtensionMethod)[keyof typeof NativeExtensionMethod];
+export declare const BrowserCacheLocation: {
+    readonly LocalStorage: "localStorage";
+    readonly SessionStorage: "sessionStorage";
+    readonly MemoryStorage: "memoryStorage";
+};
+export type BrowserCacheLocation = (typeof BrowserCacheLocation)[keyof typeof BrowserCacheLocation];
 /**
  * HTTP Request types supported by MSAL.
  */
-export declare enum HTTP_REQUEST_TYPE {
-    GET = "GET",
-    POST = "POST"
-}
+export declare const HTTP_REQUEST_TYPE: {
+    readonly GET: "GET";
+    readonly POST: "POST";
+};
+export type HTTP_REQUEST_TYPE = (typeof HTTP_REQUEST_TYPE)[keyof typeof HTTP_REQUEST_TYPE];
 /**
  * Temporary cache keys for MSAL, deleted after any request.
  */
-export declare enum TemporaryCacheKeys {
-    AUTHORITY = "authority",
-    ACQUIRE_TOKEN_ACCOUNT = "acquireToken.account",
-    SESSION_STATE = "session.state",
-    REQUEST_STATE = "request.state",
-    NONCE_IDTOKEN = "nonce.id_token",
-    ORIGIN_URI = "request.origin",
-    RENEW_STATUS = "token.renew.status",
-    URL_HASH = "urlHash",
-    REQUEST_PARAMS = "request.params",
-    SCOPES = "scopes",
-    INTERACTION_STATUS_KEY = "interaction.status",
-    CCS_CREDENTIAL = "ccs.credential",
-    CORRELATION_ID = "request.correlationId",
-    NATIVE_REQUEST = "request.native",
-    REDIRECT_CONTEXT = "request.redirect.context"
-}
-export declare enum StaticCacheKeys {
-    ACCOUNT_KEYS = "msal.account.keys",
-    TOKEN_KEYS = "msal.token.keys"
-}
+export declare const TemporaryCacheKeys: {
+    readonly AUTHORITY: "authority";
+    readonly ACQUIRE_TOKEN_ACCOUNT: "acquireToken.account";
+    readonly SESSION_STATE: "session.state";
+    readonly REQUEST_STATE: "request.state";
+    readonly NONCE_IDTOKEN: "nonce.id_token";
+    readonly ORIGIN_URI: "request.origin";
+    readonly RENEW_STATUS: "token.renew.status";
+    readonly URL_HASH: "urlHash";
+    readonly REQUEST_PARAMS: "request.params";
+    readonly SCOPES: "scopes";
+    readonly INTERACTION_STATUS_KEY: "interaction.status";
+    readonly CCS_CREDENTIAL: "ccs.credential";
+    readonly CORRELATION_ID: "request.correlationId";
+    readonly NATIVE_REQUEST: "request.native";
+    readonly REDIRECT_CONTEXT: "request.redirect.context";
+};
+export type TemporaryCacheKeys = (typeof TemporaryCacheKeys)[keyof typeof TemporaryCacheKeys];
+export declare const StaticCacheKeys: {
+    readonly ACCOUNT_KEYS: "msal.account.keys";
+    readonly TOKEN_KEYS: "msal.token.keys";
+};
+export type StaticCacheKeys = (typeof StaticCacheKeys)[keyof typeof StaticCacheKeys];
 /**
  * Cache keys stored in-memory
  */
-export declare enum InMemoryCacheKeys {
-    WRAPPER_SKU = "wrapper.sku",
-    WRAPPER_VER = "wrapper.version"
-}
+export declare const InMemoryCacheKeys: {
+    readonly WRAPPER_SKU: "wrapper.sku";
+    readonly WRAPPER_VER: "wrapper.version";
+};
+export type InMemoryCacheKeys = (typeof InMemoryCacheKeys)[keyof typeof InMemoryCacheKeys];
 /**
  * API Codes for Telemetry purposes.
  * Before adding a new code you must claim it in the MSAL Telemetry tracker as these number spaces are shared across all MSALs
  * 0-99 Silent Flow
  * 800-899 Auth Code Flow
  */
-export declare enum ApiId {
-    acquireTokenRedirect = 861,
-    acquireTokenPopup = 862,
-    ssoSilent = 863,
-    acquireTokenSilent_authCode = 864,
-    handleRedirectPromise = 865,
-    acquireTokenByCode = 866,
-    acquireTokenSilent_silentFlow = 61,
-    logout = 961,
-    logoutPopup = 962
-}
+export declare const ApiId: {
+    readonly acquireTokenRedirect: 861;
+    readonly acquireTokenPopup: 862;
+    readonly ssoSilent: 863;
+    readonly acquireTokenSilent_authCode: 864;
+    readonly handleRedirectPromise: 865;
+    readonly acquireTokenByCode: 866;
+    readonly acquireTokenSilent_silentFlow: 61;
+    readonly logout: 961;
+    readonly logoutPopup: 962;
+};
+export type ApiId = (typeof ApiId)[keyof typeof ApiId];
 export declare enum InteractionType {
     Redirect = "redirect",
     Popup = "popup",
@@ -114,54 +121,61 @@ export declare enum InteractionType {
  * Types of interaction currently in progress.
  * Used in events in wrapper libraries to invoke functions when certain interaction is in progress or all interactions are complete.
  */
-export declare enum InteractionStatus {
+export declare const InteractionStatus: {
     /**
      * Initial status before interaction occurs
      */
-    Startup = "startup",
+    readonly Startup: "startup";
     /**
      * Status set when all login calls occuring
      */
-    Login = "login",
+    readonly Login: "login";
     /**
      * Status set when logout call occuring
      */
-    Logout = "logout",
+    readonly Logout: "logout";
     /**
      * Status set for acquireToken calls
      */
-    AcquireToken = "acquireToken",
+    readonly AcquireToken: "acquireToken";
     /**
      * Status set for ssoSilent calls
      */
-    SsoSilent = "ssoSilent",
+    readonly SsoSilent: "ssoSilent";
     /**
      * Status set when handleRedirect in progress
      */
-    HandleRedirect = "handleRedirect",
+    readonly HandleRedirect: "handleRedirect";
     /**
      * Status set when interaction is complete
      */
-    None = "none"
-}
+    readonly None: "none";
+};
+export type InteractionStatus = (typeof InteractionStatus)[keyof typeof InteractionStatus];
 export declare const DEFAULT_REQUEST: RedirectRequest | PopupRequest;
 /**
  * JWK Key Format string (Type MUST be defined for window crypto APIs)
  */
 export declare const KEY_FORMAT_JWK = "jwk";
-export declare enum WrapperSKU {
-    React = "@azure/msal-react",
-    Angular = "@azure/msal-angular"
-}
+export declare const WrapperSKU: {
+    readonly React: "@azure/msal-react";
+    readonly Angular: "@azure/msal-angular";
+};
+export type WrapperSKU = (typeof WrapperSKU)[keyof typeof WrapperSKU];
 export declare const DB_NAME = "msal.db";
 export declare const DB_VERSION = 1;
 export declare const DB_TABLE_NAME: string;
-export declare enum CacheLookupPolicy {
-    Default = 0,
-    AccessToken = 1,
-    AccessTokenAndRefreshToken = 2,
-    RefreshToken = 3,
-    RefreshTokenAndNetwork = 4,
-    Skip = 5
-}
+export declare const CacheLookupPolicy: {
+    readonly Default: 0;
+    readonly AccessToken: 1;
+    readonly AccessTokenAndRefreshToken: 2;
+    readonly RefreshToken: 3;
+    readonly RefreshTokenAndNetwork: 4;
+    readonly Skip: 5;
+};
+export type CacheLookupPolicy = (typeof CacheLookupPolicy)[keyof typeof CacheLookupPolicy];
+export declare const iFrameRenewalPolicies: CacheLookupPolicy[];
+export declare const LOG_LEVEL_CACHE_KEY = "msal.browser.log.level";
+export declare const LOG_PII_CACHE_KEY = "msal.browser.log.pii";
+export declare const BROWSER_PERF_ENABLED_KEY = "msal.browser.performance.enabled";
 //# sourceMappingURL=BrowserConstants.d.ts.map

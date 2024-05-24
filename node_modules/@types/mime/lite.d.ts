@@ -1,4 +1,4 @@
-import Mime = require('./Mime');
+import { default as Mime } from "./Mime";
 
 declare const mimelite: Mime;
 

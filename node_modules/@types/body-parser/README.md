@@ -8,9 +8,8 @@ This package contains type definitions for body-parser (https://github.com/expre
 Files were exported from https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/body-parser.
 
 ### Additional Details
- * Last updated: Tue, 16 Nov 2021 18:31:30 GMT
+ * Last updated: Mon, 06 Nov 2023 22:41:05 GMT
  * Dependencies: [@types/connect](https://npmjs.com/package/@types/connect), [@types/node](https://npmjs.com/package/@types/node)
- * Global values: none
 
 # Credits
 These definitions were written by [Santi Albo](https://github.com/santialbo), [Vilic Vane](https://github.com/vilic), [Jonathan Häberle](https://github.com/dreampulse), [Gevik Babakhani](https://github.com/blendsdk), [Tomasz Łaziuk](https://github.com/tlaziuk), [Jason Walton](https://github.com/jwalton), and [Piotr Błażejewicz](https://github.com/peterblazejewicz).

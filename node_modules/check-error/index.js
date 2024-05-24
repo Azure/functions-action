@@ -6,6 +6,7 @@
  * MIT Licensed
  */
 
+var getFunctionName = require('get-func-name');
 /**
  * ### .checkError
  *
@@ -86,34 +87,6 @@ function compatibleMessage(thrown, errMatcher) {
 }
 
 /**
- * ### .getFunctionName(constructorFn)
- *
- * Returns the name of a function.
- * This also includes a polyfill function if `constructorFn.name` is not defined.
- *
- * @name getFunctionName
- * @param {Function} constructorFn
- * @namespace Utils
- * @api private
- */
-
-var functionNameMatch = /\s*function(?:\s|\s*\/\*[^(?:*\/)]+\*\/\s*)*([^\(\/]+)/;
-function getFunctionName(constructorFn) {
-  var name = '';
-  if (typeof constructorFn.name === 'undefined') {
-    // Here we run a polyfill if constructorFn.name is not defined
-    var match = String(constructorFn).match(functionNameMatch);
-    if (match) {
-      name = match[1];
-    }
-  } else {
-    name = constructorFn.name;
-  }
-
-  return name;
-}
-
-/**
  * ### .getConstructorName(errorLike)
  *
  * Gets the constructor name for an Error instance or constructor itself.
@@ -132,8 +105,11 @@ function getConstructorName(errorLike) {
     // If `err` is not an instance of Error it is an error constructor itself or another function.
     // If we've got a common function we get its name, otherwise we may need to create a new instance
     // of the error just in case it's a poorly-constructed error. Please see chaijs/chai/issues/45 to know more.
-    constructorName = getFunctionName(errorLike).trim() ||
-        getFunctionName(new errorLike()); // eslint-disable-line new-cap
+    constructorName = getFunctionName(errorLike);
+    if (constructorName === '') {
+      var newConstructorName = getFunctionName(new errorLike()); // eslint-disable-line new-cap
+      constructorName = newConstructorName || constructorName;
+    }
   }
 
   return constructorName;

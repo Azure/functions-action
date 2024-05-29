@@ -20,7 +20,7 @@ export class Kudu {
 
     constructor(scmUri: string, username: string, password: string, accessToken?: string) {
         if (accessToken === undefined) {
-            var base64EncodedCredential = (new Buffer(username + ':' + password).toString('base64'));
+            var base64EncodedCredential = (Buffer.from(username + ':' + password).toString('base64'));
             this._client = new KuduServiceClient(scmUri, "Basic " + base64EncodedCredential);
         } else {
             this._client = new KuduServiceClient(scmUri, "Bearer " + accessToken);

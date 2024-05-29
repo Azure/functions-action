@@ -50,7 +50,7 @@ export class WebsiteRunFromPackageDeploy {
 
     private static createBlobName(): string {
         const now: Date = new Date();
-        const time: string = `${now.getUTCFullYear()}${now.getUTCMonth() + 1}${now.getUTCDate()}${now.getUTCHours()}${now.getUTCMinutes()}${now.getUTCSeconds()}`;
+        const time: string = `${now.getUTCFullYear()}${now.getUTCMonth() + 1}${now.getUTCDate()}${now.getUTCHours()}${now.getUTCMinutes()}${now.getUTCSeconds()}${now.getUTCMilliseconds()}`;
         return `${ConfigurationConstant.BlobNamePrefix}_${time}.zip`;
     }
 

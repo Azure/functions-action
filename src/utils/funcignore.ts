@@ -4,6 +4,7 @@ import * as glob from 'glob';
 import * as rimraf from 'rimraf';
 import * as ignore from 'ignore';
 import { Logger } from './logger';
+import path = require('path');
 
 export class FuncIgnore {
     public static doesFuncignoreExist(working_dir: string): boolean {
@@ -32,7 +33,7 @@ export class FuncIgnore {
         const sanitizedWorkingDir: string = FuncIgnore.sanitizeWorkingDir(working_dir);
         const allFiles: string[] = glob.sync(`${sanitizedWorkingDir}/**/*`, { dot: true });
         allFiles.forEach(name => {
-            const filename = name.replace(`${working_dir}/`, '');
+            const filename = path.relative(working_dir, name);
             if (ignoreParser.ignores(filename)) {
                 try {
                     rimraf.sync(name);

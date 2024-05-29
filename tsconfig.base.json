@@ -5,8 +5,6 @@
         "rootDir": "./src",
         "outDir": "./lib",
         "strict": false,
-        "strictNullChecks": false,
-        "strictPropertyInitialization": false,
         "strictFunctionTypes": true,
         "noImplicitAny" : true,
         "noUnusedParameters": true,

@@ -1,0 +1,53 @@
+parameters:
+- name: pool
+  type: string
+  default: '1es-pool-azfunc'
+
+jobs:
+  - job: Build
+    displayName: 'Build'
+
+    pool:
+      name: ${{ parameters.pool }}
+      image: 1es-ubuntu-22.04
+      os: linux
+
+    variables:
+      NODE_VERSION: '20.x'
+
+    steps:
+    - checkout: self
+
+    - task: UseNode@1
+      inputs:
+        version: ${{ variables.NODE_VERSION }}
+      displayName: 'Setup Node'
+
+    - task: Npm@1
+      inputs:
+        command: 'install'
+      displayName: 'Install dependencies'
+
+    - task: Npm@1
+      inputs:
+        command: 'custom'
+        customCommand: 'run build'
+      displayName: 'Build'
+
+    - bash: |
+        cd ./tests/e2e/java8
+        mvn clean package
+        mvn azure-functions:package
+      displayName: 'Build project for java language'
+
+    - task: UseDotNet@2
+      displayName: 'Use .NET Core sdk'
+      inputs:
+        packageType: sdk
+        version: 3.1.x
+
+    - pwsh: |
+        cd ./tests/e2e/dotnet3
+        dotnet --version
+        dotnet build
+      displayName: 'Build project for csharp language'

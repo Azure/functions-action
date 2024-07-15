@@ -34,10 +34,17 @@ jobs:
         customCommand: 'run build'
       displayName: 'Build'
 
-    - bash: |
-        cd ./tests/e2e/java8
-        mvn clean package
-        mvn azure-functions:package
+    - task: JavaToolInstaller@0
+      inputs:
+        versionSpec: '8'
+        jdkArchitectureOption: 'x64'
+        jdkSourceOption: 'PreInstalled'
+      displayName: 'Install JDK 8'
+
+    - task: Maven@3
+      inputs:
+        mavenPomFile: 'tests/e2e/java8/pom.xml'
+        goals: 'clean package azure-functions:package'
       displayName: 'Build project for java language'
 
     - task: UseDotNet@2
@@ -46,8 +53,8 @@ jobs:
         packageType: sdk
         version: 3.1.x
 
-    - pwsh: |
-        cd ./tests/e2e/dotnet3
-        dotnet --version
-        dotnet build
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'build'
+        projects: 'tests/e2e/dotnet3/*.csproj'
       displayName: 'Build project for csharp language'

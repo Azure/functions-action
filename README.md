@@ -13,7 +13,6 @@
 | PowerShell Windows | ![master powershell windows e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_POWERSHELL6_WCON/badge.svg?branch=master) | ![dev powershell windows e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_POWERSHELL6_WCON/badge.svg?branch=dev) |
 | Python Linux       | ![master python linux e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_PYTHON37_LCON/badge.svg?branch=master) | ![dev python linux e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_PYTHON37_LCON/badge.svg?branch=dev) |
 
-
 With the Azure Functions GitHub Action, you can automate your workflow to deploy [Azure Functions](https://azure.microsoft.com/en-us/services/functions/).
 
 Get started today with a [free Azure account](https://azure.com/free/open-source)!
@@ -24,9 +23,9 @@ The definition of this GitHub Action is in [action.yml](https://github.com/Azure
 
 [Kudu zip deploy](https://github.com/projectkudu/kudu/wiki/Deploying-from-a-zip-file-or-url) method is used by the action for deployment of Functions.
 
-# End-to-End Sample workflow
+## End-to-End Sample workflow
 
-## Workflow Templates
+### Workflow Templates
 
 | Templates  | Windows |  Linux |
 |------------|---------|--------|
@@ -42,11 +41,13 @@ Alternatively, you can add a `- run: dotnet build --output ./bin` step **before*
 
 "Remove additional files at destination" is not supported by Kudu deploy method used in this action and should be handled separately. When a new build is deployed with zipdeploy, files and directories that were created by the previous deployment but are no longer present in the build will be deleted. Any other files and directories found in the site that aren't being overwritten by the deployment, such as those placed there via FTP or created by your app during runtime, will be preserved.
 
-## Supported Languages and versions
+### Supported Languages and versions
+
 - [Language versions supported in each runtime version](https://docs.microsoft.com/en-us/azure/azure-functions/supported-languages#languages-by-runtime-version)
 - [Languages supported in each OS](https://docs.microsoft.com/en-us/azure/azure-functions/supported-languages#language-support-details)
 
-## Using Publish Profile as Deployment Credential (recommended)
+### Using Publish Profile as Deployment Credential (recommended)
+
 Using publish profile as deployment credential is recommended if you are not the owner of your Azure subscription. Follow these steps to configure your workflow to use the publish profile from your function app.
 
 **NOTE:** If you are using a Custom handler with the Linux consumption SKU, this deployment process *will not work* . You must use a Service Principal and authenticate with the `azure/login` action.
@@ -59,7 +60,7 @@ Using publish profile as deployment credential is recommended if you are not the
 6. Change variable values in `env:` section according to your function app.
 7. Commit and push your project to GitHub repository, you should see a new GitHub workflow initiated in **Actions** tab.
 
-## Using Azure Service Principal for RBAC as Deployment Credential
+### Using Azure Service Principal for RBAC as Deployment Credential
 
 **NOTE:** If you want to deploy to Linux Consumption plan and your app contains executable file(custom handler, `chrome` in [Puppeteer](https://github.com/puppeteer/puppeteer)/[Playwright](https://github.com/microsoft/playwright) etc), you need to use this way in order to keep executable permission.
 
@@ -67,7 +68,8 @@ Follow these steps to configure your workflow to use an [Azure Service Principal
 
 1. Download Azure CLI from [here](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest), run `az login` to login with your Azure credentials.
 2. Run Azure CLI command
-```
+
+```bash
    az ad sp create-for-rbac --name "myApp" --role contributor \
                             --scopes /subscriptions/{subscription-id}/resourceGroups/{resource-group}/providers/Microsoft.Web/sites/{app-name} \
                             --sdk-auth
@@ -83,6 +85,7 @@ Follow these steps to configure your workflow to use an [Azure Service Principal
     (...)
   }
 ```
+
 3. Copy and paste the json response from above Azure CLI to your GitHub Repository > Settings > Secrets > Add a new secret > **AZURE_RBAC_CREDENTIALS**
 4. Use [Windows DotNet Function App RBAC](https://github.com/Azure/actions-workflow-samples/blob/master/FunctionApp/windows-dotnet-functionapp-on-azure-rbac.yml) template as a reference to build your workflow in `.github/workflows/` directory. Ensure that you use `azure/login` action and that you _are not_ using the `publish-profile` parameter
 5. Change variable values in `env:` section according to your function app.
@@ -90,13 +93,14 @@ Follow these steps to configure your workflow to use an [Azure Service Principal
 
 Azure Functions GitHub Action is supported for the Azure public cloud as well as Azure government clouds ('AzureUSGovernment' or 'AzureChinaCloud') and Azure Stack ('AzureStack') Hub. Before running this action, login to the respective Azure Cloud  using [Azure Login](https://github.com/Azure/login) by setting appropriate value for the `environment` parameter.
 
-### Manged Identities for Storage Account Access and Package Deployments on Linux Consumption SKU
+#### Manged Identities for Storage Account Access and Package Deployments on Linux Consumption SKU
 
 If the function app uses managed identities for accessing the storage account (i.e. `AzureWebJobsStorage` is not set) then the action will use the RBAC account to publish a package deployment to the storage account defined in `AzureWebJobsStorage__accountName`. The app setting `WEBSITE_RUN_FROM_PACKAGE` will be created during deployment and will not include a SAS token.
 
 If `WEBSITE_RUN_FROM_PACKAGE_BLOB_MI_RESOURCE_ID` is defined then user-assigned manage identity will be used, otherwise system-assigned manage identity. The RBAC account will require [Microsoft.Storage/storageAccounts/listkeys/action](https://learn.microsoft.com/en-us/azure/storage/blobs/authorize-data-operations-portal#use-the-account-access-key) if `AzureWebJobsStorage` is not set.
 
 ## GitHub Action Parameters
+
 - **app-name**: The function app name on Azure. (e.g. if your function app can be accessed via https://your-site-name.azurewebsites.net/, then **app-name** should be `your-site-name`).
 - **package**: This is the location in your project to be published. By default, this value is set to `.`, which means all files and folders in the GitHub repository will be deployed.
 - **slot-name**: This is the slot name to be deployed to. By default, this value is empty, which means the GitHub Action will deploy to your main production site. When this setting points to a non-production slot, please ensure the **publish-profile** parameter contains the credentials from the function app slot instead of the main production site.

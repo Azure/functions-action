@@ -100,35 +100,41 @@ If the function app uses managed identities for accessing the storage account (i
 If `WEBSITE_RUN_FROM_PACKAGE_BLOB_MI_RESOURCE_ID` is defined then user-assigned manage identity will be used, otherwise system-assigned manage identity. The RBAC account will require [Microsoft.Storage/storageAccounts/listkeys/action](https://learn.microsoft.com/en-us/azure/storage/blobs/authorize-data-operations-portal#use-the-account-access-key) if `AzureWebJobsStorage` is not set.
 
 ## GitHub Action Parameters
+
 Required parameters for all function app plans:
+
 - **app-name**: The function app name on Azure (e.g. if your app's homepage is https://your-site-name.azurewebsites.net/, then **app-name** should be `your-site-name`).
 - **package**: This is the location in your project to be published. By default, this value is set to `.`, which means all files and folders in the GitHub repository will be deployed.
 
-Parameters specific to the Flex Consumtion plan:
+Parameters specific to the Flex Consumption plan:
+
 - **sku**: Set this to `flexconsumption` when authenticating with **publish-profile**. When using RBAC credentials or deploying to a non-Flex Consumption plan, the Action can resolve the value, so the parameter does not need to be included.
-- **remote-build**: Set this to `true` to enable a build action from Kudu when the package is deployed to a Flex Consumption app. Oryx build is always performed during a remote build in Flex Consumption; do not set **scm-do-build-during-deployment** or **enable-oryx-build**. 
+- **remote-build**: Set this to `true` to enable a build action from Kudu when the package is deployed to a Flex Consumption app. Oryx build is always performed during a remote build in Flex Consumption; do not set **scm-do-build-during-deployment** or **enable-oryx-build**.
 By default, this parameter is set to `false`.
 
 Parameters specific to the Consumption, Elastic Premium, and App Service (Dedicated) plans:
+
 - **scm-do-build-during-deployment**: Allow the Kudu site (e.g. https://your-site-name.scm.azurewebsites.net/) to perform pre-deployment operations. By default, this is set to `false`. If you don't want to resolve the dependencies in the GitHub Workflow, and instead, you want to control the deployments in Kudu / KuduLite, you may want to change this setting to `true`. For more information on SCM_DO_BUILD_DURING_DEPLOYMENT setting, please visit our [Kudu doc](https://github.com/projectkudu/kudu/wiki/Configurable-settings#enabledisable-build-actions).
 - **enable-oryx-build**: Allow Kudu site to resolve your project dependencies with [Oryx](https://github.com/Microsoft/Oryx). By default, this is set to `false`. If you want to use Oryx to resolve your dependencies (e.g. [remote build](https://docs.microsoft.com/en-us/azure/azure-functions/functions-deployment-technologies#remote-build)) instead of the GitHub Workflow, set **scm-do-build-during-deployment** and **enable-oryx-build** to `true`.
 
 Optional parameters for all function app plans:
+
 - **slot-name**: This is the slot name to be deployed to. By default, this value is empty, which means the GitHub Action will deploy to your production site. When this setting points to a non-production slot, please ensure the **publish-profile** parameter contains the credentials for the slot instead of the production site. *Currently not supported in Flex Consumption*.
 - **publish-profile**: The credentials that will be used during the deployment. It should contain a piece of XML content from your .PublishSettings file. You can acquire .PublishSettings by visiting the Azure Portal -> Your Function App -> Overview -> Get Publish Profile. We highly recommend setting the content in GitHub secrets since it contains sensitive information such as your site URL, username, and password. When the publish profile is rotated in your function app, you also need to update the GitHub secret. Otherwise, a 401 error will occur when accessing the /api/settings endpoint.
 - **respect-pom-xml**: Allow the GitHub Action to derive the Java function app's artifact from pom.xml for deployments. By default, it is set to `false`, which means the **package** parameter needs to point to your Java function app's artifact (e.g. ./target/azure-functions/<function-app-name>). It is recommended to set **package** to `.` and **respect-pom-xml** to `true` when deploying Java function apps.
 - **respect-funcignore**:  Allow the GitHub Action to parse your .funcignore file and exclude files and folders defined in it. By default, this value is set to `false`. If your GitHub repo contains .funcignore file and you want to exclude certain paths (e.g. text editor configs .vscode/, Python virtual environment .venv/), we recommend setting this to `true`.
 
 ## Dependencies on other GitHub Actions
-* [Checkout](https://github.com/actions/checkout) Checkout your Git repository content into GitHub Actions agent.
-* [Azure Login](https://github.com/Azure/login) Login with your Azure credentials for function app deployment authentication.
-* Environment setup actions
-  * [Setup DotNet](https://github.com/actions/setup-dotnet) Build your DotNet core function app or function app extensions.
-  * [Setup Node](https://github.com/actions/setup-node) Resolve Node function app dependencies using npm.
-  * [Setup Python](https://github.com/actions/setup-python) Resolve Python function app dependencies using pip.
-  * [Setup Java](https://github.com/actions/setup-java) Resolve Java function app dependencies using maven.
 
-# Contributing
+- [Checkout](https://github.com/actions/checkout) Checkout your Git repository content into GitHub Actions agent.
+- [Azure Login](https://github.com/Azure/login) Login with your Azure credentials when authenticating with OIDC or service principal.
+- Environment setup actions:
+  - [Setup DotNet](https://github.com/actions/setup-dotnet) Build your DotNet core function app or function app extensions.
+  - [Setup Node](https://github.com/actions/setup-node) Resolve Node function app dependencies using npm.
+  - [Setup Python](https://github.com/actions/setup-python) Resolve Python function app dependencies using pip.
+  - [Setup Java](https://github.com/actions/setup-java) Resolve Java function app dependencies using maven.
+
+## Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us

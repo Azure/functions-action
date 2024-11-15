@@ -23,9 +23,9 @@ The definition of this GitHub Action is in [action.yml](https://github.com/Azure
 
 [Kudu zip deploy](https://github.com/projectkudu/kudu/wiki/Deploying-from-a-zip-file-or-url) method is used by the action for deployment of Functions.
 
-## End-to-End Sample workflow
+## End-to-End workflow samples
 
-### Workflow Templates
+### Workflow templates
 
 | Templates  | Windows |  Linux |
 |------------|---------|--------|
@@ -35,7 +35,7 @@ The definition of this GitHub Action is in [action.yml](https://github.com/Azure
 | Java       | [windows-java-functionapp-on-azure.yml](https://github.com/Azure/actions-workflow-samples/tree/master/FunctionApp/windows-java-functionapp-on-azure.yml) | [linux-java-functionapp-on-azure.yml](https://github.com/Azure/actions-workflow-samples/tree/master/FunctionApp/linux-java-functionapp-on-azure.yml) |
 | Python     | - | [linux-python-functionapp-on-azure.yml](https://github.com/Azure/actions-workflow-samples/tree/master/FunctionApp/linux-python-functionapp-on-azure.yml) |
 
-For guidance on how to adapt these samples to work with the [Flex Consumption](https://learn.microsoft.com/azure/azure-functions/flex-consumption-plan) plan, please see [GitHub Action parameters](#github-action-parameters).
+For guidance on how to adapt these samples to work with the [Flex Consumption](https://learn.microsoft.com/azure/azure-functions/flex-consumption-plan) plan, please see [GitHub Action parameters](#input-parameters).
 
 If you have extension project(s) in your repo, these templates will **NOT** resolve the **extensions.csproj** in your project. If you want to use binding extensions (e.g. Blob/Queue/EventHub Triggers), please consider [registering Azure Functions binding extensions](https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-register) in your host.json.
 
@@ -48,7 +48,7 @@ Alternatively, you can add a `- run: dotnet build --output ./bin` step **before*
 - [Language versions supported in each runtime version](https://docs.microsoft.com/en-us/azure/azure-functions/supported-languages#languages-by-runtime-version)
 - [Languages supported in each OS](https://docs.microsoft.com/en-us/azure/azure-functions/supported-languages#language-support-details)
 
-### Authentication methods
+## Authentication methods
 
 You'll have to decide how the action will authenticate with Azure to deploy content to your function app. There are three supported authentication methods:
 
@@ -56,14 +56,14 @@ You'll have to decide how the action will authenticate with Azure to deploy cont
 1. RBAC with an Azure service principal
 1. Publish profile
 
-There are certain scenarios when not all of these methods are supported:
+There are special considerations for certain function app scenarios:
 
 - Your app is on any hosting plan in the Azure government clouds or Azure Stack Hub:
   - When using OIDC or RBAC auth, include the relevant `environment` and `audience` parameters for the `azure/login` action.
 - Your app is Linux-based on the Consumption plan and your project contains an executable file (custom handler, `chrome` in [Puppeteer](https://github.com/puppeteer/puppeteer)/[Playwright](https://github.com/microsoft/playwright), etc.):
   - RBAC is the only supported authentication method.
 
-#### Using OIDC for authentication (recommended)
+### Using OIDC for authentication (recommended)
 
 [OpenID Connect](https://docs.github.com/actions/security-for-github-actions/security-hardening-your-deployments/configuring-openid-connect-in-cloud-providers) involves configuring your Azure user-assigned managed identity to trust GitHub's OIDC as a federated identity.
 
@@ -93,7 +93,8 @@ Follow these steps to configure your workflow to use OIDC for authentication:
 1. Add the `azure/login` action as a step prior to the Azure Functions Action (see snippet below).
     1. Include the parameters `client-id`, `tenant-id`, and `subscription-id`, referencing your repository secrets.
 
-**NOTE:** The `Entity` is what will trigger the workflow to fetch the OIDC token. Our samples assume you want to trigger the workflow on pushes to `main`. If you would like to customize this, please see our [entity type examples](https://learn.microsoft.com/entra/workload-id/workload-identity-federation-create-trust-user-assigned-managed-identity#entity-type-examples).
+>[!TIP]
+>The `Entity` is what will trigger the workflow to fetch the OIDC token. Our samples assume you want to trigger the workflow on pushes to `main`. If you would like to customize this, please see our [entity type examples](https://learn.microsoft.com/entra/workload-id/workload-identity-federation-create-trust-user-assigned-managed-identity#entity-type-examples).
 
 By choosing OIDC for your authentication method, the `deploy` job of your automated workflow will look something like the following snippet:
 
@@ -103,7 +104,6 @@ jobs:
     build:
       runs-on: ubuntu-latest
       permissions:
-          id-token: write # Required to fetch an OIDC token to authenticate with the job
           contents: read # Required for actions/checkout
       steps: 
         # ...required build steps for your language
@@ -227,13 +227,15 @@ jobs:
             publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
 ```
 
-### Manged Identities for Storage Account Access and Package Deployments on Linux Consumption SKU
+### Manged identities for storage account access and package deployments on Linux Consumption SKU
 
 If the function app uses managed identities for accessing the storage account (i.e. `AzureWebJobsStorage` is not set) then the action will use the RBAC account to publish a package deployment to the storage account defined in `AzureWebJobsStorage__accountName`. The app setting `WEBSITE_RUN_FROM_PACKAGE` will be created during deployment and will not include a SAS token.
 
 If `WEBSITE_RUN_FROM_PACKAGE_BLOB_MI_RESOURCE_ID` is defined then user-assigned manage identity will be used, otherwise system-assigned manage identity. The RBAC account will require [Microsoft.Storage/storageAccounts/listkeys/action](https://learn.microsoft.com/en-us/azure/storage/blobs/authorize-data-operations-portal#use-the-account-access-key) if `AzureWebJobsStorage` is not set.
 
-## GitHub Action Parameters
+## Usage
+
+### Input parameters
 
 The parameters you use depend on the hosting plan your app is on. For example, the Flex Consumption plan uses different parameters than the other plans to enable a [remote build](https://learn.microsoft.com/azure/azure-functions/functions-deployment-technologies#remote-build). If you intend to deploy to the [Container Apps](https://learn.microsoft.com/azure/azure-functions/functions-container-apps-hosting) plan, please use [`functions-container-action`](https://github.com/Azure/functions-container-action) instead.
 

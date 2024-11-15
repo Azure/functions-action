@@ -35,6 +35,8 @@ The definition of this GitHub Action is in [action.yml](https://github.com/Azure
 | Java       | [windows-java-functionapp-on-azure.yml](https://github.com/Azure/actions-workflow-samples/tree/master/FunctionApp/windows-java-functionapp-on-azure.yml) | [linux-java-functionapp-on-azure.yml](https://github.com/Azure/actions-workflow-samples/tree/master/FunctionApp/linux-java-functionapp-on-azure.yml) |
 | Python     | - | [linux-python-functionapp-on-azure.yml](https://github.com/Azure/actions-workflow-samples/tree/master/FunctionApp/linux-python-functionapp-on-azure.yml) |
 
+For guidance on how to adapt these samples to work with the [Flex Consumption](https://learn.microsoft.com/azure/azure-functions/flex-consumption-plan) plan, please see [GitHub Action parameters](#github-action-parameters).
+
 If you have extension project(s) in your repo, these templates will **NOT** resolve the **extensions.csproj** in your project. If you want to use binding extensions (e.g. Blob/Queue/EventHub Triggers), please consider [registering Azure Functions binding extensions](https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-register) in your host.json.
 
 Alternatively, you can add a `- run: dotnet build --output ./bin` step **before** functions-action step.
@@ -48,7 +50,7 @@ Alternatively, you can add a `- run: dotnet build --output ./bin` step **before*
 
 ### Authentication methods
 
-You must choose a method of how the action will authenticate with Azure to deploy content to your function app. There are three supported authentication methods:
+You'll have to decide how the action will authenticate with Azure to deploy content to your function app. There are three supported authentication methods:
 
 1. OpenID Connect (OIDC) with an Azure user-assigned managed identity (recommended)
 1. RBAC with an Azure service principal
@@ -93,7 +95,7 @@ Follow these steps to configure your workflow to use OIDC for authentication:
 
 **NOTE:** The `Entity` is what will trigger the workflow to fetch the OIDC token. Our samples assume you want to trigger the workflow on pushes to `main`. If you would like to customize this, please see our [entity type examples](https://learn.microsoft.com/entra/workload-id/workload-identity-federation-create-trust-user-assigned-managed-identity#entity-type-examples).
 
-By choosing OIDC for your authentication method, the `deploy` job of your automated workflow will look something like the following:
+By choosing OIDC for your authentication method, the `deploy` job of your automated workflow will look something like the following snippet:
 
 ```yml
 # Deploy to an app on the Flex Consumption plan using OIDC authentication
@@ -160,7 +162,7 @@ Follow these steps to configure your workflow to use RBAC with a service princip
     1. Include the parameter `cred`, referencing your recently created repository secret.
     1. Ensure that there is no mention of publish profiles in your workflow, especially the `publish-profile` parameter of the Azure Functions Action.
 
-By choosing RBAC with a service principal for your authentication method, the `deploy` job of your automated workflow will look something like the following:
+By choosing RBAC with a service principal for your authentication method, the `deploy` job of your automated workflow will look something like the following snippet:
 
 ```yml
 # Deploy to an app on the Flex Consumption plan using RBAC with a service principal as authentication
@@ -202,7 +204,7 @@ Follow these steps to configure your workflow to use publish profile for authent
 1. Ensure that your workflow is not using the `azure/login` action.
 1. Include the `publish-profile` parameter in the Azure Functions Action, referencing **AZURE_FUNCTIONAPP_PUBLISH_PROFILE**.
 
-By choosing publish profile for your authentication method, the `deploy` job of your automated workflow will look something like the following:
+By choosing publish profile for your authentication method, the `deploy` job of your automated workflow will look something like the following snippet:
 
 ```yml
 # Deploy to an app on the Flex Consumption plan using RBAC with a service principal as authentication

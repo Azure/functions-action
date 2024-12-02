@@ -35,7 +35,7 @@
   "dependencies": {
     "@actions/core": "^1.10.1",
     "@azure/arm-storage": "^18.2.0",
-    "@azure/identity": "^4.0.1",
+    "@azure/identity": "^4.2.1",
     "@azure/storage-blob": "^12.17.0",
     "@types/glob": "^8.1.0",
     "@types/xml2js": "^0.4.5",

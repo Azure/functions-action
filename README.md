@@ -13,17 +13,16 @@
 | PowerShell Windows | ![master powershell windows e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_POWERSHELL6_WCON/badge.svg?branch=master) | ![dev powershell windows e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_POWERSHELL6_WCON/badge.svg?branch=dev) |
 | Python Linux       | ![master python linux e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_PYTHON37_LCON/badge.svg?branch=master) | ![dev python linux e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_PYTHON37_LCON/badge.svg?branch=dev) |
 
-With the Azure Functions GitHub Action, you can automate your workflow to deploy [Azure Functions](https://azure.microsoft.com/en-us/services/functions/).
+The Azure Functions Action deploys your project code to your [function app](https://azure.microsoft.com/en-us/services/functions/). With this action, you can create an automated workflow that builds, authenticates, and deploys to your function app.
 
-Get started today with a [free Azure account](https://azure.com/free/open-source)!
+To get started, you can copy one of our end-to-end samples, or have one generated for you in the Azure Portal; just go to the Deployment Center blade of your app. For full guidance on creating automated workflows, see our Learn article [here](https://learn.microsoft.com/azure/azure-functions/functions-how-to-github-actions).
 
-The repository contains a GitHub Action to deploy your function app project into Azure Functions. If you are looking for a GitHub Action to deploy your customized container image into an Azure Functions container, please consider using [functions-container-action](https://github.com/Azure/functions-container-action).
+>[!IMPORTANT]
+>If you are looking for a GitHub Action to deploy your customized container image to Azure Functions, please use [functions-container-action](https://github.com/Azure/functions-container-action).
 
 The definition of this GitHub Action is in [action.yml](https://github.com/Azure/functions-action/blob/master/action.yml).
 
-[Kudu zip deploy](https://github.com/projectkudu/kudu/wiki/Deploying-from-a-zip-file-or-url) method is used by the action for deployment of Functions.
-
-## End-to-End workflow samples
+## End-to-end workflow samples
 
 ### Workflow templates
 
@@ -106,7 +105,9 @@ jobs:
       permissions:
           contents: read # Required for actions/checkout
       steps: 
+        # ...checkout your repository
         # ...required build steps for your language
+        # ...upload your build artifact
     
     deploy:
       runs-on: ubuntu-latest
@@ -114,6 +115,8 @@ jobs:
       permissions:
           id-token: write # Required to fetch an OIDC token to authenticate with the job
       steps:
+        # ...download your build artifact
+
         - name: 'Log in to Azure with AZ CLI'
           uses: azure/login@v2
           with:
@@ -170,11 +173,16 @@ jobs:
     build:
       runs-on: ubuntu-latest
       steps:
+        # ...checkout your repository
         # ...required build steps for your language
+        # ...upload your build artifact
+
     deploy:
       runs-on: ubuntu-latest
       needs: build
       steps:
+        # ...download your build artifact
+        
         - name: 'Log in to Azure with AZ CLI'
           uses: azure/login@v2
           with:
@@ -212,11 +220,16 @@ jobs:
     build:
       runs-on: ubuntu-latest
       steps:
-          # ...required build steps for your language
+        # ...checkout your repository
+        # ...required build steps for your language
+        # ...upload your build artifact
+
     deploy:
       runs-on: ubuntu-latest
       needs: build
       steps:
+        # ...download your build artifact
+
         - name: 'Run the Azure Functions Action'
           uses: Azure/functions-action@v1
           id: deploy-to-function-app

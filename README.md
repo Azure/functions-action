@@ -13,9 +13,9 @@
 | PowerShell Windows | ![master powershell windows e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_POWERSHELL6_WCON/badge.svg?branch=master) | ![dev powershell windows e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_POWERSHELL6_WCON/badge.svg?branch=dev) |
 | Python Linux       | ![master python linux e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_PYTHON37_LCON/badge.svg?branch=master) | ![dev python linux e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_PYTHON37_LCON/badge.svg?branch=dev) |
 
-The Azure Functions Action is used in a [GitHub Actions workflow](https://docs.github.com/en/actions/about-github-actions/understanding-github-actions)to deploy packaged project code to an existing [function app](https://azure.microsoft.com/services/functions/) hosted in Azure. Using this action, you can create continuous workflow automation that builds, authenticates, and deploys code to your function app when you make changes in the GitHub repository.
+The Azure Functions action is used in a [GitHub Actions workflow](https://docs.github.com/en/actions/about-github-actions/understanding-github-actions) to deploy packaged project code to an existing [function app](https://azure.microsoft.com/services/functions/) hosted in Azure. Using this action, you can create continuous workflow automation that builds, authenticates, and deploys code to your function app when you make changes in the GitHub repository.
 
-The Azure Functions action is defined in this [action.yml](https://github.com/Azure/functions-action/blob/master/action.yml) file. To learn about specific parameters, see the [Reference section](#reference) in this readme.
+The Azure Functions action is defined in this [action.yml](https://github.com/Azure/functions-action/blob/master/action.yml) file. To learn about specific parameters, see the [Reference section](#parameter-reference) in this readme.
 
 ## Getting started
 
@@ -42,13 +42,13 @@ You can create a workflow for your function app deployments in one of these ways
 
 Keep these considerations in mind when working with the `azure-functions` action in your workflows:
 
-+ These sample templates require updates when deploying apps that running in a [Flex Consumption](https://learn.microsoft.com/azure/azure-functions/flex-consumption-plan) plan. For more information, see [GitHub Action parameters](#input-parameters).
++ These sample templates require updates when deploying apps that running in a [Flex Consumption](https://learn.microsoft.com/azure/azure-functions/flex-consumption-plan) plan. For more information, see [GitHub Action parameters](#parameter-reference).
 
 + When using run-from-package deployment, apps can use external storage on a blob container, which is specified using the app setting `WEBSITE_RUN_FROM_PACKAGE=<URL>`. In this case, the `<URL>` points to the external blob storage container. This is the default deployment for apps running on Linux in a Consumption plan. To protect the deployment package, the container should require private access, which requires access by using either a shared access signature (SAS) or managed identities. There are specific app settings required when using managed identities to access the deployment container. For more information, see [Fetch a package from Azure Blob Storage using a managed identity](https://learn.microsoft.com/en-us/azure/azure-functions/run-functions-from-deployment-package#fetch-a-package-from-azure-blob-storage-using-a-managed-identity).  
 
-+ If you have a non-.NET project that includes an explicitly binding reference (extensions.csproj), the Functions Action ignores this file and doesn't build the extensions project. For more information, see [Binding extensions projects](#binding-extensions-projects).
++ If you have a non-.NET project that includes an explicit binding reference (extensions.csproj), the Functions Action ignores this file and doesn't build the extensions project. For more information, see [Binding extensions projects](#binding-extensions-projects).
 
-+ The _remove additional files at destination_ functionality provided by an `scm` (Kudu) deployment isn't supported by the deployment method used in this action. When you use [zip deployment](https://learn.microsoft.com/azure/azure-functions/functions-deployment-technologies#zip-deploy) or [One deploy for Flex Consumption plans](https://learn.microsoft.com/azure/azure-functions/functions-deployment-technologies#one-deploy). With these deployment technologies, all files from a previous deployment are removed or are updated with the latest files from the deployment package. Any other files and directories outside of the deployment, such as added using FTP or created by your app during runtime, are preserved. If you're using `scm` with a package deployment, you must handle the removal of previously deployed files outside of the Functions action.
++ The _remove additional files at destination_ functionality provided by a `scm` (Kudu) deployment isn't supported by the deployment method used in this action. When you use [zip deploy](https://learn.microsoft.com/azure/azure-functions/functions-deployment-technologies#zip-deploy) or [one deploy for Flex Consumption plans](https://learn.microsoft.com/azure/azure-functions/functions-deployment-technologies#one-deploy), all files from a previous deployment are removed or are updated with the latest files from the deployment package. Any other files and directories outside of the deployment, such as added using FTP or created by your app during runtime, are preserved. If you're using `scm` with a package deployment, you must handle the removal of previously deployed files outside of the Functions action.
 
 ## Supported Languages and versions
 
@@ -73,7 +73,7 @@ These are special considerations for certain hosting scenarios:
 
 ### OIDC authentication (recommended)
 
-When using [OIDC](https://docs.github.com/actions/security-for-github-actions/security-hardening-your-deployments/configuring-openid-connect-in-cloud-providers) for authentication, you configure a user-assigned managed identity in Azure to trust GitHub using federated identity. GitHub uses federated identity when deploying to your app. You must also assign permissions to the identity in your function app, which is done using RABC.
+When using [OIDC](https://docs.github.com/actions/security-for-github-actions/security-hardening-your-deployments/configuring-openid-connect-in-cloud-providers) for authentication, you configure a user-assigned managed identity in Azure to trust GitHub using federated identity. The workflow then uses this federated identity to authenticate with Azure. You must also grant the identity permissions to deploy to your function app, which is done using RBAC.
 
 >[!TIP]  
 >This method is the most secure and recommended for those with permissions to configure identity.
@@ -84,7 +84,7 @@ To configure your workflow to use OIDC authentication:
 
 1. Copy down the values for Client ID, Subscription ID, and Directory (tenant) ID for the new user-assigned managed identity resource.
 
-1. [Assign the role](https://learn.microsoft.com/azure/role-based-access-control/role-assignments-portal) `Website Contributor` to your user-assigned managed identity, which is scoped to the function app you want to deploy to.
+1. [Assign the role](https://learn.microsoft.com/azure/role-based-access-control/role-assignments-portal) `Website Contributor` to your user-assigned managed identity, scoped to the function app you want to deploy to.
 
 1. [Create a federated credential](https://learn.microsoft.com/entra/workload-id/workload-identity-federation-create-trust-user-assigned-managed-identity#configure-a-federated-identity-credential-on-a-user-assigned-managed-identity) with the following settings:  
 

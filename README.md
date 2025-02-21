@@ -42,7 +42,7 @@ You can create a workflow for your function app deployments in one of these ways
 
 Keep these considerations in mind when working with the `azure-functions` action in your workflows:
 
-+ These sample templates require updates when deploying apps that running in a [Flex Consumption](https://learn.microsoft.com/azure/azure-functions/flex-consumption-plan) plan. For more information, see [GitHub Action parameters](#parameter-reference).
++ These sample templates require updates when deploying apps that run in a [Flex Consumption](https://learn.microsoft.com/azure/azure-functions/flex-consumption-plan) plan. For more information, see [GitHub Action parameters](#parameter-reference).
 
 + When using run-from-package deployment, apps can use external storage on a blob container, which is specified using the app setting `WEBSITE_RUN_FROM_PACKAGE=<URL>`. In this case, the `<URL>` points to the external blob storage container. This is the default deployment for apps running on Linux in a Consumption plan. To protect the deployment package, the container should require private access, which requires access by using either a shared access signature (SAS) or managed identities. There are specific app settings required when using managed identities to access the deployment container. For more information, see [Fetch a package from Azure Blob Storage using a managed identity](https://learn.microsoft.com/en-us/azure/azure-functions/run-functions-from-deployment-package#fetch-a-package-from-azure-blob-storage-using-a-managed-identity).  
 
@@ -73,7 +73,7 @@ These are special considerations for certain hosting scenarios:
 
 ### OIDC authentication (recommended)
 
-When using [OIDC](https://docs.github.com/actions/security-for-github-actions/security-hardening-your-deployments/configuring-openid-connect-in-cloud-providers) for authentication, you configure a user-assigned managed identity in Azure to trust GitHub using federated identity. The workflow then uses this federated identity to authenticate with Azure. You must also grant the identity permissions to deploy to your function app, which is done using RBAC.
+When using [Open ID Connect (OIDC)](https://docs.github.com/actions/security-for-github-actions/security-hardening-your-deployments/configuring-openid-connect-in-cloud-providers) for authentication, you configure a user-assigned managed identity in Azure to allow your GitHub to use this identity from the context of your workflow. The workflow can then authenticate with Azure without the need for credentials. You must also grant the managed identity permissions to deploy to your function app, which is done using a role assignment.
 
 >[!TIP]  
 >This method is the most secure and recommended for those with permissions to configure identity.
@@ -136,7 +136,7 @@ jobs:
       runs-on: ubuntu-latest
       needs: build
       permissions:
-          id-token: write # Required to fetch an OIDC token to authenticate with the job
+          id-token: write # Required for authentication using `azure/login`
       steps:
         # ...download your build artifact
 
@@ -157,12 +157,12 @@ jobs:
 
 ### Azure service principal authentication
 
-Azure service principals also support [RBAC](https://docs.microsoft.com/en-us/azure/role-based-access-control/overview). When using this authentication option, you create a service principal for your function app and manage the secrets yourself.
+You can alternatively use a service principal, which requires you to manage secrets. You must configure the workflow with these secrets, and then it can use them to authenticate with Azure.
 
 >[!TIP]  
 >When possible, you should [use OIDC for authentication](#oidc-authentication-recommended) instead of service principal-based authentication.
 
-To configure your workflow to use a service principal for authentication with RBAC:
+To configure your workflow to use a service principal for authentication:
 
 1. If you don't already have it installed, [download Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest) and run `az login` to sign in with your Azure credentials.
 
@@ -234,9 +234,9 @@ jobs:
 A publish profile contains plain-text secrets that authenticate with your function app using basic authentication with the `scm` HTTP endpoint.
 
 >[!WARNING]  
->Because publish profile authentication uses a shared, plain-text secret and requires you to enable basic HTTP authentication to the `scm` endpoint in your app, you should instead use more secure option like [OIDC authentication](#oidc-authentication-recommended).
+> Publish profile authentication uses a shared secret which you must manage. It also requires you to enable publishing credential access to the app, which is off by default and is not recommended. You should instead use a more secure option like [OIDC authentication](#oidc-authentication-recommended).
 
-To configure your workflow using the publish profile for authentication:
+To configure your workflow using the publish profile:
 
 1. In the [Azure portal](https://portal.azure.com), locate your function app.
 

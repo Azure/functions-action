@@ -238,7 +238,7 @@ jobs:
 A publish profile contains plain-text secrets that authenticate with your function app using basic authentication with the `scm` HTTP endpoint.
 
 > [!WARNING]  
-> Publish profile authentication uses a shared secret which you must manage. It also requires you to enable publishing credential access to the app, which is off by default and is not recommended. You should instead use a more secure option like [OIDC authentication](#oidc-authentication-recommended).
+> Publish profile authentication uses a shared secret which you must manage. It also requires you to enable publishing credential access to the app, which is off by default and is not recommended. You should instead use a more secure option like [OIDC authentication](#use-oidc-recommended).
 
 To configure your workflow using the publish profile:
 
@@ -293,7 +293,7 @@ Parameters required on all [hosting plans](https://learn.microsoft.com/azure/azu
 | Parameter | Description |
 | ---- | ---- |
 | **app-name** | The function app name on Azure. For example, when your app's site URL is `https://your-site-name.azurewebsites.net/`, then `app-name` is `your-site-name`. |
-| **package** | This is the path to your project in the repo being published. By default, this value is set to `.`, which means all files and folders in the GitHub repository are deployed. | 
+| **package** | This is the path to your project in the repo being published. By default, this value is set to `.`, which means all files and folders in the GitHub repository are deployed. |
 
 Parameters used with the [Flex Consumption](https://learn.microsoft.com/azure/azure-functions/flex-consumption-plan) plan:
 
@@ -314,7 +314,7 @@ Optional parameters for all hosting plans:
 | Parameter | Description |
 | ---- | ---- |
 | **slot-name** | Specifies a named slot as the deployment target. By default, this value isn't set, which means the action deploys to your production slot. When this setting resolves to a named slot, make sure that `publish-profile` also contains the credentials for the target slot instead of the production slot. Currently not supported in a Flex Consumption plan. |
-| **publish-profile** | The plain-text credentials used to access the `scm` endpoint using HTTP basic authentication during deployment. This must contain the XML contents of your `.PublishSettings` file. T use this authentication method, see [Publish profile (HTTP basic) authentication](#publish-profile-http-basic-authentication). We highly recommend setting the content in GitHub secrets since it contains sensitive information such as your site URL, username, and password. When the publish profile is rotated in your function app, you also need to update the GitHub secret. Otherwise, a 401 error occurs when accessing the /api/settings endpoint. |
+| **publish-profile** | The plain-text credentials used to access the `scm` endpoint using HTTP basic authentication during deployment. This must contain the XML contents of your `.PublishSettings` file. To use this authentication method, see [Publish profile (HTTP basic) authentication](#use-a-publish-profile-not-recommended). We highly recommend setting the content in GitHub secrets since it contains sensitive information such as your site URL, username, and password. When the publish profile is rotated in your function app, you also need to update the GitHub secret. Otherwise, a 401 error occurs when accessing the /api/settings endpoint. |
 | **respect-pom-xml** | Allow the GitHub Action to derive the Java function app's artifact from pom.xml for deployments. By default, it's set to `false`, which means the **package** parameter needs to point to your Java function app's artifact, such as `./target/azure-functions/<FUNCTION_APP_NAME>`. It's recommended to set **package** to `.` and **respect-pom-xml** to `true` when deploying Java function apps. |
 | **respect-funcignore** | Allow the GitHub Action to parse your .funcignore file and exclude files and folders defined in it. By default, this value is set to `false`. If your GitHub repo contains .funcignore file and you want to exclude certain paths (for example, text editor configs .vscode/, Python virtual environment .venv/), we recommend setting this to `true`. |
 

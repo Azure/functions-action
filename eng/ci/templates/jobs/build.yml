@@ -51,10 +51,10 @@ jobs:
       displayName: 'Use .NET Core sdk'
       inputs:
         packageType: sdk
-        version: 3.1.x
+        version: 8.0.x
 
     - task: DotNetCoreCLI@2
       inputs:
         command: 'build'
-        projects: 'tests/e2e/dotnet3/*.csproj'
+        projects: 'tests/e2e/dotnet8/*.csproj'
       displayName: 'Build project for csharp language'

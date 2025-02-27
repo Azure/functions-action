@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0F9DDECE-DBD1-4730-A4B3-912B56AAE75E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{EEE5504F-0D20-4EF1-9029-36BA16DF905E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotnet3", "tests\samples\NetCoreAppFolder\Dotnet3.csproj", "{DB2AE487-206A-4787-9188-B4C23C1DB260}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "e2e", "e2e", "{0A403211-4064-4275-9324-6ED1AAFCE6D7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnet3", "tests\e2e\dotnet3\dotnet3.csproj", "{F1352C75-7483-4E66-9BC8-FE54F082121B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DB2AE487-206A-4787-9188-B4C23C1DB260}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB2AE487-206A-4787-9188-B4C23C1DB260}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB2AE487-206A-4787-9188-B4C23C1DB260}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB2AE487-206A-4787-9188-B4C23C1DB260}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1352C75-7483-4E66-9BC8-FE54F082121B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1352C75-7483-4E66-9BC8-FE54F082121B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1352C75-7483-4E66-9BC8-FE54F082121B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1352C75-7483-4E66-9BC8-FE54F082121B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{EEE5504F-0D20-4EF1-9029-36BA16DF905E} = {0F9DDECE-DBD1-4730-A4B3-912B56AAE75E}
+		{DB2AE487-206A-4787-9188-B4C23C1DB260} = {EEE5504F-0D20-4EF1-9029-36BA16DF905E}
+		{0A403211-4064-4275-9324-6ED1AAFCE6D7} = {0F9DDECE-DBD1-4730-A4B3-912B56AAE75E}
+		{F1352C75-7483-4E66-9BC8-FE54F082121B} = {0A403211-4064-4275-9324-6ED1AAFCE6D7}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {47719DB1-980F-40CF-9262-8D6B866BA597}
+	EndGlobalSection
+EndGlobal

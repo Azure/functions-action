@@ -274,12 +274,17 @@ function regexpEqual(leftHandOperand, rightHandOperand) {
  */
 
 function entriesEqual(leftHandOperand, rightHandOperand, options) {
-  // IE11 doesn't support Set#entries or Set#@@iterator, so we need manually populate using Set#forEach
-  if (leftHandOperand.size !== rightHandOperand.size) {
+  try {
+    // IE11 doesn't support Set#entries or Set#@@iterator, so we need manually populate using Set#forEach
+    if (leftHandOperand.size !== rightHandOperand.size) {
+      return false;
+    }
+    if (leftHandOperand.size === 0) {
+      return true;
+    }
+  } catch (sizeError) {
+    // things that aren't actual Maps or Sets will throw here
     return false;
-  }
-  if (leftHandOperand.size === 0) {
-    return true;
   }
   var leftHandItems = [];
   var rightHandItems = [];

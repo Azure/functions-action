@@ -3,8 +3,8 @@
  * Licensed under the MIT License.
  */
 
-import { AuthError } from "@azure/msal-common";
-import * as BrowserAuthErrorCodes from "./BrowserAuthErrorCodes";
+import { AuthError } from "@azure/msal-common/browser";
+import * as BrowserAuthErrorCodes from "./BrowserAuthErrorCodes.js";
 export { BrowserAuthErrorCodes }; // Allow importing as "BrowserAuthErrorCodes"
 
 const ErrorLink = "For more visit: aka.ms/msaljs/browser-errors";
@@ -90,6 +90,12 @@ export const BrowserAuthErrorMessages = {
         "The provided prompt is not supported by the native platform. This request should be routed to the web based flow.",
     [BrowserAuthErrorCodes.invalidBase64String]:
         "Invalid base64 encoded string.",
+    [BrowserAuthErrorCodes.invalidPopTokenRequest]:
+        "Invalid PoP token request. The request should not have both a popKid value and signPopToken set to true.",
+    [BrowserAuthErrorCodes.failedToBuildHeaders]:
+        "Failed to build request headers object.",
+    [BrowserAuthErrorCodes.failedToParseHeaders]:
+        "Failed to parse response headers",
 };
 
 /**
@@ -333,20 +339,29 @@ export const BrowserAuthErrorMessage = {
             BrowserAuthErrorCodes.invalidBase64String
         ],
     },
+    invalidPopTokenRequest: {
+        code: BrowserAuthErrorCodes.invalidPopTokenRequest,
+        desc: BrowserAuthErrorMessages[
+            BrowserAuthErrorCodes.invalidPopTokenRequest
+        ],
+    },
 };
 
 /**
  * Browser library error class thrown by the MSAL.js library for SPAs
  */
 export class BrowserAuthError extends AuthError {
-    constructor(errorCode: string) {
-        super(errorCode, BrowserAuthErrorMessages[errorCode]);
+    constructor(errorCode: string, subError?: string) {
+        super(errorCode, BrowserAuthErrorMessages[errorCode], subError);
 
         Object.setPrototypeOf(this, BrowserAuthError.prototype);
         this.name = "BrowserAuthError";
     }
 }
 
-export function createBrowserAuthError(errorCode: string): BrowserAuthError {
-    return new BrowserAuthError(errorCode);
+export function createBrowserAuthError(
+    errorCode: string,
+    subError?: string
+): BrowserAuthError {
+    return new BrowserAuthError(errorCode, subError);
 }

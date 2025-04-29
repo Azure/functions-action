@@ -22,14 +22,15 @@ import {
     IPerformanceClient,
     StubPerformanceClient,
     Logger,
-} from "@azure/msal-common";
+} from "@azure/msal-common/browser";
 import {
     BrowserCacheLocation,
     BrowserConstants,
-} from "../utils/BrowserConstants";
-import { INavigationClient } from "../navigation/INavigationClient";
-import { NavigationClient } from "../navigation/NavigationClient";
-import { FetchClient } from "../network/FetchClient";
+} from "../utils/BrowserConstants.js";
+import { INavigationClient } from "../navigation/INavigationClient.js";
+import { NavigationClient } from "../navigation/NavigationClient.js";
+import { FetchClient } from "../network/FetchClient.js";
+import * as BrowserUtils from "../utils/BrowserUtils.js";
 
 // Default timeout for popup windows and iframes in milliseconds
 export const DEFAULT_POPUP_TIMEOUT_MS = 60000;
@@ -94,14 +95,28 @@ export type BrowserAuthOptions = {
      */
     skipAuthorityMetadataCache?: boolean;
     /**
-     * App supports nested app auth or not; defaults to false
+     * App supports nested app auth or not; defaults to
+     *
+     * @deprecated This flag is deprecated and will be removed in the next major version. createNestablePublicClientApplication should be used instead.
      */
     supportsNestedAppAuth?: boolean;
+    /**
+     * Callback that will be passed the url that MSAL will navigate to in redirect flows. Returning false in the callback will stop navigation.
+     */
+    onRedirectNavigate?: (url: string) => boolean | void;
+    /**
+     * Flag of whether the STS will send back additional parameters to specify where the tokens should be retrieved from.
+     */
+    instanceAware?: boolean;
 };
 
 /** @internal */
-export type InternalAuthOptions = Required<BrowserAuthOptions> & {
+export type InternalAuthOptions = Omit<
+    Required<BrowserAuthOptions>,
+    "onRedirectNavigate"
+> & {
     OIDCOptions: Required<OIDCOptions>;
+    onRedirectNavigate?: (url: string) => boolean | void;
 };
 
 /**
@@ -259,7 +274,8 @@ export function buildConfiguration(
         knownAuthorities: [],
         cloudDiscoveryMetadata: Constants.EMPTY_STRING,
         authorityMetadata: Constants.EMPTY_STRING,
-        redirectUri: Constants.EMPTY_STRING,
+        redirectUri:
+            typeof window !== "undefined" ? BrowserUtils.getCurrentUri() : "",
         postLogoutRedirectUri: Constants.EMPTY_STRING,
         navigateToLoginRequestUrl: true,
         clientCapabilities: [],
@@ -278,6 +294,7 @@ export function buildConfiguration(
         },
         skipAuthorityMetadataCache: false,
         supportsNestedAppAuth: false,
+        instanceAware: false,
     };
 
     // Default cache options for browser

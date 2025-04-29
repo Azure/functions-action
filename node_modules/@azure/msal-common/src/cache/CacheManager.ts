@@ -11,8 +11,8 @@ import {
     AppMetadataCache,
     TokenKeys,
     TenantProfileFilter,
-} from "./utils/CacheTypes";
-import { CacheRecord } from "./entities/CacheRecord";
+} from "./utils/CacheTypes.js";
+import { CacheRecord } from "./entities/CacheRecord.js";
 import {
     CredentialType,
     APP_METADATA,
@@ -20,40 +20,40 @@ import {
     AUTHORITY_METADATA_CONSTANTS,
     AuthenticationScheme,
     Separators,
-} from "../utils/Constants";
-import { CredentialEntity } from "./entities/CredentialEntity";
-import { generateCredentialKey } from "./utils/CacheHelpers";
-import { ScopeSet } from "../request/ScopeSet";
-import { AccountEntity } from "./entities/AccountEntity";
-import { AccessTokenEntity } from "./entities/AccessTokenEntity";
-import { IdTokenEntity } from "./entities/IdTokenEntity";
-import { RefreshTokenEntity } from "./entities/RefreshTokenEntity";
-import { ICacheManager } from "./interface/ICacheManager";
+} from "../utils/Constants.js";
+import { CredentialEntity } from "./entities/CredentialEntity.js";
+import { generateCredentialKey } from "./utils/CacheHelpers.js";
+import { ScopeSet } from "../request/ScopeSet.js";
+import { AccountEntity } from "./entities/AccountEntity.js";
+import { AccessTokenEntity } from "./entities/AccessTokenEntity.js";
+import { IdTokenEntity } from "./entities/IdTokenEntity.js";
+import { RefreshTokenEntity } from "./entities/RefreshTokenEntity.js";
+import { ICacheManager } from "./interface/ICacheManager.js";
 import {
     createClientAuthError,
     ClientAuthErrorCodes,
-} from "../error/ClientAuthError";
+} from "../error/ClientAuthError.js";
 import {
     AccountInfo,
     TenantProfile,
     tenantIdMatchesHomeTenant,
     updateAccountTenantProfileData,
-} from "../account/AccountInfo";
-import { AppMetadataEntity } from "./entities/AppMetadataEntity";
-import { ServerTelemetryEntity } from "./entities/ServerTelemetryEntity";
-import { ThrottlingEntity } from "./entities/ThrottlingEntity";
-import { extractTokenClaims } from "../account/AuthToken";
-import { ICrypto } from "../crypto/ICrypto";
-import { AuthorityMetadataEntity } from "./entities/AuthorityMetadataEntity";
-import { BaseAuthRequest } from "../request/BaseAuthRequest";
-import { Logger } from "../logger/Logger";
-import { name, version } from "../packageMetadata";
-import { StoreInCache } from "../request/StoreInCache";
-import { getAliasesFromStaticSources } from "../authority/AuthorityMetadata";
-import { StaticAuthorityOptions } from "../authority/AuthorityOptions";
-import { TokenClaims } from "../account/TokenClaims";
-import { IPerformanceClient } from "../telemetry/performance/IPerformanceClient";
-import { CacheError, CacheErrorCodes } from "../error/CacheError";
+} from "../account/AccountInfo.js";
+import { AppMetadataEntity } from "./entities/AppMetadataEntity.js";
+import { ServerTelemetryEntity } from "./entities/ServerTelemetryEntity.js";
+import { ThrottlingEntity } from "./entities/ThrottlingEntity.js";
+import { extractTokenClaims } from "../account/AuthToken.js";
+import { ICrypto } from "../crypto/ICrypto.js";
+import { AuthorityMetadataEntity } from "./entities/AuthorityMetadataEntity.js";
+import { BaseAuthRequest } from "../request/BaseAuthRequest.js";
+import { Logger } from "../logger/Logger.js";
+import { name, version } from "../packageMetadata.js";
+import { StoreInCache } from "../request/StoreInCache.js";
+import { getAliasesFromStaticSources } from "../authority/AuthorityMetadata.js";
+import { StaticAuthorityOptions } from "../authority/AuthorityOptions.js";
+import { TokenClaims } from "../account/TokenClaims.js";
+import { IPerformanceClient } from "../telemetry/performance/IPerformanceClient.js";
+import { CacheError, CacheErrorCodes } from "../error/CacheError.js";
 
 /**
  * Interface class which implement cache storage functions used by MSAL to perform validity checks, and store tokens.
@@ -234,11 +234,6 @@ export abstract class CacheManager implements ICacheManager {
     abstract getTokenKeys(): TokenKeys;
 
     /**
-     * Function which clears cache.
-     */
-    abstract clear(): Promise<void>;
-
-    /**
      * Function which updates an outdated credential cache key
      */
     abstract updateCredentialCacheKey(
@@ -303,22 +298,12 @@ export abstract class CacheManager implements ICacheManager {
         accountFilter?: AccountFilter
     ): AccountInfo[] {
         return cachedAccounts.flatMap((accountEntity) => {
-            return this.getAccountInfoForTenantProfiles(
+            return this.getTenantProfilesFromAccountEntity(
                 accountEntity,
+                accountFilter?.tenantId,
                 accountFilter
             );
         });
-    }
-
-    private getAccountInfoForTenantProfiles(
-        accountEntity: AccountEntity,
-        accountFilter?: AccountFilter
-    ): AccountInfo[] {
-        return this.getTenantProfilesFromAccountEntity(
-            accountEntity,
-            accountFilter?.tenantId,
-            accountFilter
-        );
     }
 
     private getTenantedAccountInfoByFilter(
@@ -1905,7 +1890,7 @@ export abstract class CacheManager implements ICacheManager {
     /**
      * Returns true if the credential's keyId matches the one in the request, false otherwise
      * @param entity
-     * @param tokenType
+     * @param keyId
      */
     private matchKeyId(entity: CredentialEntity, keyId: string): boolean {
         return !!(entity.keyId && entity.keyId === keyId);
@@ -2013,9 +1998,6 @@ export class DefaultStorageClass extends CacheManager {
         throw createClientAuthError(ClientAuthErrorCodes.methodNotImplemented);
     }
     getTokenKeys(): TokenKeys {
-        throw createClientAuthError(ClientAuthErrorCodes.methodNotImplemented);
-    }
-    async clear(): Promise<void> {
         throw createClientAuthError(ClientAuthErrorCodes.methodNotImplemented);
     }
     updateCredentialCacheKey(): string {

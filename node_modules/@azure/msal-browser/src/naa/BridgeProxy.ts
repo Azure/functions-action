@@ -3,19 +3,24 @@
  * Licensed under the MIT License.
  */
 
-import { AccountInfo } from "./AccountInfo";
-import { AuthBridge, AuthBridgeResponse } from "./AuthBridge";
-import { AuthResult } from "./AuthResult";
-import { BridgeCapabilities } from "./BridgeCapabilities";
-import { BridgeError } from "./BridgeError";
-import { BridgeRequest } from "./BridgeRequest";
-import { BridgeRequestEnvelope, BridgeMethods } from "./BridgeRequestEnvelope";
-import { BridgeResponseEnvelope } from "./BridgeResponseEnvelope";
-import { BridgeStatusCode } from "./BridgeStatusCode";
-import { IBridgeProxy } from "./IBridgeProxy";
-import { InitContext } from "./InitContext";
-import { TokenRequest } from "./TokenRequest";
-import * as BrowserCrypto from "../crypto/BrowserCrypto";
+import { AuthBridge, AuthBridgeResponse } from "./AuthBridge.js";
+import { AuthResult } from "./AuthResult.js";
+import { BridgeCapabilities } from "./BridgeCapabilities.js";
+import { AccountContext } from "./BridgeAccountContext.js";
+import { BridgeError } from "./BridgeError.js";
+import { BridgeRequest } from "./BridgeRequest.js";
+import {
+    BridgeRequestEnvelope,
+    BridgeMethods,
+} from "./BridgeRequestEnvelope.js";
+import { BridgeResponseEnvelope } from "./BridgeResponseEnvelope.js";
+import { BridgeStatusCode } from "./BridgeStatusCode.js";
+import { IBridgeProxy } from "./IBridgeProxy.js";
+import { InitContext } from "./InitContext.js";
+import { TokenRequest } from "./TokenRequest.js";
+import * as BrowserCrypto from "../crypto/BrowserCrypto.js";
+import { BrowserConstants } from "../utils/BrowserConstants.js";
+import { version } from "../packageMetadata.js";
 
 declare global {
     interface Window {
@@ -33,6 +38,7 @@ export class BridgeProxy implements IBridgeProxy {
     sdkName: string;
     sdkVersion: string;
     capabilities?: BridgeCapabilities;
+    accountContext?: AccountContext;
 
     /**
      * initializeNestedAppAuthBridge - Initializes the bridge to the host app
@@ -76,11 +82,8 @@ export class BridgeProxy implements IBridgeProxy {
 
             const bridgeResponse = await new Promise<BridgeResponseEnvelope>(
                 (resolve, reject) => {
-                    const message: BridgeRequestEnvelope = {
-                        messageType: "NestedAppAuthRequest",
-                        method: "GetInitContext",
-                        requestId: BrowserCrypto.createNewGuid(),
-                    };
+                    const message = BridgeProxy.buildRequest("GetInitContext");
+
                     const request: BridgeRequest = {
                         requestId: message.requestId,
                         method: message.method,
@@ -134,13 +137,27 @@ export class BridgeProxy implements IBridgeProxy {
         };
     }
 
-    public async getActiveAccount(): Promise<AccountInfo> {
-        const result = await this.sendRequest("GetActiveAccount");
-        return BridgeProxy.validateBridgeResultOrThrow(result.account);
-    }
-
     public getHostCapabilities(): BridgeCapabilities | null {
         return this.capabilities ?? null;
+    }
+
+    public getAccountContext(): AccountContext | null {
+        return this.accountContext ? this.accountContext : null;
+    }
+
+    private static buildRequest(
+        method: BridgeMethods,
+        requestParams?: Partial<BridgeRequestEnvelope>
+    ): BridgeRequestEnvelope {
+        return {
+            messageType: "NestedAppAuthRequest",
+            method: method,
+            requestId: BrowserCrypto.createNewGuid(),
+            sendTime: Date.now(),
+            clientLibrary: BrowserConstants.MSAL_SKU,
+            clientLibraryVersion: version,
+            ...requestParams,
+        };
     }
 
     /**
@@ -152,12 +169,7 @@ export class BridgeProxy implements IBridgeProxy {
         method: BridgeMethods,
         requestParams?: Partial<BridgeRequestEnvelope>
     ): Promise<BridgeResponseEnvelope> {
-        const message: BridgeRequestEnvelope = {
-            messageType: "NestedAppAuthRequest",
-            method: method,
-            requestId: BrowserCrypto.createNewGuid(),
-            ...requestParams,
-        };
+        const message = BridgeProxy.buildRequest(method, requestParams);
 
         const promise = new Promise<BridgeResponseEnvelope>(
             (resolve, reject) => {
@@ -194,10 +206,12 @@ export class BridgeProxy implements IBridgeProxy {
     private constructor(
         sdkName: string,
         sdkVersion: string,
+        accountContext?: AccountContext,
         capabilities?: BridgeCapabilities
     ) {
         this.sdkName = sdkName;
         this.sdkVersion = sdkVersion;
+        this.accountContext = accountContext;
         this.capabilities = capabilities;
     }
 
@@ -210,6 +224,7 @@ export class BridgeProxy implements IBridgeProxy {
         return new BridgeProxy(
             response.sdkName,
             response.sdkVersion,
+            response.accountContext,
             response.capabilities
         );
     }

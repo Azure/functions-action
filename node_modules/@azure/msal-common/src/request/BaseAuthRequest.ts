@@ -3,11 +3,11 @@
  * Licensed under the MIT License.
  */
 
-import { AuthenticationScheme } from "../utils/Constants";
-import { AzureCloudOptions } from "../config/ClientConfiguration";
-import { StringDict } from "../utils/MsalTypes";
-import { StoreInCache } from "./StoreInCache";
-import { ShrOptions } from "../crypto/SignedHttpRequest";
+import { AuthenticationScheme } from "../utils/Constants.js";
+import { AzureCloudOptions } from "../config/ClientConfiguration.js";
+import { StringDict } from "../utils/MsalTypes.js";
+import { StoreInCache } from "./StoreInCache.js";
+import { ShrOptions } from "../crypto/SignedHttpRequest.js";
 
 /**
  * BaseAuthRequest
@@ -27,6 +27,9 @@ import { ShrOptions } from "../crypto/SignedHttpRequest";
  * - requestedClaimsHash     - SHA 256 hash string of the requested claims string, used as part of an access token cache key so tokens can be filtered by requested claims
  * - tokenQueryParameters    - String to string map of custom query parameters added to the /token call
  * - storeInCache            - Object containing boolean values indicating whether to store tokens in the cache or not (default is true)
+ * - scenarioId              - Scenario id to track custom user prompts
+ * - popKid                  - Key ID to identify the public key for PoP token request
+ * - embeddedClientId        - Embedded client id. When specified, broker client id (brk_client_id) and redirect uri (brk_redirect_uri) params are set with values from the config, overriding the corresponding extra parameters, if present.
  */
 export type BaseAuthRequest = {
     authority: string;
@@ -46,4 +49,7 @@ export type BaseAuthRequest = {
     maxAge?: number;
     tokenQueryParameters?: StringDict;
     storeInCache?: StoreInCache;
+    scenarioId?: string;
+    popKid?: string;
+    embeddedClientId?: string;
 };

@@ -1,4 +1,4 @@
-let { execSync } = require('node:child_process')
+let { execSync } = require('child_process')
 let pico = require('picocolors')
 
 try {
@@ -13,4 +13,5 @@ try {
     )
     process.exit(1)
   }
+  // eslint-disable-next-line no-unused-vars
 } catch (e) {}

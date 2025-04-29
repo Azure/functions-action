@@ -10,12 +10,75 @@ import {
     Constants,
     RegionDiscoverySources,
     RegionDiscoveryOutcomes,
-} from "../../utils/Constants";
-import { CacheManager } from "../../cache/CacheManager";
-import { AuthError } from "../../error/AuthError";
-import { ServerTelemetryRequest } from "./ServerTelemetryRequest";
-import { ServerTelemetryEntity } from "../../cache/entities/ServerTelemetryEntity";
-import { RegionDiscoveryMetadata } from "../../authority/RegionDiscoveryMetadata";
+} from "../../utils/Constants.js";
+import { CacheManager } from "../../cache/CacheManager.js";
+import { AuthError } from "../../error/AuthError.js";
+import { ServerTelemetryRequest } from "./ServerTelemetryRequest.js";
+import { ServerTelemetryEntity } from "../../cache/entities/ServerTelemetryEntity.js";
+import { RegionDiscoveryMetadata } from "../../authority/RegionDiscoveryMetadata.js";
+
+const skuGroupSeparator = ",";
+const skuValueSeparator = "|";
+
+type SkuParams = {
+    libraryName?: string;
+    libraryVersion?: string;
+    extensionName?: string;
+    extensionVersion?: string;
+    skus?: string;
+};
+
+function makeExtraSkuString(params: SkuParams): string {
+    const {
+        skus,
+        libraryName,
+        libraryVersion,
+        extensionName,
+        extensionVersion,
+    } = params;
+    const skuMap: Map<number, (string | undefined)[]> = new Map([
+        [0, [libraryName, libraryVersion]],
+        [2, [extensionName, extensionVersion]],
+    ]);
+    let skuArr: string[] = [];
+
+    if (skus?.length) {
+        skuArr = skus.split(skuGroupSeparator);
+
+        // Ignore invalid input sku param
+        if (skuArr.length < 4) {
+            return skus;
+        }
+    } else {
+        skuArr = Array.from({ length: 4 }, () => skuValueSeparator);
+    }
+
+    skuMap.forEach((value, key) => {
+        if (value.length === 2 && value[0]?.length && value[1]?.length) {
+            setSku({
+                skuArr,
+                index: key,
+                skuName: value[0],
+                skuVersion: value[1],
+            });
+        }
+    });
+
+    return skuArr.join(skuGroupSeparator);
+}
+
+function setSku(params: {
+    skuArr: string[];
+    index: number;
+    skuName: string;
+    skuVersion: string;
+}): void {
+    const { skuArr, index, skuName, skuVersion } = params;
+    if (index >= skuArr.length) {
+        return;
+    }
+    skuArr[index] = [skuName, skuVersion].join(skuValueSeparator);
+}
 
 /** @internal */
 export class ServerTelemetryManager {
@@ -51,7 +114,12 @@ export class ServerTelemetryManager {
      */
     generateCurrentRequestHeaderValue(): string {
         const request = `${this.apiId}${SERVER_TELEM_CONSTANTS.VALUE_SEPARATOR}${this.cacheOutcome}`;
-        const platformFields = [this.wrapperSKU, this.wrapperVer].join(
+        const platformFieldsArr = [this.wrapperSKU, this.wrapperVer];
+        const nativeBrokerErrorCode = this.getNativeBrokerErrorCode();
+        if (nativeBrokerErrorCode?.length) {
+            platformFieldsArr.push(`broker_error=${nativeBrokerErrorCode}`);
+        }
+        const platformFields = platformFieldsArr.join(
             SERVER_TELEM_CONSTANTS.VALUE_SEPARATOR
         );
         const regionDiscoveryFields = this.getRegionDiscoveryFields();
@@ -276,5 +344,31 @@ export class ServerTelemetryManager {
      */
     setCacheOutcome(cacheOutcome: CacheOutcome): void {
         this.cacheOutcome = cacheOutcome;
+    }
+
+    setNativeBrokerErrorCode(errorCode: string): void {
+        const lastRequests = this.getLastRequests();
+        lastRequests.nativeBrokerErrorCode = errorCode;
+        this.cacheManager.setServerTelemetry(
+            this.telemetryCacheKey,
+            lastRequests
+        );
+    }
+
+    getNativeBrokerErrorCode(): string | undefined {
+        return this.getLastRequests().nativeBrokerErrorCode;
+    }
+
+    clearNativeBrokerErrorCode(): void {
+        const lastRequests = this.getLastRequests();
+        delete lastRequests.nativeBrokerErrorCode;
+        this.cacheManager.setServerTelemetry(
+            this.telemetryCacheKey,
+            lastRequests
+        );
+    }
+
+    static makeExtraSkuString(params: SkuParams): string {
+        return makeExtraSkuString(params);
     }
 }

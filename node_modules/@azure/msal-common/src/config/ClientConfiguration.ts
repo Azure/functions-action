@@ -3,26 +3,26 @@
  * Licensed under the MIT License.
  */
 
-import { INetworkModule } from "../network/INetworkModule";
-import { DEFAULT_CRYPTO_IMPLEMENTATION, ICrypto } from "../crypto/ICrypto";
-import { ILoggerCallback, Logger, LogLevel } from "../logger/Logger";
+import { INetworkModule } from "../network/INetworkModule.js";
+import { DEFAULT_CRYPTO_IMPLEMENTATION, ICrypto } from "../crypto/ICrypto.js";
+import { ILoggerCallback, Logger, LogLevel } from "../logger/Logger.js";
 import {
     Constants,
     DEFAULT_TOKEN_RENEWAL_OFFSET_SEC,
-} from "../utils/Constants";
-import { version } from "../packageMetadata";
-import { Authority } from "../authority/Authority";
-import { AzureCloudInstance } from "../authority/AuthorityOptions";
-import { CacheManager, DefaultStorageClass } from "../cache/CacheManager";
-import { ServerTelemetryManager } from "../telemetry/server/ServerTelemetryManager";
-import { ICachePlugin } from "../cache/interface/ICachePlugin";
-import { ISerializableTokenCache } from "../cache/interface/ISerializableTokenCache";
-import { ClientCredentials } from "../account/ClientCredentials";
-import { ProtocolMode } from "../authority/ProtocolMode";
+} from "../utils/Constants.js";
+import { version } from "../packageMetadata.js";
+import { Authority } from "../authority/Authority.js";
+import { AzureCloudInstance } from "../authority/AuthorityOptions.js";
+import { CacheManager, DefaultStorageClass } from "../cache/CacheManager.js";
+import { ServerTelemetryManager } from "../telemetry/server/ServerTelemetryManager.js";
+import { ICachePlugin } from "../cache/interface/ICachePlugin.js";
+import { ISerializableTokenCache } from "../cache/interface/ISerializableTokenCache.js";
+import { ClientCredentials } from "../account/ClientCredentials.js";
+import { ProtocolMode } from "../authority/ProtocolMode.js";
 import {
     ClientAuthErrorCodes,
     createClientAuthError,
-} from "../error/ClientAuthError";
+} from "../error/ClientAuthError.js";
 
 /**
  * Use the configuration object to configure MSAL Modules and initialize the base interfaces for MSAL.
@@ -80,15 +80,19 @@ export type CommonClientConfiguration = {
  * - cloudDiscoveryMetadata      - A string containing the cloud discovery response. Used in AAD scenarios.
  * - clientCapabilities          - Array of capabilities which will be added to the claims.access_token.xms_cc request property on every network request.
  * - protocolMode                - Enum that represents the protocol that msal follows. Used for configuring proper endpoints.
- * - skipAuthorityMetadataCache      - A flag to choose whether to use or not use the local metadata cache during authority initialization. Defaults to false.
+ * - skipAuthorityMetadataCache  - A flag to choose whether to use or not use the local metadata cache during authority initialization. Defaults to false.
+ * - instanceAware               - A flag of whether the STS will send back additional parameters to specify where the tokens should be retrieved from.
+ * - redirectUri                 - The redirect URI where authentication responses can be received by your application. It must exactly match one of the redirect URIs registered in the Azure portal.
  * @internal
  */
 export type AuthOptions = {
     clientId: string;
     authority: Authority;
+    redirectUri: string;
     clientCapabilities?: Array<string>;
     azureCloudOptions?: AzureCloudOptions;
     skipAuthorityMetadataCache?: boolean;
+    instanceAware?: boolean;
 };
 
 /**
@@ -271,6 +275,7 @@ function buildAuthOptions(authOptions: AuthOptions): Required<AuthOptions> {
         clientCapabilities: [],
         azureCloudOptions: DEFAULT_AZURE_CLOUD_OPTIONS,
         skipAuthorityMetadataCache: false,
+        instanceAware: false,
         ...authOptions,
     };
 }

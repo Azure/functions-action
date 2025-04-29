@@ -13,28 +13,59 @@ import {
     OIDC_DEFAULT_SCOPES,
     ThrottlingConstants,
     HeaderNames,
-} from "../utils/Constants";
-import * as AADServerParamKeys from "../constants/AADServerParamKeys";
-import { ScopeSet } from "./ScopeSet";
+} from "../utils/Constants.js";
+import * as AADServerParamKeys from "../constants/AADServerParamKeys.js";
+import { ScopeSet } from "./ScopeSet.js";
 import {
     createClientConfigurationError,
     ClientConfigurationErrorCodes,
-} from "../error/ClientConfigurationError";
-import { StringDict } from "../utils/MsalTypes";
-import { RequestValidator } from "./RequestValidator";
+} from "../error/ClientConfigurationError.js";
+import { StringDict } from "../utils/MsalTypes.js";
+import { RequestValidator } from "./RequestValidator.js";
 import {
     ApplicationTelemetry,
     LibraryInfo,
-} from "../config/ClientConfiguration";
-import { ServerTelemetryManager } from "../telemetry/server/ServerTelemetryManager";
-import { ClientInfo } from "../account/ClientInfo";
+} from "../config/ClientConfiguration.js";
+import { ServerTelemetryManager } from "../telemetry/server/ServerTelemetryManager.js";
+import { ClientInfo } from "../account/ClientInfo.js";
+import { IPerformanceClient } from "../telemetry/performance/IPerformanceClient.js";
+
+function instrumentBrokerParams(
+    parameters: Map<string, string>,
+    correlationId?: string,
+    performanceClient?: IPerformanceClient
+) {
+    if (!correlationId) {
+        return;
+    }
+
+    const clientId = parameters.get(AADServerParamKeys.CLIENT_ID);
+    if (clientId && parameters.has(AADServerParamKeys.BROKER_CLIENT_ID)) {
+        performanceClient?.addFields(
+            {
+                embeddedClientId: clientId,
+                embeddedRedirectUri: parameters.get(
+                    AADServerParamKeys.REDIRECT_URI
+                ),
+            },
+            correlationId
+        );
+    }
+}
 
 /** @internal */
 export class RequestParameterBuilder {
     private parameters: Map<string, string>;
+    private readonly performanceClient?: IPerformanceClient;
+    private readonly correlationId?: string;
 
-    constructor() {
+    constructor(
+        correlationId?: string,
+        performanceClient?: IPerformanceClient
+    ) {
         this.parameters = new Map<string, string>();
+        this.performanceClient = performanceClient;
+        this.correlationId = correlationId;
     }
 
     /**
@@ -465,12 +496,10 @@ export class RequestParameterBuilder {
      * @param eQParams
      */
     addExtraQueryParameters(eQParams: StringDict): void {
-        const sanitizedEQParams = RequestValidator.sanitizeEQParams(
-            eQParams,
-            this.parameters
-        );
-        Object.keys(sanitizedEQParams).forEach((key) => {
-            this.parameters.set(key, eQParams[key]);
+        Object.entries(eQParams).forEach(([key, value]) => {
+            if (!this.parameters.has(key) && value) {
+                this.parameters.set(key, value);
+            }
         });
     }
 
@@ -600,6 +629,19 @@ export class RequestParameterBuilder {
         );
     }
 
+    addBrokerParameters(params: {
+        brokerClientId: string;
+        brokerRedirectUri: string;
+    }): void {
+        const brokerParams: StringDict = {};
+        brokerParams[AADServerParamKeys.BROKER_CLIENT_ID] =
+            params.brokerClientId;
+        brokerParams[AADServerParamKeys.BROKER_REDIRECT_URI] =
+            params.brokerRedirectUri;
+
+        this.addExtraQueryParameters(brokerParams);
+    }
+
     /**
      * Utility to create a URL from the params map
      */
@@ -609,6 +651,12 @@ export class RequestParameterBuilder {
         this.parameters.forEach((value, key) => {
             queryParameterArray.push(`${key}=${value}`);
         });
+
+        instrumentBrokerParams(
+            this.parameters,
+            this.correlationId,
+            this.performanceClient
+        );
 
         return queryParameterArray.join("&");
     }

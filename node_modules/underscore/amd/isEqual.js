@@ -27,7 +27,7 @@ define(['./underscore', './_setup', './_getByteLength', './isTypedArray', './isF
     var className = _setup.toString.call(a);
     if (className !== _setup.toString.call(b)) return false;
     // Work around a bug in IE 10 - Edge 13.
-    if (_stringTagBug.hasStringTagBug && className == '[object Object]' && isDataView(a)) {
+    if (_stringTagBug.hasDataViewBug && className == '[object Object]' && isDataView(a)) {
       if (!isDataView(b)) return false;
       className = tagDataView;
     }

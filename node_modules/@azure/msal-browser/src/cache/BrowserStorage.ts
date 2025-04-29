@@ -6,24 +6,24 @@
 import {
     BrowserConfigurationAuthErrorCodes,
     createBrowserConfigurationAuthError,
-} from "../error/BrowserConfigurationAuthError";
-import { BrowserCacheLocation } from "../utils/BrowserConstants";
-import { IWindowStorage } from "./IWindowStorage";
+} from "../error/BrowserConfigurationAuthError.js";
+import { BrowserCacheLocation } from "../utils/BrowserConstants.js";
+import { IWindowStorage } from "./IWindowStorage.js";
+import { LocalStorage } from "./LocalStorage.js";
+import { SessionStorage } from "./SessionStorage.js";
 
+/**
+ * @deprecated This class will be removed in a future major version
+ */
 export class BrowserStorage implements IWindowStorage<string> {
-    private windowStorage: Storage;
+    private windowStorage: IWindowStorage<string>;
 
     constructor(cacheLocation: string) {
-        this.validateWindowStorage(cacheLocation);
-        this.windowStorage = window[cacheLocation];
-    }
-
-    private validateWindowStorage(cacheLocation: string): void {
-        if (
-            (cacheLocation !== BrowserCacheLocation.LocalStorage &&
-                cacheLocation !== BrowserCacheLocation.SessionStorage) ||
-            !window[cacheLocation]
-        ) {
+        if (cacheLocation === BrowserCacheLocation.LocalStorage) {
+            this.windowStorage = new LocalStorage();
+        } else if (cacheLocation === BrowserCacheLocation.SessionStorage) {
+            this.windowStorage = new SessionStorage();
+        } else {
             throw createBrowserConfigurationAuthError(
                 BrowserConfigurationAuthErrorCodes.storageNotSupported
             );

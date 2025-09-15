@@ -84,7 +84,7 @@ To configure your workflow to use OIDC authentication:
 
 1. Copy down the values for Client ID, Subscription ID, and Directory (tenant) ID for the new user-assigned managed identity resource.
 
-1. [Assign the role](https://learn.microsoft.com/azure/role-based-access-control/role-assignments-portal) [`Website Contributor'](https://learn.microsoft.com/azure/role-based-access-control/built-in-roles/web-and-mobile#website-contributor)` to your user-assigned managed identity, scoped to the function app you want to deploy to.
+1. [Assign the role](https://learn.microsoft.com/azure/role-based-access-control/role-assignments-portal) [`Website Contributor`](https://learn.microsoft.com/azure/role-based-access-control/built-in-roles/web-and-mobile#website-contributor) to your user-assigned managed identity, scoped to the function app you want to deploy to.
 
 1. [Create a federated credential](https://learn.microsoft.com/entra/workload-id/workload-identity-federation-create-trust-user-assigned-managed-identity#configure-a-federated-identity-credential-on-a-user-assigned-managed-identity) with the following settings:  
 

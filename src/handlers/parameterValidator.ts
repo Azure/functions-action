@@ -55,6 +55,7 @@ export class ParameterValidator implements IOrchestratable {
         this.validateFields(state);
         this._scmCredentials = await this.parseScmCredentials(state, this._publishProfile);
         this.validateScmCredentialsSlotName(state);
+        this.validateFlexConsumptionRequirements(state)
         return StateConstant.ValidateAzureResource;
     }
 
@@ -216,6 +217,17 @@ export class ParameterValidator implements IOrchestratable {
                     "correct casing and the publish-profile is acquired from your function app's slot rather than " +
                     "your main production site."
                 );
+            }
+        }
+    }
+
+    private validateFlexConsumptionRequirements(state: StateConstant): void{
+        if(this._sku.startsWith('flexconsumption')){
+            if (!this._remoteBuild){
+                throw new ValidationError(
+                    state,ConfigurationConstant.ParamInRemoteBuild,
+                    `Flex Consumption plan detected. Please ensure the remote-build parameter is set true due MS requirements. See more: https://learn.microsoft.com/en-us/azure/azure-functions/functions-how-to-github-actions?tabs=linux%2Cdotnet&pivots=method-portal#parameters`
+                )
             }
         }
     }

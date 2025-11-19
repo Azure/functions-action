@@ -45,7 +45,7 @@
     "azure-actions-webclient": "^1.1.1",
     "core-util-is": "^1.0.3",
     "fs-extra": "^11.2.0",
-    "glob": "^10.3.10",
+    "glob": "^10.5.0",
     "ignore": "^5.3.1",
     "rimraf": "^5.0.5",
     "typescript": "^5.4.3",

@@ -68,7 +68,7 @@ jobs:
       # Perform additional steps such as running tests, if needed
       
       - name: 'Upload artifact for the deployment job'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ env.BUILD_ARTIFACT_NAME }}
           path: ${{ env.POM_XML_DIRECTORY }}/target/azure-functions/${{ env.AZURE_FUNCTIONAPP_NAME }}

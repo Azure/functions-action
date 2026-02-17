@@ -2,7 +2,7 @@ import { existsSync, readFileSync,  } from 'fs';
 import { resolve, normalize } from 'path';
 import * as glob from 'glob';
 import * as rimraf from 'rimraf';
-import * as ignore from 'ignore';
+import ignore, { Ignore } from 'ignore';
 import { Logger } from './logger';
 import path = require('path');
 
@@ -12,19 +12,18 @@ export class FuncIgnore {
         return existsSync(funcignorePath)
     }
 
-    public static readFuncignore(working_dir: string): ignore.Ignore {
+    public static readFuncignore(working_dir: string): Ignore {
         const funcignorePath: string = resolve(working_dir, '.funcignore');
         const rules: string[] = readFileSync(funcignorePath).toString().split('\n').filter(l => l.trim() !== '');
 
         try {
-            // @ts-ignore
             return ignore().add(rules);
         } catch (error) {
             Logger.Warn(`Failed to parse .funcignore: ${error}`);
         }
     }
 
-    public static removeFilesFromFuncIgnore(working_dir: string, ignoreParser: ignore.Ignore): void {
+    public static removeFilesFromFuncIgnore(working_dir: string, ignoreParser: Ignore): void {
         if (!ignoreParser) {
             Logger.Warn(`The ignore parser is undefined. Nothing will be removed.`);
             return;

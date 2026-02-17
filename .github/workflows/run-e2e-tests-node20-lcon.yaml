@@ -17,7 +17,7 @@ permissions:
 env:
   AZURE_FUNCTIONAPP_NAME: gae-fa-node20-lcon
   AZURE_FUNCTIONAPP_PACKAGE_PATH: './tests/e2e/node20'
-  NODE_VERSION: '20.x'
+  NODE_VERSION: '24.x'
 
 jobs:
   run:
@@ -27,10 +27,10 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Set Node.js 20.x for GitHub Action
-      uses: actions/setup-node@v1
+    - name: Set Node.js 24.x for GitHub Action
+      uses: actions/setup-node@v6
       with:
-        node-version: 20.x
+        node-version: 24.x
 
     - name: Run Npm Install for GitHub Action
       run: npm install
@@ -39,7 +39,7 @@ jobs:
       run: npm run build
 
     - name: E2E Setup Node ${{ env.NODE_VERSION }} Environment
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v6
       with:
         node-version: ${{ env.NODE_VERSION }}
 

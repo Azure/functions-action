@@ -5,7 +5,7 @@ import { ApplicationInsightsResources, AzureApplicationInsights } from "azure-ac
 import { AzureAppService } from "../Arm/azure-app-service";
 import { IAuthorizer } from "azure-actions-webclient/Authorizer/IAuthorizer";
 
-var uuidV4 = require("uuid/v4");
+import { v4 as uuidV4 } from "uuid";
 
 export async function addAnnotation(endpoint: IAuthorizer, azureAppService: AzureAppService, isDeploymentSuccess: boolean): Promise<void> {
     try {

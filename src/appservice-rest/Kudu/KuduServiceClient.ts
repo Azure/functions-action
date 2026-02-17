@@ -26,7 +26,7 @@ export class KuduServiceClient {
             request.headers['Cookie'] = this._cookie;
         }
 
-        let retryCount = reqOptions && util.isNumber(reqOptions.retryCount) ? reqOptions.retryCount : 5;
+        let retryCount = reqOptions && typeof reqOptions.retryCount === 'number' ? reqOptions.retryCount : 5;
 
         while(retryCount >= 0) {
             try {

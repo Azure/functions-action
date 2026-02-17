@@ -1,42 +1,51 @@
 # @isaacs/cliui
 
-Temporary fork of [cliui](http://npm.im/cliui).
-
-![ci](https://github.com/yargs/cliui/workflows/ci/badge.svg)
-[![NPM version](https://img.shields.io/npm/v/cliui.svg)](https://www.npmjs.com/package/cliui)
-[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
-![nycrc config on GitHub](https://img.shields.io/nycrc/yargs/cliui)
+Fork of [cliui](http://npm.im/cliui). Fully CommonJS/ESM
+hybridized, with all dependencies vendored and optimized for
+minimal bundle size without sacrificing functionality.
 
 easily create complex multi-column command-line-interfaces.
+
+## Changes in v9
+
+The default export is no longer exported. So, intead of `import
+cliui from '@isaacs/cliui'`, you'll do `import { cliui } from
+'@isaacs/cliui'`. This is done in order to minimize typescript
+oddness between the CommonJS and ESM versions.
+
+A minified export is provided at `@isaacs/cliui/min`. If you are
+concerned about bundle size, that's the thing to use.
 
 ## Example
 
 ```js
-const ui = require('cliui')()
+import { cliui } from '@isaacs/cliui'
+// or: const { cliui } = require('cliui')
+const ui = cliui()
 
 ui.div('Usage: $0 [command] [options]')
 
 ui.div({
   text: 'Options:',
-  padding: [2, 0, 1, 0]
+  padding: [2, 0, 1, 0],
 })
 
 ui.div(
   {
-    text: "-f, --file",
+    text: '-f, --file',
     width: 20,
-    padding: [0, 4, 0, 4]
+    padding: [0, 4, 0, 4],
   },
   {
-    text: "the file to load." +
-      chalk.green("(if this description is long it wraps).")
-    ,
-    width: 20
+    text:
+      'the file to load.' +
+      chalk.green('(if this description is long it wraps).'),
+    width: 20,
   },
   {
-    text: chalk.red("[required]"),
-    align: 'right'
-  }
+    text: chalk.red('[required]'),
+    align: 'right',
+  },
 )
 
 console.log(ui.toString())
@@ -44,11 +53,10 @@ console.log(ui.toString())
 
 ## Deno/ESM Support
 
-As of `v7` `cliui` supports [Deno](https://github.com/denoland/deno) and
-[ESM](https://nodejs.org/api/esm.html#esm_ecmascript_modules):
+Load the minified version from unpkg.
 
 ```typescript
-import cliui from "https://deno.land/x/cliui/deno.ts";
+import { cliui } from 'https://unpkg.com/@isaacs/cliui/dist/esm/index.min.js'
 
 const ui = cliui({})
 
@@ -56,13 +64,13 @@ ui.div('Usage: $0 [command] [options]')
 
 ui.div({
   text: 'Options:',
-  padding: [2, 0, 1, 0]
+  padding: [2, 0, 1, 0],
 })
 
 ui.div({
-  text: "-f, --file",
+  text: '-f, --file',
   width: 20,
-  padding: [0, 4, 0, 4]
+  padding: [0, 4, 0, 4],
 })
 
 console.log(ui.toString())
@@ -77,21 +85,21 @@ cliui exposes a simple layout DSL:
 If you create a single `ui.div`, passing a string rather than an
 object:
 
-* `\n`: characters will be interpreted as new rows.
-* `\t`: characters will be interpreted as new columns.
-* `\s`: characters will be interpreted as padding.
+- `\n`: characters will be interpreted as new rows.
+- `\t`: characters will be interpreted as new columns.
+- `\s`: characters will be interpreted as padding.
 
 **as an example...**
 
 ```js
 var ui = require('./')({
-  width: 60
+  width: 60,
 })
 
 ui.div(
   'Usage: node ./bin/foo.js\n' +
-  '  <regex>\t  provide a regex\n' +
-  '  <glob>\t  provide a glob\t [required]'
+    '  <regex>\t  provide a regex\n' +
+    '  <glob>\t  provide a glob\t [required]',
 )
 
 console.log(ui.toString())
@@ -108,7 +116,7 @@ Usage: node ./bin/foo.js
 ## Methods
 
 ```js
-cliui = require('cliui')
+cliui = require('@isaacs/cliui')
 ```
 
 ### cliui({width: integer})
@@ -126,11 +134,11 @@ Create a row with any number of columns, a column
 can either be a string, or an object with the following
 options:
 
-* **text:** some text to place in the column.
-* **width:** the width of a column.
-* **align:** alignment, `right` or `center`.
-* **padding:** `[top, right, bottom, left]`.
-* **border:** should a border be placed around the div?
+- **text:** some text to place in the column.
+- **width:** the width of a column.
+- **align:** alignment, `right` or `center`.
+- **padding:** `[top, right, bottom, left]`.
+- **border:** should a border be placed around the div?
 
 ### cliui.span(column, column, column)
 

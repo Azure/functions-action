@@ -8,5 +8,6 @@ export type AccountInfo = {
     idToken?: string;
     platformBrokerId?: string;
     idTokenClaims?: object;
+    loginHint?: string;
 };
 //# sourceMappingURL=AccountInfo.d.ts.map

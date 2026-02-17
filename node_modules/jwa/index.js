@@ -1,4 +1,3 @@
-var bufferEqual = require('buffer-equal-constant-time');
 var Buffer = require('safe-buffer').Buffer;
 var crypto = require('crypto');
 var formatEcdsa = require('ecdsa-sig-formatter');
@@ -135,10 +134,25 @@ function createHmacSigner(bits) {
   }
 }
 
+var bufferEqual;
+var timingSafeEqual = 'timingSafeEqual' in crypto ? function timingSafeEqual(a, b) {
+  if (a.byteLength !== b.byteLength) {
+    return false;
+  }
+
+  return crypto.timingSafeEqual(a, b)
+} : function timingSafeEqual(a, b) {
+  if (!bufferEqual) {
+    bufferEqual = require('buffer-equal-constant-time');
+  }
+
+  return bufferEqual(a, b)
+}
+
 function createHmacVerifier(bits) {
   return function verify(thing, signature, secret) {
     var computedSig = createHmacSigner(bits)(thing, secret);
-    return bufferEqual(Buffer.from(signature), Buffer.from(computedSig));
+    return timingSafeEqual(Buffer.from(signature), Buffer.from(computedSig));
   }
 }
 

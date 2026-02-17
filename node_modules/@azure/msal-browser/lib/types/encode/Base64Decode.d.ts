@@ -7,4 +7,9 @@
  * @param input
  */
 export declare function base64Decode(input: string): string;
+/**
+ * Decodes base64 into Uint8Array
+ * @param base64String
+ */
+export declare function base64DecToArr(base64String: string): Uint8Array;
 //# sourceMappingURL=Base64Decode.d.ts.map

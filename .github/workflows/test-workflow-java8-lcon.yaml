@@ -63,7 +63,7 @@ jobs:
           distribution: 'microsoft'
 
       - name: 'Build project with Maven'
-        run: mvn clean package
+        run: mvn clean package -DfunctionAppName=${{ env.AZURE_FUNCTIONAPP_NAME }}
 
       # Perform additional steps such as running tests, if needed
       

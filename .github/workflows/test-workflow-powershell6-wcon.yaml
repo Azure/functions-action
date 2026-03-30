@@ -49,7 +49,7 @@ jobs:
       contents: read   # Required for actions/checkout
     steps:
       - name: 'Checkout repository'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # Perform additional steps such as running tests, if needed
      

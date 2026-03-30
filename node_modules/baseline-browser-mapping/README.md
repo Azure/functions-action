@@ -15,23 +15,27 @@ To install the package, run:
 
 `npm install --save-dev baseline-browser-mapping`
 
-`baseline-browser-mapping` depends on `web-features` and `@mdn/browser-compat-data` for core browser version selection, but the data is pre-packaged and minified. This package checks for updates to those modules and the supported [downstream browsers](#downstream-browsers) on a daily basis and is updated frequently. Consider adding a script to your `package.json` to update `baseline-browser-mapping` and using it as part of your build process to ensure your data is as up to date as possible:
-
-```javascript
-"scripts": [
-  "refresh-baseline-browser-mapping": "npm i --save-dev baseline-browser-mapping@latest"
-]
-```
-
 The minimum supported NodeJS version for `baseline-browser-mapping` is v8 in alignment with `browserslist`. For NodeJS versions earlier than v13.2, the [`require('baseline-browser-mapping')`](https://nodejs.org/api/modules.html#requireid) syntax should be used to import the module.
 
 ## Keeping `baseline-browser-mapping` up to date
+
+`baseline-browser-mapping` depends on `web-features` and `@mdn/browser-compat-data` for core browser version selection, but the data is pre-packaged and minified. This package checks for updates to those modules and the supported [downstream browsers](#downstream-browsers) on a daily basis and is updated frequently.
 
 If you are only using this module to generate minimum browser versions for Baseline Widely available or Baseline year feature sets, you don't need to update this module frequently, as the backward looking data is reasonably stable.
 
 However, if you are targeting Newly available, using the [`getAllVersions()`](#get-data-for-all-browser-versions) function or heavily relying on the data for downstream browsers, you should update this module more frequently. If you target a feature cut off date within the last two months and your installed version of `baseline-browser-mapping` has data that is more than 2 months old, you will receive a console warning advising you to update to the latest version when you call `getCompatibleVersions()` or `getAllVersions()`.
 
-If you want to suppress these warnings you can use the `suppressWarnings: true` option in the configuration object passed to `getCompatibleVersions()` or `getAllVersions()`. Alternatively, you can use the `BASELINE_BROWSER_MAPPING_IGNORE_OLD_DATA=true` environment variable when running your build process. This module also respects the `BROWSERSLIST_IGNORE_OLD_DATA=true` environment variable. Environment variables can also be provided in a `.env` file from Node 20 onwards; however, this module does not load .env files automatically to avoid conflicts with other libraries with different requirements. You will need to use `process.loadEnvFile()` or a library like `dotenv` to load .env files before `baseline-browser-mapping` is called.
+If you want to suppress the console warnings mentioned above you can use the `suppressWarnings: true` option in the configuration object passed to `getCompatibleVersions()` or `getAllVersions()`. Alternatively, you can use the `BASELINE_BROWSER_MAPPING_IGNORE_OLD_DATA=true` environment variable when running your build process. This module also respects the `BROWSERSLIST_IGNORE_OLD_DATA=true` environment variable. Environment variables can also be provided in a `.env` file from Node 20 onwards; however, this module does not load .env files automatically to avoid conflicts with other libraries with different requirements. You will need to use `process.loadEnvFile()` or a library like `dotenv` to load .env files before `baseline-browser-mapping` is called.
+
+If you're building a tool that uses this module, consider suppressing the warnings but building a process into your tool that automatically updates this module. See, for example, [`browserslist`](https://github.com/browserslist/browserslist/blob/main/node.js#L471) and its [`update-browserslist-db`](https://github.com/browserslist/update-db) package.
+
+If you're implementing `baseline-browser-mapping` directly, you should add a script to your `package.json` to update `baseline-browser-mapping` and use it as part of your build process to ensure your data is as up to date as possible. For example, if you are using NPM for package management:
+
+```javascript
+"scripts": [
+  "refresh-baseline-browser-mapping": "npm i baseline-browser-mapping@latest -D"
+]
+```
 
 If you want to ensure [reproducible builds](https://www.wikiwand.com/en/articles/Reproducible_builds), we strongly recommend using the `widelyAvailableOnDate` option to fix the Widely available date on a per build basis to ensure dependent tools provide the same output and you do not produce data staleness warnings. If you are using [`browserslist`](https://github.com/browserslist/browserslist) to target Baseline Widely available, consider automatically updating your `browserslist` configuration in `package.json` or `.browserslistrc` to `baseline widely available on {YYYY-MM-DD}` as part of your build process to ensure the same or sufficiently similar list of minimum browsers is reproduced for historical builds.
 

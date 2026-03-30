@@ -6,12 +6,7 @@
  * import sqlite from 'node:sqlite';
  * ```
  *
- * This module is only available under the `node:` scheme. The following will not
- * work:
- *
- * ```js
- * import sqlite from 'sqlite';
- * ```
+ * This module is only available under the `node:` scheme.
  *
  * The following example shows the basic usage of the `node:sqlite` module to open
  * an in-memory database, write data to the database, and then read the data back.
@@ -123,6 +118,14 @@ declare module "node:sqlite" {
          * @default false
          */
         allowUnknownNamedParameters?: boolean | undefined;
+        /**
+         * If `true`, enables the defensive flag. When the defensive flag is enabled,
+         * language features that allow ordinary SQL to deliberately corrupt the database
+         * file are disabled. The defensive flag can also be set using `enableDefensive()`.
+         * @since v24.12.0
+         * @default true
+         */
+        defensive?: boolean | undefined;
     }
     interface CreateSessionOptions {
         /**
@@ -295,6 +298,16 @@ declare module "node:sqlite" {
          */
         enableLoadExtension(allow: boolean): void;
         /**
+         * Enables or disables the defensive flag. When the defensive flag is active,
+         * language features that allow ordinary SQL to deliberately corrupt the
+         * database file are disabled.
+         * See [`SQLITE_DBCONFIG_DEFENSIVE`](https://www.sqlite.org/c3ref/c_dbconfig_defensive.html#sqlitedbconfigdefensive)
+         * in the SQLite documentation for details.
+         * @since v24.12.0
+         * @param active Whether to set the defensive flag.
+         */
+        enableDefensive(active: boolean): void;
+        /**
          * This method is a wrapper around [`sqlite3_db_filename()`](https://sqlite.org/c3ref/db_filename.html)
          * @since v24.0.0
          * @param dbName Name of the database. This can be `'main'` (the default primary database) or any other
@@ -413,7 +426,7 @@ declare module "node:sqlite" {
          */
         prepare(sql: string): StatementSync;
         /**
-         * Creates a new `SQLTagStore`, which is an LRU (Least Recently Used) cache for
+         * Creates a new {@link SQLTagStore `SQLTagStore`}, which is an LRU (Least Recently Used) cache for
          * storing prepared statements. This allows for the efficient reuse of prepared
          * statements by tagging them with a unique identifier.
          *
@@ -427,7 +440,7 @@ declare module "node:sqlite" {
          * import { DatabaseSync } from 'node:sqlite';
          *
          * const db = new DatabaseSync(':memory:');
-         * const sql = db.createSQLTagStore();
+         * const sql = db.createTagStore();
          *
          * db.exec('CREATE TABLE users (id INT, name TEXT)');
          *
@@ -450,6 +463,7 @@ declare module "node:sqlite" {
          * // ]
          * ```
          * @since v24.9.0
+         * @param maxSize The maximum number of prepared statements to cache. **Default**: `1000`.
          * @returns A new SQL tag store for caching prepared statements.
          */
         createTagStore(maxSize?: number): SQLTagStore;
@@ -468,6 +482,8 @@ declare module "node:sqlite" {
          * [`sqlite3changeset_apply()`](https://www.sqlite.org/session/sqlite3changeset_apply.html).
          *
          * ```js
+         * import { DatabaseSync } from 'node:sqlite';
+         *
          * const sourceDb = new DatabaseSync(':memory:');
          * const targetDb = new DatabaseSync(':memory:');
          *
@@ -525,19 +541,24 @@ declare module "node:sqlite" {
          * [`sqlite3session_delete()`](https://www.sqlite.org/session/sqlite3session_delete.html).
          */
         close(): void;
+        /**
+         * Closes the session. If the session is already closed, does nothing.
+         * @since v24.9.0
+         */
+        [Symbol.dispose](): void;
     }
     /**
      * This class represents a single LRU (Least Recently Used) cache for storing
      * prepared statements.
      *
-     * Instances of this class are created via the database.createSQLTagStore() method,
+     * Instances of this class are created via the database.createTagStore() method,
      * not by using a constructor. The store caches prepared statements based on the
      * provided SQL query string. When the same query is seen again, the store
      * retrieves the cached statement and safely applies the new values through
      * parameter binding, thereby preventing attacks like SQL injection.
      *
      * The cache has a maxSize that defaults to 1000 statements, but a custom size can
-     * be provided (e.g., database.createSQLTagStore(100)). All APIs exposed by this
+     * be provided (e.g., database.createTagStore(100)). All APIs exposed by this
      * class execute synchronously.
      * @since v24.9.0
      */

@@ -3,7 +3,7 @@
  * JavaScript in parallel. To access it:
  *
  * ```js
- * import worker from 'node:worker_threads';
+ * import worker_threads from 'node:worker_threads';
  * ```
  *
  * Workers (threads) are useful for performing CPU-intensive JavaScript operations.
@@ -57,8 +57,8 @@
 declare module "worker_threads" {
     import { Context } from "node:vm";
     import { EventEmitter, NodeEventTarget } from "node:events";
-    import { EventLoopUtilityFunction } from "node:perf_hooks";
     import { FileHandle } from "node:fs/promises";
+    import { Performance } from "node:perf_hooks";
     import { Readable, Writable } from "node:stream";
     import { ReadableStream, TransformStream, WritableStream } from "node:stream/web";
     import { URL } from "node:url";
@@ -91,9 +91,7 @@ declare module "worker_threads" {
         readonly port1: MessagePort;
         readonly port2: MessagePort;
     }
-    interface WorkerPerformance {
-        eventLoopUtilization: EventLoopUtilityFunction;
-    }
+    interface WorkerPerformance extends Pick<Performance, "eventLoopUtilization"> {}
     type Transferable =
         | ArrayBuffer
         | MessagePort
@@ -410,7 +408,7 @@ declare module "worker_threads" {
         readonly resourceLimits?: ResourceLimits | undefined;
         /**
          * An object that can be used to query performance information from a worker
-         * instance. Similar to `perf_hooks.performance`.
+         * instance.
          * @since v15.1.0, v14.17.0, v12.22.0
          */
         readonly performance: WorkerPerformance;
@@ -446,8 +444,8 @@ declare module "worker_threads" {
          */
         terminate(): Promise<number>;
         /**
-         * This method returns a `Promise` that will resolve to an object identical to `process.threadCpuUsage()`,
-         * or reject with an `ERR_WORKER_NOT_RUNNING` error if the worker is no longer running.
+         * This method returns a `Promise` that will resolve to an object identical to {@link process.threadCpuUsage()},
+         * or reject with an [`ERR_WORKER_NOT_RUNNING`](https://nodejs.org/docs/latest-v24.x/api/errors.html#err_worker_not_running) error if the worker is no longer running.
          * This methods allows the statistics to be observed from outside the actual thread.
          * @since v24.6.0
          */
@@ -556,49 +554,49 @@ declare module "worker_threads" {
          * @since v24.2.0
          */
         [Symbol.asyncDispose](): Promise<void>;
-        addListener(event: "error", listener: (err: Error) => void): this;
+        addListener(event: "error", listener: (err: any) => void): this;
         addListener(event: "exit", listener: (exitCode: number) => void): this;
         addListener(event: "message", listener: (value: any) => void): this;
         addListener(event: "messageerror", listener: (error: Error) => void): this;
         addListener(event: "online", listener: () => void): this;
         addListener(event: string | symbol, listener: (...args: any[]) => void): this;
-        emit(event: "error", err: Error): boolean;
+        emit(event: "error", err: any): boolean;
         emit(event: "exit", exitCode: number): boolean;
         emit(event: "message", value: any): boolean;
         emit(event: "messageerror", error: Error): boolean;
         emit(event: "online"): boolean;
         emit(event: string | symbol, ...args: any[]): boolean;
-        on(event: "error", listener: (err: Error) => void): this;
+        on(event: "error", listener: (err: any) => void): this;
         on(event: "exit", listener: (exitCode: number) => void): this;
         on(event: "message", listener: (value: any) => void): this;
         on(event: "messageerror", listener: (error: Error) => void): this;
         on(event: "online", listener: () => void): this;
         on(event: string | symbol, listener: (...args: any[]) => void): this;
-        once(event: "error", listener: (err: Error) => void): this;
+        once(event: "error", listener: (err: any) => void): this;
         once(event: "exit", listener: (exitCode: number) => void): this;
         once(event: "message", listener: (value: any) => void): this;
         once(event: "messageerror", listener: (error: Error) => void): this;
         once(event: "online", listener: () => void): this;
         once(event: string | symbol, listener: (...args: any[]) => void): this;
-        prependListener(event: "error", listener: (err: Error) => void): this;
+        prependListener(event: "error", listener: (err: any) => void): this;
         prependListener(event: "exit", listener: (exitCode: number) => void): this;
         prependListener(event: "message", listener: (value: any) => void): this;
         prependListener(event: "messageerror", listener: (error: Error) => void): this;
         prependListener(event: "online", listener: () => void): this;
         prependListener(event: string | symbol, listener: (...args: any[]) => void): this;
-        prependOnceListener(event: "error", listener: (err: Error) => void): this;
+        prependOnceListener(event: "error", listener: (err: any) => void): this;
         prependOnceListener(event: "exit", listener: (exitCode: number) => void): this;
         prependOnceListener(event: "message", listener: (value: any) => void): this;
         prependOnceListener(event: "messageerror", listener: (error: Error) => void): this;
         prependOnceListener(event: "online", listener: () => void): this;
         prependOnceListener(event: string | symbol, listener: (...args: any[]) => void): this;
-        removeListener(event: "error", listener: (err: Error) => void): this;
+        removeListener(event: "error", listener: (err: any) => void): this;
         removeListener(event: "exit", listener: (exitCode: number) => void): this;
         removeListener(event: "message", listener: (value: any) => void): this;
         removeListener(event: "messageerror", listener: (error: Error) => void): this;
         removeListener(event: "online", listener: () => void): this;
         removeListener(event: string | symbol, listener: (...args: any[]) => void): this;
-        off(event: "error", listener: (err: Error) => void): this;
+        off(event: "error", listener: (err: any) => void): this;
         off(event: "exit", listener: (exitCode: number) => void): this;
         off(event: "message", listener: (value: any) => void): this;
         off(event: "messageerror", listener: (error: Error) => void): this;
@@ -691,7 +689,7 @@ declare module "worker_threads" {
     var locks: LockManager;
     /**
      * Mark an object as not transferable. If `object` occurs in the transfer list of
-     * a `port.postMessage()` call, it is ignored.
+     * a {@link MessagePort.postMessage port.postMessage()} call, it is ignored.
      *
      * In particular, this makes sense for objects that can be cloned, rather than
      * transferred, and which are used by other objects on the sending side.
@@ -813,13 +811,13 @@ declare module "worker_threads" {
      *
      * if (isMainThread) {
      *   setEnvironmentData('Hello', 'World!');
-     *   const worker = new Worker(__filename);
+     *   const worker = new Worker(new URL(import.meta.url));
      * } else {
      *   console.log(getEnvironmentData('Hello'));  // Prints 'World!'.
      * }
      * ```
      * @since v15.12.0, v14.18.0
-     * @param key Any arbitrary, cloneable JavaScript value that can be used as a {Map} key.
+     * @param key Any arbitrary, cloneable JavaScript value that can be used as a {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map Map} key.
      */
     function getEnvironmentData(key: Serializable): Serializable;
     /**

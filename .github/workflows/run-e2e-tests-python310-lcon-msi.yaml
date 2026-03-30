@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v6
 
     - name: Set Node.js 24.x for GitHub Action
       uses: actions/setup-node@v6
@@ -33,7 +33,7 @@ jobs:
         node-version: 24.x
 
     - name: Setup Python ${{ env.PYTHON_VERSION }} Environment
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v6
       with:
         python-version: ${{ env.PYTHON_VERSION }}
 
@@ -53,7 +53,7 @@ jobs:
         popd
     
     - name: 'Login via Azure CLI'
-      uses: azure/login@v1
+      uses: azure/login@v2
       with:
         client-id: ${{ secrets.AZURE_CLIENT_ID_FA_PYTHON310_LCON_MSI }}
         tenant-id: ${{ secrets.AZURE_TENANT_ID_FA_E2E_TESTS }}

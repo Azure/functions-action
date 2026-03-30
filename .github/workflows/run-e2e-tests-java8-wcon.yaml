@@ -26,7 +26,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v6
 
     - name: Set Node.js 24.x for GitHub Action
       uses: actions/setup-node@v6
@@ -54,7 +54,7 @@ jobs:
         popd
 
     - name: 'Login via Azure CLI'
-      uses: azure/login@v1
+      uses: azure/login@v2
       with:
         client-id: ${{ secrets.AZURE_CLIENT_ID_FA_JAVA8_WCON }}
         tenant-id: ${{ secrets.AZURE_TENANT_ID_FA_E2E_TESTS }}

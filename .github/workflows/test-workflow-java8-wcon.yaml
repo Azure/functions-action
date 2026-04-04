@@ -80,7 +80,7 @@ jobs:
       id-token: write  # Required to fetch an OIDC token to authenticate with the job
     steps:
       - name: 'Download artifact from build job'
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: ${{ env.BUILD_ARTIFACT_NAME }}
           path: '${{ env.POM_XML_DIRECTORY }}/downloaded-artifact'

@@ -86,7 +86,7 @@ jobs:
       id-token: write  # Required for OIDC
     steps:
       - name: 'Download artifact from build job'
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: ${{ env.BUILD_ARTIFACT_NAME }}
           path: '${{ env.AZURE_FUNCTIONAPP_PROJECT_PATH }}/downloaded-artifact'

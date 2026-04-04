@@ -86,7 +86,7 @@ jobs:
           path: '${{ env.POM_XML_DIRECTORY }}/downloaded-artifact'
       
       - name: 'Log in to Azure with AZ CLI'
-        uses: azure/login@v2
+        uses: azure/login@v3
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID_FA_JAVA8_LCON }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID_FA_E2E_TESTS }}

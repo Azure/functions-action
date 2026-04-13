@@ -53,7 +53,7 @@ jobs:
         popd
     
     - name: 'Login via Azure CLI'
-      uses: azure/login@v2
+      uses: azure/login@v3
       with:
         client-id: ${{ secrets.AZURE_CLIENT_ID_FA_PYTHON310_LCON_MSI }}
         tenant-id: ${{ secrets.AZURE_TENANT_ID_FA_E2E_TESTS }}

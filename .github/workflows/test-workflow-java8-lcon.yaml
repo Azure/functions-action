@@ -68,7 +68,7 @@ jobs:
       # Perform additional steps such as running tests, if needed
       
       - name: 'Upload artifact for the deployment job'
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ env.BUILD_ARTIFACT_NAME }}
           path: ${{ env.POM_XML_DIRECTORY }}/target/azure-functions/${{ env.AZURE_FUNCTIONAPP_NAME }}
@@ -80,13 +80,13 @@ jobs:
       id-token: write  # Required to fetch an OIDC token to authenticate with the job
     steps:
       - name: 'Download artifact from build job'
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: ${{ env.BUILD_ARTIFACT_NAME }}
           path: '${{ env.POM_XML_DIRECTORY }}/downloaded-artifact'
       
       - name: 'Log in to Azure with AZ CLI'
-        uses: azure/login@v2
+        uses: azure/login@v3
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID_FA_JAVA8_LCON }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID_FA_E2E_TESTS }}

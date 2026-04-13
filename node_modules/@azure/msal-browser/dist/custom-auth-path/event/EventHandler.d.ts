@@ -26,7 +26,7 @@ export declare class EventHandler {
      * @param payload
      * @param error
      */
-    emitEvent(eventType: EventType, interactionType?: InteractionType, payload?: EventPayload, error?: EventError): void;
+    emitEvent(eventType: EventType, correlationId: string, interactionType?: InteractionType, payload?: EventPayload, error?: EventError): void;
     /**
      * Invoke registered callbacks
      * @param message

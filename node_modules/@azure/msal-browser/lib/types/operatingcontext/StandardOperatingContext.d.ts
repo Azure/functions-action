@@ -21,6 +21,6 @@ export declare class StandardOperatingContext extends BaseOperatingContext {
      * Confirms that the code is running a browser rather.  This is required.
      * @returns Promise<boolean> indicating whether this operating context is currently available.
      */
-    initialize(): Promise<boolean>;
+    initialize(correlationId?: string): Promise<boolean>;
 }
 //# sourceMappingURL=StandardOperatingContext.d.ts.map

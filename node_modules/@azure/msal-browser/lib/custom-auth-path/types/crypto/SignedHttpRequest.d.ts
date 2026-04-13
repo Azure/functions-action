@@ -24,8 +24,9 @@ export declare class SignedHttpRequest {
     /**
      * Removes cached keys from browser for given public key thumbprint
      * @param publicKeyThumbprint Public key digest (from generatePublicKeyThumbprint API)
+     * @param correlationId
      * @returns If keys are properly deleted
      */
-    removeKeys(publicKeyThumbprint: string): Promise<boolean>;
+    removeKeys(publicKeyThumbprint: string, correlationId: string): Promise<void>;
 }
 //# sourceMappingURL=SignedHttpRequest.d.ts.map

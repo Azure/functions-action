@@ -8,9 +8,6 @@ export type OSError = {
     status?: string;
     retryable?: boolean;
 };
-export declare const NativeAuthErrorMessages: {
-    user_switch: string;
-};
 export declare class NativeAuthError extends AuthError {
     ext: OSError | undefined;
     constructor(errorCode: string, description?: string, ext?: OSError);

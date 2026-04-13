@@ -24,8 +24,9 @@ export declare abstract class BaseOperatingContext {
     abstract getId(): string;
     /**
      * returns a boolean indicating whether this operating context is present
+     * @param correlationId
      */
-    abstract initialize(): Promise<boolean>;
+    abstract initialize(correlationId?: string): Promise<boolean>;
     /**
      * Return the MSAL config
      * @returns BrowserConfiguration

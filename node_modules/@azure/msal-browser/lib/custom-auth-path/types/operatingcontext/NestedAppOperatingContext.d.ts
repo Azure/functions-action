@@ -33,8 +33,9 @@ export declare class NestedAppOperatingContext extends BaseOperatingContext {
     /**
      * Checks whether the operating context is available.
      * Confirms that the code is running a browser rather.  This is required.
+     * @param correlationId
      * @returns Promise<boolean> indicating whether this operating context is currently available.
      */
-    initialize(): Promise<boolean>;
+    initialize(correlationId?: string): Promise<boolean>;
 }
 //# sourceMappingURL=NestedAppOperatingContext.d.ts.map

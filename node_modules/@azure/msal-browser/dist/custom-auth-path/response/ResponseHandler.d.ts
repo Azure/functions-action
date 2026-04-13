@@ -1,6 +1,6 @@
 import { ICrypto, Logger, AuthorizeResponse } from "@azure/msal-common/browser";
 import { InteractionType } from "../utils/BrowserConstants.js";
-export declare function deserializeResponse(responseString: string, responseLocation: string, logger: Logger): AuthorizeResponse;
+export declare function deserializeResponse(responseString: string, responseLocation: string, logger: Logger, correlationId: string): AuthorizeResponse;
 /**
  * Returns the interaction type that the response object belongs to
  */

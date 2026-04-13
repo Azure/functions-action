@@ -14,38 +14,45 @@ export declare class AsyncMemoryStorage<T> implements IAsyncStorage<T> {
      * Get the item matching the given key. Tries in-memory cache first, then in the asynchronous
      * storage object if item isn't found in-memory.
      * @param key
+     * @param correlationId
      */
-    getItem(key: string): Promise<T | null>;
+    getItem(key: string, correlationId: string): Promise<T | null>;
     /**
      * Sets the item in the in-memory cache and then tries to set it in the asynchronous
      * storage object with the given key.
      * @param key
      * @param value
+     * @param correlationId
      */
-    setItem(key: string, value: T): Promise<void>;
+    setItem(key: string, value: T, correlationId: string): Promise<void>;
     /**
      * Removes the item matching the key from the in-memory cache, then tries to remove it from the asynchronous storage object.
      * @param key
+     * @param correlationId
      */
-    removeItem(key: string): Promise<void>;
+    removeItem(key: string, correlationId: string): Promise<void>;
     /**
      * Get all the keys from the in-memory cache as an iterable array of strings. If no keys are found, query the keys in the
      * asynchronous storage object.
+     * @param correlationId
      */
-    getKeys(): Promise<string[]>;
+    getKeys(correlationId: string): Promise<string[]>;
     /**
      * Returns true or false if the given key is present in the cache.
      * @param key
+     * @param correlationId
      */
-    containsKey(key: string): Promise<boolean>;
+    containsKey(key: string, correlationId: string): Promise<boolean>;
     /**
      * Clears in-memory Map
+     * @param correlationId
      */
-    clearInMemory(): void;
+    clearInMemory(correlationId: string): void;
     /**
      * Tries to delete the IndexedDB database
+     * @param correlationId
      * @returns
      */
-    clearPersistent(): Promise<boolean>;
+    clearPersistent(correlationId: string): Promise<boolean>;
 }
 //# sourceMappingURL=AsyncMemoryStorage.d.ts.map

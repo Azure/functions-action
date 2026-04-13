@@ -1,4 +1,3 @@
-import { IPerformanceClient } from "@azure/msal-common/browser";
 /**
  * Check whether browser crypto is available.
  */
@@ -9,7 +8,7 @@ export declare function validateCryptoAvailable(skipValidateSubtleCrypto: boolea
  * @param performanceClient {?IPerformanceClient}
  * @param correlationId {?string} correlation id
  */
-export declare function sha256Digest(dataString: string, performanceClient?: IPerformanceClient, correlationId?: string): Promise<ArrayBuffer>;
+export declare function sha256Digest(dataString: string): Promise<ArrayBuffer>;
 /**
  * Populates buffer with cryptographically random values.
  * @param dataBuffer

@@ -69,7 +69,7 @@ jobs:
         # ...download your build artifact
         
         - name: 'Log in to Azure with AZ CLI'
-          uses: azure/login@v2
+          uses: azure/login@v3
           with:
             cred-id: ${{ secrets.AZURE_RBAC_CREDENTIALS }}
           

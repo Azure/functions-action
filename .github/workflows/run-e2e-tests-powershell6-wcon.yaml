@@ -24,7 +24,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
 
     - name: Set Node.js 24.x for GitHub Action
       uses: actions/setup-node@v6

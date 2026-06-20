@@ -54,7 +54,7 @@ jobs:
         working-directory: ${{ env.AZURE_FUNCTIONAPP_PROJECT_PATH }}
     steps:
       - name: 'Checkout repository'
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: 'Set up Python version: ${{ env.Python_VERSION }}'
         uses: actions/setup-python@v6

@@ -31,10 +31,6 @@ jobs:
       with:
         node-version: 24.x
 
-    - name: Preserve public npm restore for GitHub-hosted CI
-      shell: pwsh
-      run: Remove-Item -LiteralPath '${{ github.workspace }}/.npmrc'
-
     - name: Run Npm Install for GitHub Action
       run: npm install
 

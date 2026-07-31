@@ -63,10 +63,6 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: Preserve public NuGet restore for GitHub-hosted CI
-        shell: pwsh
-        run: Remove-Item -LiteralPath '${{ github.workspace }}/NuGet.config'
-
       # Perform additional steps such as running tests, if needed
 
       - name: 'Build and prepare .NET project for deployment'

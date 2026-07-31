@@ -23,6 +23,11 @@ jobs:
         version: ${{ variables.NODE_VERSION }}
       displayName: 'Setup Node'
 
+    - task: npmAuthenticate@0
+      inputs:
+        workingFile: '$(Build.SourcesDirectory)/.npmrc'
+      displayName: 'Authenticate npm'
+
     - task: Npm@1
       inputs:
         command: 'install'
@@ -53,8 +58,12 @@ jobs:
         packageType: sdk
         version: 8.0.x
 
+    - task: NuGetAuthenticate@1
+      displayName: 'Authenticate NuGet'
+
     - task: DotNetCoreCLI@2
       inputs:
         command: 'build'
         projects: 'tests/e2e/dotnet8/*.csproj'
+        arguments: '/p:RestoreConfigFile="$(Build.SourcesDirectory)/NuGet.config"'
       displayName: 'Build project for csharp language'

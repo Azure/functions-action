@@ -32,6 +32,10 @@ jobs:
       with:
         node-version: 24.x
 
+    - name: Preserve public dependency restores for GitHub-hosted CI
+      shell: pwsh
+      run: Remove-Item -LiteralPath '${{ github.workspace }}/.npmrc', '${{ github.workspace }}/NuGet.config'
+
     - name: Run Npm Install for GitHub Action
       run: npm install
 

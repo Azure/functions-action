@@ -1,0 +1,1 @@
+{"version":3,"file":"types-web.mjs","sourceRoot":"","sources":["../../src/types-web.mts"],"names":[],"mappings":"AAAA,uCAAuC;AACvC,kCAAkC","sourcesContent":["// Copyright (c) Microsoft Corporation.\n// Licensed under the MIT License.\n\n/**\n * `NodeJSReadableStream` is not available in the browser.\n *\n * @public\n */\nexport type NodeJSReadableStream = never;\n"]}

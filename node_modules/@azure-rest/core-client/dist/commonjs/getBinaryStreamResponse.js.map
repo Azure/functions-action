@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../src/getBinaryStreamResponse.ts"],
+  "sourcesContent": ["// Copyright (c) Microsoft Corporation.\n// Licensed under the MIT License.\n\nimport type { NodeReadableStream } from \"@azure/core-rest-pipeline\";\nimport type { HttpResponse, StreamableMethod } from \"./common.js\";\n\n/**\n * Resolves a StreamableMethod into a binary stream response using Node.js streaming.\n * Returns both the raw HttpResponse (for status/header inspection) and the readable stream body.\n * Error handling is left to the caller so that generated deserializers can apply\n * operation-specific error deserialization (per-status-code details, exception headers, etc.).\n */\nexport async function getBinaryStreamResponse(streamableMethod: StreamableMethod): Promise<\n  HttpResponse & {\n    blobBody?: Promise<Blob>;\n    readableStreamBody?: NodeReadableStream;\n  }\n> {\n  const response = await streamableMethod.asNodeStream();\n  return {\n    ...response,\n    blobBody: undefined,\n    readableStreamBody: response.body,\n  };\n}\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAYA,eAAsB,wBAAwB,kBAK5C;AACA,QAAM,WAAW,MAAM,iBAAiB,aAAa;AACrD,SAAO;AAAA,IACL,GAAG;AAAA,IACH,UAAU;AAAA,IACV,oBAAoB,SAAS;AAAA,EAC/B;AACF;",
+  "names": []
+}

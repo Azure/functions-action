@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../src/restError.ts"],
+  "sourcesContent": ["// Copyright (c) Microsoft Corporation.\n// Licensed under the MIT License.\n\nimport type { RestError } from \"@azure/core-rest-pipeline\";\nimport type { PathUncheckedResponse } from \"./common.js\";\n\nimport {\n  createRestError as tspCreateRestError,\n  type PathUncheckedResponse as TspPathUncheckedResponse,\n} from \"@typespec/ts-http-runtime\";\n\n/**\n * Creates a rest error from a PathUnchecked response\n */\nexport function createRestError(response: PathUncheckedResponse): RestError;\n/**\n * Creates a rest error from an error message and a PathUnchecked response\n */\nexport function createRestError(message: string, response: PathUncheckedResponse): RestError;\nexport function createRestError(\n  messageOrResponse: string | PathUncheckedResponse,\n  response?: PathUncheckedResponse,\n): RestError {\n  if (typeof messageOrResponse === \"string\") {\n    return tspCreateRestError(messageOrResponse, response as unknown as TspPathUncheckedResponse);\n  } else {\n    return tspCreateRestError(messageOrResponse as unknown as TspPathUncheckedResponse);\n  }\n}\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAMA,6BAGO;AAUA,SAAS,gBACd,mBACA,UACW;AACX,MAAI,OAAO,sBAAsB,UAAU;AACzC,eAAO,uBAAAA,iBAAmB,mBAAmB,QAA+C;AAAA,EAC9F,OAAO;AACL,eAAO,uBAAAA,iBAAmB,iBAAwD;AAAA,EACpF;AACF;",
+  "names": ["tspCreateRestError"]
+}

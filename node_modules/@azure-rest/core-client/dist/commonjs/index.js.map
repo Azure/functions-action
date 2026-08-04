@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../src/index.ts"],
+  "sourcesContent": ["// Copyright (c) Microsoft Corporation.\n// Licensed under the MIT License.\n\n/**\n * Azure Rest Core Client library for JavaScript\n * @packageDocumentation\n */\n\nexport { createRestError } from \"./restError.js\";\nexport {\n  addCredentialPipelinePolicy,\n  type AddCredentialPipelinePolicyOptions,\n} from \"./clientHelpers.js\";\nexport { operationOptionsToRequestParameters } from \"./operationOptionHelpers.js\";\nexport type { NodeReadableStream } from \"@azure/core-rest-pipeline\";\nexport { getBinaryStreamResponse } from \"#platform/getBinaryStreamResponse\";\nexport * from \"./getClient.js\";\nexport type * from \"./common.js\";\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAQA,uBAAgC;AAChC,2BAGO;AACP,oCAAoD;AAEpD,qCAAwC;AACxC,wBAAc,2BAhBd;",
+  "names": []
+}

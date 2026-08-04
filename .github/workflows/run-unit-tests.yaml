@@ -21,7 +21,7 @@ jobs:
       uses: actions/checkout@master
 
     - name: Setup Node ${{ env.NODE_VERSION }}
-      uses: actions/setup-node@v6
+      uses: actions/setup-node@v7
       with:
         node-version: ${{ env.NODE_VERSION }}
 
@@ -44,6 +44,6 @@ jobs:
         npm run coverage-report
         
     - name: 'Upload Coverage Report to CodeCov'
-      uses: codecov/codecov-action@v6.0.0
+      uses: codecov/codecov-action@v7.0.0
       with:
         token: ${{ secrets.CODECOV_TOKEN }}

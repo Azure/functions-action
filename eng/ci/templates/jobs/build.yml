@@ -15,6 +15,14 @@ jobs:
     variables:
       NODE_VERSION: '20.x'
 
+    templateContext:
+      outputParentDirectory: $(Build.ArtifactStagingDirectory)
+      outputs:
+        - output: pipelineArtifact
+          displayName: 'Publish npm debug logs'
+          targetPath: $(Build.ArtifactStagingDirectory)/npm-logs
+          condition: failed()
+
     steps:
     - checkout: self
 
@@ -23,10 +31,38 @@ jobs:
         version: ${{ variables.NODE_VERSION }}
       displayName: 'Setup Node'
 
+    - task: npmAuthenticate@0
+      inputs:
+        workingFile: '$(Build.SourcesDirectory)/.npmrc'
+      displayName: 'Authenticate npm'
+
     - task: Npm@1
       inputs:
         command: 'install'
       displayName: 'Install dependencies'
+
+    - pwsh: |
+        $logDir = Join-Path $HOME '.npm/_logs'
+        $artifactDir = Join-Path '$(Build.ArtifactStagingDirectory)' 'npm-logs'
+
+        Write-Host "NPM log directory: $logDir"
+
+        if (Test-Path $logDir) {
+          New-Item -ItemType Directory -Force -Path $artifactDir | Out-Null
+
+          Get-ChildItem $logDir -Filter '*-debug-0.log' |
+            Sort-Object LastWriteTime -Descending |
+            Select-Object -First 1 |
+            ForEach-Object {
+              Copy-Item $_.FullName -Destination $artifactDir -Force
+              Write-Host "--- Latest npm debug log: $($_.FullName) ---"
+              Get-Content $_.FullName -Tail 200
+            }
+        } else {
+          Write-Host 'No npm log directory was found on the agent.'
+        }
+      displayName: 'Dump npm debug log on failure'
+      condition: failed()
 
     - task: Npm@1
       inputs:
@@ -53,8 +89,12 @@ jobs:
         packageType: sdk
         version: 8.0.x
 
+    - task: NuGetAuthenticate@1
+      displayName: 'Authenticate NuGet'
+
     - task: DotNetCoreCLI@2
       inputs:
         command: 'build'
         projects: 'tests/e2e/dotnet8/*.csproj'
+        arguments: '/p:RestoreConfigFile="$(Build.SourcesDirectory)/NuGet.config"'
       displayName: 'Build project for csharp language'

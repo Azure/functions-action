@@ -1,18 +1,5 @@
 # GitHub Actions for deploying to Azure Functions
 
-|                    | master | dev |
-|--------------------|--------|-----|
-| Coverage           | ![master coverage](https://codecov.io/gh/Azure/functions-action/branch/master/graph/badge.svg) | ![dev coverage](https://codecov.io/gh/Azure/functions-action/branch/dev/graph/badge.svg) |
-| Unit Test          | ![master unit test](https://github.com/Azure/functions-action/workflows/RUN_UNIT_TESTS/badge.svg?branch=master) | ![dev unit test](https://github.com/Azure/functions-action/workflows/RUN_UNIT_TESTS/badge.svg?branch=dev) |
-| .NETCore Windows   | ![master .netcore windows e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_DOTNET3_WCON/badge.svg?branch=master) | ![dev .netcore windows e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_DOTNET3_WCON/badge.svg?branch=dev) |
-| .NETCore Linux     | ![master .netcore linux e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_DOTNET3_LCON/badge.svg?branch=master) | ![dev .netcore linux e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_DOTNET3_LCON/badge.svg?branch=dev) |
-| Java Windows       | ![master java windows e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_JAVA8_WCON/badge.svg?branch=master) | ![dev java windows e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_JAVA8_WCON/badge.svg?branch=dev) |
-| Java Linux         | ![master java linux e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_JAVA8_LCON/badge.svg?branch=master) | ![dev java linux e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_JAVA8_LCON/badge.svg?branch=dev) |
-| Node JS Windows    | ![master nodejs windows e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_NODE20_WCON/badge.svg?branch=master) | ![dev nodejs windows e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_NODE20_WCON/badge.svg?branch=dev) |
-| Node JS Linux      | ![master nodejs linux e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_NODE20_LCON/badge.svg?branch=master) | ![dev nodejs linux e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_NODE20_LCON/badge.svg?branch=dev) |
-| PowerShell Windows | ![master powershell windows e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_POWERSHELL6_WCON/badge.svg?branch=master) | ![dev powershell windows e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_POWERSHELL6_WCON/badge.svg?branch=dev) |
-| Python Linux       | ![master python linux e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_PYTHON37_LCON/badge.svg?branch=master) | ![dev python linux e2e](https://github.com/Azure/functions-action/workflows/RUN_E2E_TESTS_PYTHON37_LCON/badge.svg?branch=dev) |
-
 The Azure Functions action is used in a [GitHub Actions workflow](https://docs.github.com/en/actions/about-github-actions/understanding-github-actions) to deploy packaged project code to an existing [function app](https://azure.microsoft.com/services/functions/) hosted in Azure. Using this action, you can create continuous workflow automation that builds, authenticates, and deploys code to your function app when you make changes in the GitHub repository.
 
 The Azure Functions action is defined in this [action.yml](https://github.com/Azure/functions-action/blob/master/action.yml) file. To learn about specific parameters, see the [Reference section](#parameter-reference) in this readme.
@@ -30,13 +17,15 @@ You can create a workflow for your function app deployments in one of these ways
 
 ### Workflow templates
 
+All workflow templates below use [OpenID Connect (OIDC)](#use-oidc-recommended) authentication, which is the recommended way to authenticate this action with Azure. The full set of templates lives in [Azure/actions-workflow-samples/FunctionApp/oidc-auth-samples](https://github.com/Azure/actions-workflow-samples/tree/master/FunctionApp/oidc-auth-samples).
+
 | Templates  | Windows |  Linux |
 |------------|---------|--------|
-| .NET (C#)     | [windows-dotnet-functionapp-on-azure.yml](https://github.com/Azure/actions-workflow-samples/tree/master/FunctionApp/windows-dotnet-functionapp-on-azure.yml) | [linux-dotnet-functionapp-on-azure.yml](https://github.com/Azure/actions-workflow-samples/tree/master/FunctionApp/linux-dotnet-functionapp-on-azure.yml) |
-| Node       | [windows-node.js-functionapp-on-azure.yml](https://github.com/Azure/actions-workflow-samples/tree/master/FunctionApp/windows-node.js-functionapp-on-azure.yml) | [linux-node.js-functionapp-on-azure.yml](https://github.com/Azure/actions-workflow-samples/tree/master/FunctionApp/linux-node.js-functionapp-on-azure.yml) |
-| PowerShell | [windows-powershell-functionapp-on-azure.yml](https://github.com/Azure/actions-workflow-samples/tree/master/FunctionApp/windows-powershell-functionapp-on-azure.yml) | [linux-powershell-functionapp-on-azure.yml](https://github.com/Azure/actions-workflow-samples/blob/master/FunctionApp/linux-powershell-functionapp-on-azure.yml) |
-| Java       | [windows-java-functionapp-on-azure.yml](https://github.com/Azure/actions-workflow-samples/tree/master/FunctionApp/windows-java-functionapp-on-azure.yml) | [linux-java-functionapp-on-azure.yml](https://github.com/Azure/actions-workflow-samples/tree/master/FunctionApp/linux-java-functionapp-on-azure.yml) |
-| Python     | Not supported | [linux-python-functionapp-on-azure.yml](https://github.com/Azure/actions-workflow-samples/tree/master/FunctionApp/linux-python-functionapp-on-azure.yml) |
+| .NET (C#)  | [windows-dotnet-functionapp-on-azure-oidc.yml](https://github.com/Azure/actions-workflow-samples/blob/master/FunctionApp/oidc-auth-samples/windows-dotnet-functionapp-on-azure-oidc.yml) | [linux-dotnet-functionapp-on-azure-oidc.yml](https://github.com/Azure/actions-workflow-samples/blob/master/FunctionApp/oidc-auth-samples/linux-dotnet-functionapp-on-azure-oidc.yml) |
+| Node       | [windows-node-functionapp-on-azure-oidc.yml](https://github.com/Azure/actions-workflow-samples/blob/master/FunctionApp/oidc-auth-samples/windows-node-functionapp-on-azure-oidc.yml) | [linux-node-functionapp-on-azure-oidc.yml](https://github.com/Azure/actions-workflow-samples/blob/master/FunctionApp/oidc-auth-samples/linux-node-functionapp-on-azure-oidc.yml) |
+| Java       | [windows-java-functionapp-on-azure-oidc.yml](https://github.com/Azure/actions-workflow-samples/blob/master/FunctionApp/oidc-auth-samples/windows-java-functionapp-on-azure-oidc.yml) | [linux-java-functionapp-on-azure-oidc.yml](https://github.com/Azure/actions-workflow-samples/blob/master/FunctionApp/oidc-auth-samples/linux-java-functionapp-on-azure-oidc.yml) |
+| PowerShell | [powershell-functionapp-on-azure-oidc.yml](https://github.com/Azure/actions-workflow-samples/blob/master/FunctionApp/oidc-auth-samples/powershell-functionapp-on-azure-oidc.yml) (cross-platform) ||
+| Python     | Not supported | [python-functionapp-on-azure-oidc.yml](https://github.com/Azure/actions-workflow-samples/blob/master/FunctionApp/oidc-auth-samples/python-functionapp-on-azure-oidc.yml) |
 
 ## Workflow template considerations
 
@@ -62,8 +51,8 @@ You must choose how the action authenticates with Azure when deploying code from
 | Method| Description |
 | ---- | ---- |
 | [OpenID Connect (OIDC)](#use-oidc-recommended) | **Recommended**. This is the most secure authentication option. Supports role-based access control (RBAC) for accessing Azure resources. Leverages user-assigned managed identities, which means that secrets are managed by Azure. |
-| [Azure service principal](#use-an-azure-service-principal-not-recommeded) | **Not recommended**. GitHub uses service principal credentials to access Azure resources using RBAC. You must manage the service principal secrets in GitHub. |  
-| [Publish profile](#use-a-publish-profile-not-recommended) | **Not recommended**. Credentials (username and password) are stored in GitHub and used to access the `scm` endpoint using HTTP basic authentication during deployment. This will require you to enable basic authentication for your app. |
+| [Azure service principal](docs/authentication.md#azure-service-principal) | **Not recommended**. GitHub uses service principal credentials to access Azure resources using RBAC. You must manage the service principal secrets in GitHub. |  
+| [Publish profile](docs/authentication.md#publish-profile) | **Not recommended**. Credentials (username and password) are stored in GitHub and used to access the `scm` endpoint using HTTP basic authentication during deployment. This will require you to enable basic authentication for your app. |
 
 These are special considerations for certain hosting scenarios:
 
@@ -159,130 +148,7 @@ jobs:
             package: '${{ env.AZURE_FUNCTIONAPP_PROJECT_PATH }}'   
 ```
 
-### Use an Azure service principal (not recommeded)
-
-You can alternatively use a service principal, which requires you to manage secrets. You must configure the workflow with these secrets, and then it can use them to authenticate with Azure.
-
-> [!IMPORTANT]  
-> When possible, you should [use OIDC for authentication](#use-oidc-recommended) instead of service principal-based authentication.
-
-To configure your workflow to use a service principal for authentication:
-
-1. If you don't already have it installed, [download Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest) and run `az login` to sign in with your Azure credentials.
-
-1. Run this Azure CLI command:
-
-    ```azurecli
-    az ad sp create-for-rbac --name "myApp" --role "Website Contributor" \
-                            --scopes /subscriptions/<SUBSCRIPTION_ID>/resourceGroups/<RESOURCE_GROUP>/providers/Microsoft.Web/sites/<APP_NAME> \
-                            --json-auth
-    ```
-
-    In this example, Replace `<SUBSCRIPTION_ID>`, `<RESOURCE_GROUP>`, and `<APP_NAME>` with the names of your subscription, resource group, and Azure function app. The command should return JSON output like this:
-
-    ```json
-    {
-      "clientId": "<GUID>",
-      "clientSecret": "<GUID>",
-      "subscriptionId": "<GUID>",
-      "tenantId": "<GUID>",
-      (...)
-    }
-    ```
-
-1. Copy this JSON response output, which is the credential you provide to GitHub for authentication.
-
-> [!WARNING]  
-> Keep this credential safe. It provides `Website Contributor` role access to your function app.
-
-1. In your GitHub Repository, select **Settings** > **Secrets** > **Add a new secret**, name the secret something like `AZURE_RBAC_CREDENTIALS`, and paste in JSON credentials of the service principal.
-
-1. Add the `azure/login` action as a step prior to the Azure Functions action:
-
-    + Make sure to include the parameter `cred-id`, which maps to your recently created repository secret `AZURE_RBAC_CREDENTIALS`.
-    + Make sure you don't also have any publish profiles in your workflow, which would be in the `publish-profile` parameter of the Azure Functions action.
-
-When you use a service principal with RBAC, the `jobs` section of your workflow looks something like this:
-
-```yml
-# Deploy to an app on the Flex Consumption plan using a service principal with RBAC as authentication
-jobs:
-    build:
-      runs-on: ubuntu-latest
-      steps:
-        # ...checkout your repository
-        # ...required build steps for your language
-        # ...upload your build artifact
-
-    deploy:
-      runs-on: ubuntu-latest
-      needs: build
-      steps:
-        # ...download your build artifact
-        
-        - name: 'Log in to Azure with AZ CLI'
-          uses: azure/login@v3
-          with:
-            cred-id: ${{ secrets.AZURE_RBAC_CREDENTIALS }}
-          
-        - name: 'Run the Azure Functions action'
-          uses: Azure/functions-action@v1
-          id: deploy-to-function-app
-          with:
-            app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
-            package: '${{ env.AZURE_FUNCTIONAPP_PROJECT_PATH }}'   
-```
-
-### Use a publish profile (not recommended)
-
-A publish profile contains plain-text secrets that authenticate with your function app using basic authentication with the `scm` HTTP endpoint.
-
-> [!WARNING]  
-> Publish profile authentication uses a shared secret which you must manage. It also requires you to enable publishing credential access to the app, which is off by default and is not recommended. You should instead use a more secure option like [OIDC authentication](#use-oidc-recommended).
-
-To configure your workflow using the publish profile:
-
-1. In the [Azure portal](https://portal.azure.com), locate your function app.
-
-1. Make sure that **Basic authentication** is enabled in the `scm` endpoint in your app under **Settings** > **Configuration** > **SCM Basic Auth Publishing Credentials**.
-
-1. In the **Overview** blade, select **Get publish profile** and download the **.PublishSettings** file, which contains the plain-text publishing credentials for your `scm` endpoint.
-
-1. Open the **.PublishSettings** file and copy the XML file contents. Delete or secure this secrets file when you're done.
-
-1. In your GitHub Repository, select **Settings** > **Secrets** > **Add a new secret**, name the secret **AZURE_FUNCTIONAPP_PUBLISH_PROFILE**, and paste in the XML profile file contents.
-
-1. Make sure that your workflow isn't using the `azure/login` action.
-
-1. Include the `publish-profile` parameter in the Azure Functions action, referencing the **AZURE_FUNCTIONAPP_PUBLISH_PROFILE** secret.
-
-    When using a publish profile, the `jobs` section of your workflow looks something like this:
-
-    ```yml
-    # Deploy to an app on the Flex Consumption plan using RBAC with a service principal as authentication
-    jobs:
-        build:
-          runs-on: ubuntu-latest
-          steps:
-            # ...checkout your repository
-            # ...required build steps for your language
-            # ...upload your build artifact
-    
-        deploy:
-          runs-on: ubuntu-latest
-          needs: build
-          steps:
-            # ...download your build artifact
-    
-            - name: 'Run the Azure Functions action'
-              uses: Azure/functions-action@v1
-              id: deploy-to-function-app
-              with:
-                app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
-                package: '${{ env.AZURE_FUNCTIONAPP_PROJECT_PATH }}'
-                sku: `flexconsumption`    # Parameter required when using a publish profile with Flex Consumption
-                publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
-    ```
+For details on the non-recommended authentication methods (service principal and publish profile), see [docs/authentication.md](docs/authentication.md).
 
 ## Parameter reference
 
@@ -314,7 +180,7 @@ Optional parameters for all hosting plans:
 | Parameter | Description |
 | ---- | ---- |
 | **slot-name** | Specifies a named slot as the deployment target. By default, this value isn't set, which means the action deploys to your production slot. When this setting resolves to a named slot, make sure that `publish-profile` also contains the credentials for the target slot instead of the production slot. Currently not supported in a Flex Consumption plan. |
-| **publish-profile** | The plain-text credentials used to access the `scm` endpoint using HTTP basic authentication during deployment. This must contain the XML contents of your `.PublishSettings` file. To use this authentication method, see [Publish profile (HTTP basic) authentication](#use-a-publish-profile-not-recommended). We highly recommend setting the content in GitHub secrets since it contains sensitive information such as your site URL, username, and password. When the publish profile is rotated in your function app, you also need to update the GitHub secret. Otherwise, a 401 error occurs when accessing the /api/settings endpoint. |
+| **publish-profile** | The plain-text credentials used to access the `scm` endpoint using HTTP basic authentication during deployment. This must contain the XML contents of your `.PublishSettings` file. To use this authentication method, see [Publish profile (HTTP basic) authentication](docs/authentication.md#publish-profile). We highly recommend setting the content in GitHub secrets since it contains sensitive information such as your site URL, username, and password. When the publish profile is rotated in your function app, you also need to update the GitHub secret. Otherwise, a 401 error occurs when accessing the /api/settings endpoint. |
 | **respect-pom-xml** | Allow the GitHub Action to derive the Java function app's artifact from pom.xml for deployments. By default, it's set to `false`, which means the **package** parameter needs to point to your Java function app's artifact, such as `./target/azure-functions/<FUNCTION_APP_NAME>`. It's recommended to set **package** to `.` and **respect-pom-xml** to `true` when deploying Java function apps. |
 | **respect-funcignore** | Allow the GitHub Action to parse your .funcignore file and exclude files and folders defined in it. By default, this value is set to `false`. If your GitHub repo contains .funcignore file and you want to exclude certain paths (for example, text editor configs .vscode/, Python virtual environment .venv/), we recommend setting this to `true`. |
 

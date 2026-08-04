@@ -54,7 +54,7 @@ jobs:
         working-directory: ${{ env.POM_XML_DIRECTORY }}
     steps:
       - name: 'Checkout repository'
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: 'Set up Java version: ${{ env.JAVA_VERSION }}'
         uses: actions/setup-java@v1

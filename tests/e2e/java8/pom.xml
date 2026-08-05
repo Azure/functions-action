@@ -88,13 +88,6 @@
             <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
-        <!-- Temporary CFS validation dependency; remove after verifying authenticated upstream caching. -->
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-text</artifactId>
-            <version>1.14.0</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>

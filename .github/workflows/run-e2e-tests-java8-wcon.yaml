@@ -54,8 +54,6 @@ jobs:
     - name: Configure Azure Artifacts Maven authentication
       shell: pwsh
       run: ./eng/scripts/Install-MavenCredentialProvider.ps1
-      env:
-        AZURE_ARTIFACTS_PAT: ${{ secrets.AZURE_ARTIFACTS_PAT }}
 
     - name: E2E Restore Project Dependencies Using Mvn
       shell: bash

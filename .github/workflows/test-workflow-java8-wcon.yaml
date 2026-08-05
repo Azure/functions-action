@@ -62,8 +62,15 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: 'microsoft'
 
+      - name: Configure optional Azure Artifacts Maven authentication
+        shell: pwsh
+        working-directory: ${{ github.workspace }}
+        run: ./eng/scripts/Install-MavenCredentialProvider.ps1
+        env:
+          AZURE_ARTIFACTS_PAT: ${{ secrets.AZURE_ARTIFACTS_PAT }}
+
       - name: 'Build project with Maven'
-        run: mvn --batch-mode --update-snapshots clean package -DfunctionAppName=${{ env.AZURE_FUNCTIONAPP_NAME }}
+        run: mvn --batch-mode clean package -DfunctionAppName=${{ env.AZURE_FUNCTIONAPP_NAME }}
 
       # Perform additional steps such as running tests, if needed
       

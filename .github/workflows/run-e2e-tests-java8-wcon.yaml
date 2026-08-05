@@ -44,13 +44,19 @@ jobs:
       with:
         java-version: ${{ env.JAVA_VERSION }}
 
+    - name: Configure optional Azure Artifacts Maven authentication
+      shell: pwsh
+      run: ./eng/scripts/Install-MavenCredentialProvider.ps1
+      env:
+        AZURE_ARTIFACTS_PAT: ${{ secrets.AZURE_ARTIFACTS_PAT }}
+
     - name: E2E Restore Project Dependencies Using Mvn
       shell: bash
       run: |
         pushd '${{ env.POM_XML_DIRECTORY }}'
         echo "$GITHUB_SHA" > sha.txt
-        mvn clean package
-        mvn azure-functions:package
+        mvn --batch-mode clean package
+        mvn --batch-mode azure-functions:package
         popd
 
     - name: 'Login via Azure CLI'

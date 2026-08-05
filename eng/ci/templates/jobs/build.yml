@@ -77,6 +77,19 @@ jobs:
         jdkSourceOption: 'PreInstalled'
       displayName: 'Install JDK 8'
 
+    # Maven resolves plugins before applying the POM's repositories. Install the CFS mirror
+    # first, then let MavenAuthenticate add credentials for its upstream-public mirror ID.
+    - pwsh: |
+        $m2 = Join-Path $HOME '.m2'
+        New-Item -ItemType Directory -Path $m2 -Force | Out-Null
+        Copy-Item '$(Build.SourcesDirectory)/settings.xml' (Join-Path $m2 'settings.xml') -Force
+      displayName: 'Install Maven settings.xml'
+
+    - task: MavenAuthenticate@0
+      displayName: 'Authenticate Maven feed'
+      inputs:
+        artifactsFeeds: upstream-public
+
     - task: Maven@3
       inputs:
         mavenPomFile: 'tests/e2e/java8/pom.xml'

@@ -43,7 +43,11 @@ if (-not (Test-Path $artifactPath)) {
 
     try {
         Push-Location $workingDirectory
-        & mvn --batch-mode dependency:get "-Dartifact=${groupId}:${artifactId}:${Version}" "-DremoteRepositories=central::::${bootstrapFeed}"
+        # Cache the provider under the same repository ID used by the final Maven mirror. Maven
+        # validates a cached core extension against its recorded repository before loading it;
+        # recording it as 'central' causes that validation to request the provider through the
+        # upstream-public mirror before the provider has had a chance to authenticate it.
+        & mvn --batch-mode dependency:get "-Dartifact=${groupId}:${artifactId}:${Version}" "-DremoteRepositories=${FeedId}::::${bootstrapFeed}"
         if ($LASTEXITCODE -ne 0) {
             throw "'mvn dependency:get' failed with exit code $LASTEXITCODE."
         }

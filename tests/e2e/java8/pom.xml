@@ -26,9 +26,10 @@
     <repositories>
         <repository>
             <id>central</id>
+            <name>Azure Functions public upstream feed</name>
             <url>https://pkgs.dev.azure.com/azfunc/public/_packaging/upstream-public/maven/v1</url>
             <releases>
-                <enabled>false</enabled>
+                <enabled>true</enabled>
             </releases>
             <snapshots>
                 <enabled>true</enabled>
@@ -39,9 +40,10 @@
     <pluginRepositories>
         <pluginRepository>
             <id>central</id>
+            <name>Azure Functions public upstream feed</name>
             <url>https://pkgs.dev.azure.com/azfunc/public/_packaging/upstream-public/maven/v1</url>
             <releases>
-                <enabled>false</enabled>
+                <enabled>true</enabled>
             </releases>
             <snapshots>
                 <enabled>true</enabled>

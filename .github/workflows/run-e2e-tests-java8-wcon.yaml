@@ -62,8 +62,8 @@ jobs:
       run: |
         pushd '${{ env.POM_XML_DIRECTORY }}'
         echo "$GITHUB_SHA" > sha.txt
-        mvn clean package
-        mvn azure-functions:package
+        mvn --batch-mode --update-snapshots clean package
+        mvn --batch-mode --update-snapshots azure-functions:package
         popd
 
     - name: E2E Run Azure Functions Action

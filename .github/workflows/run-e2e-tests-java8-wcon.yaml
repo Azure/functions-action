@@ -51,9 +51,11 @@ jobs:
         tenant-id: ${{ secrets.AZURE_TENANT_ID_FA_E2E_TESTS }}
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID_FA_E2E_TESTS }}
 
-    - name: Configure Azure Artifacts Maven credential provider
+    - name: Configure Azure Artifacts Maven authentication
       shell: pwsh
       run: ./eng/scripts/Install-MavenCredentialProvider.ps1
+      env:
+        AZURE_ARTIFACTS_PAT: ${{ secrets.AZURE_ARTIFACTS_PAT }}
 
     - name: E2E Restore Project Dependencies Using Mvn
       shell: bash

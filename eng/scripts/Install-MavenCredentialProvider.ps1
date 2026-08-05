@@ -12,7 +12,6 @@
 
 [CmdletBinding()]
 param(
-    [string] $FeedUrl = 'https://pkgs.dev.azure.com/azfunc/public/_packaging/upstream-public/maven/v1',
     [string] $FeedId = 'upstream-public'
 )
 
@@ -26,30 +25,32 @@ if ([string]::IsNullOrWhiteSpace($env:AZURE_ARTIFACTS_PAT)) {
 $mavenDirectory = Join-Path $HOME '.m2'
 New-Item -ItemType Directory -Path $mavenDirectory -Force | Out-Null
 
-$escapedFeedId = [System.Security.SecurityElement]::Escape($FeedId)
-$escapedFeedUrl = [System.Security.SecurityElement]::Escape($FeedUrl)
-$escapedPat = [System.Security.SecurityElement]::Escape($env:AZURE_ARTIFACTS_PAT)
+$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..' '..')).Path
+$settingsTemplate = Join-Path $repoRoot 'settings.xml'
+if (-not (Test-Path $settingsTemplate)) {
+    throw "Maven settings template was not found at '$settingsTemplate'."
+}
 
-@"
-<?xml version="1.0" encoding="UTF-8"?>
-<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
-  <servers>
-    <server>
-      <id>$escapedFeedId</id>
-      <username>AzureDevOps</username>
-      <password>$escapedPat</password>
-    </server>
-  </servers>
-  <mirrors>
-    <mirror>
-      <id>$escapedFeedId</id>
-      <name>Azure Artifacts upstream public Maven feed</name>
-      <url>$escapedFeedUrl</url>
-      <mirrorOf>*</mirrorOf>
-    </mirror>
-  </mirrors>
-</settings>
-"@ | Set-Content -Path (Join-Path $mavenDirectory 'settings.xml') -Encoding utf8
+$settings = New-Object System.Xml.XmlDocument
+$settings.PreserveWhitespace = $true
+$settings.Load($settingsTemplate)
+
+$namespaceUri = 'http://maven.apache.org/SETTINGS/1.0.0'
+$servers = $settings.CreateElement('servers', $namespaceUri)
+$server = $settings.CreateElement('server', $namespaceUri)
+
+$id = $settings.CreateElement('id', $namespaceUri)
+$id.InnerText = $FeedId
+$username = $settings.CreateElement('username', $namespaceUri)
+$username.InnerText = 'AzureDevOps'
+$password = $settings.CreateElement('password', $namespaceUri)
+$password.InnerText = $env:AZURE_ARTIFACTS_PAT
+
+[void]$server.AppendChild($id)
+[void]$server.AppendChild($username)
+[void]$server.AppendChild($password)
+[void]$servers.AppendChild($server)
+[void]$settings.DocumentElement.PrependChild($servers)
+$settings.Save((Join-Path $mavenDirectory 'settings.xml'))
 
 Write-Host "Configured Maven to authenticate to the '$FeedId' Azure Artifacts mirror."

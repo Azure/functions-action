@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Maven settings for Central Feed Service (CFS).
+
+  The pom.xml files in this repo override the `central` repository so every package is served by
+  the Azure Artifacts feed below. Anonymous reads of packages already saved to the feed work
+  without this file, so most contributors never need it.
+
+  It exists because the repository id and the credential id cannot be the same value:
+
+    * The pom repository id must be `central` in order to override the id Maven inherits from the
+      Super POM. Anything else leaves the real Maven Central in the resolution list (CFS0021).
+    * MavenAuthenticate@0 and the Azure Artifacts credential provider key credentials off the
+      *feed name* (`upstream-public`), not the repository id.
+
+  A mirror bridges the two: requests for `central` are redirected to the feed, and the mirror id
+  matches the feed name so credentials line up.
+
+  CI installs this file to ~/.m2/settings.xml. To use it locally (only needed when pulling a
+  package or version the feed has not cached yet):
+
+      mvn -s settings.xml <goals>
+-->
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
+  <mirrors>
+    <mirror>
+      <id>upstream-public</id>
+      <name>Azure Functions public upstream feed</name>
+      <url>https://pkgs.dev.azure.com/azfunc/public/_packaging/upstream-public/maven/v1</url>
+      <mirrorOf>central</mirrorOf>
+    </mirror>
+  </mirrors>
+</settings>

@@ -5,6 +5,7 @@
 
 # Github Actions master branch will not have node_modules (use v1 instead)
 tests/temp/*.zip
+.mvn/
 
 # Tests
 coverage/

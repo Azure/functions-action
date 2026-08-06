@@ -22,13 +22,14 @@
         <functionResourceGroup>hazeng-proj-githubactions</functionResourceGroup>
     </properties>
 
+    <!-- Package sources must be routed through an Azure Artifacts feed (CFS). -->
     <repositories>
         <repository>
-            <id>maven.snapshots</id>
-            <name>Maven Central Snapshot Repository</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+            <id>central</id>
+            <name>Azure Functions public upstream feed</name>
+            <url>https://pkgs.dev.azure.com/azfunc/public/_packaging/upstream-public/maven/v1</url>
             <releases>
-                <enabled>false</enabled>
+                <enabled>true</enabled>
             </releases>
             <snapshots>
                 <enabled>true</enabled>
@@ -38,11 +39,11 @@
 
     <pluginRepositories>
         <pluginRepository>
-            <id>maven.snapshots</id>
-            <name>Maven Central Snapshot Repository</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+            <id>central</id>
+            <name>Azure Functions public upstream feed</name>
+            <url>https://pkgs.dev.azure.com/azfunc/public/_packaging/upstream-public/maven/v1</url>
             <releases>
-                <enabled>false</enabled>
+                <enabled>true</enabled>
             </releases>
             <snapshots>
                 <enabled>true</enabled>

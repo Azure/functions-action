@@ -37,7 +37,7 @@
     "@actions/core": "2.0.3",
     "@azure/arm-storage": "^20.0.0",
     "@azure/identity": "4.13.1",
-    "@azure/msal-node": "5.1.2",
+    "@azure/msal-node": "6.0.0",
     "@azure/storage-blob": "^12.32.0",
     "@types/glob": "^8.1.0",
     "@types/xml2js": "^0.4.5",

@@ -5,7 +5,7 @@ import { StorageManagementClient, StorageAccountListKeysResult } from '@azure/ar
 import { DefaultAzureCredential } from '@azure/identity';
 
 import { AzureResourceError } from '../exceptions';
-import { Logger, Sleeper } from '../utils';
+import { HostStorage, Logger, Sleeper } from '../utils';
 import { AzureAppService } from '../appservice-rest/Arm/azure-app-service';
 import { ConfigurationConstant } from '../constants/configuration';
 import { IActionContext } from '../interfaces/IActionContext';
@@ -19,11 +19,15 @@ export class WebsiteRunFromPackageDeploy {
             Logger.Info("Using AzureWebJobsStorage for Blob access.");
             blobServiceClient = BlobServiceClient.fromConnectionString(context.appSettings.AzureWebJobsStorage);
         } else {
-            Logger.Info("Using AzureWebJobsStorage__accountName and RBAC for Blob access.");
-            blobServiceClient = new BlobServiceClient(
-                `https://${context.appSettings.AzureWebJobsStorage__accountName}.blob.core.windows.net`,
-                new DefaultAzureCredential()
+            const blobServiceUri: string | undefined = HostStorage.getBlobServiceUri(
+                context.appSettings.AzureWebJobsStorage__blobServiceUri,
+                context.appSettings.AzureWebJobsStorage__accountName
             );
+            if (!blobServiceUri) {
+                throw new AzureResourceError(state, "Get Blob Service", "Neither AzureWebJobsStorage, AzureWebJobsStorage__blobServiceUri nor AzureWebJobsStorage__accountName exist in app settings, cannot determine the blob endpoint to upload the package to.");
+            }
+            Logger.Info("Using identity-based AzureWebJobsStorage settings and RBAC for Blob access.");
+            blobServiceClient = new BlobServiceClient(blobServiceUri, new DefaultAzureCredential());
         }
         const containerClient: ContainerClient = blobServiceClient.getContainerClient(ConfigurationConstant.BlobContainerName);
         await containerClient.createIfNotExists();

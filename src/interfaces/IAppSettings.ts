@@ -1,6 +1,7 @@
 export interface IAppSettings {
     AzureWebJobsStorage: Readonly<string>;
     AzureWebJobsStorage__accountName: Readonly<string>;
+    AzureWebJobsStorage__blobServiceUri: Readonly<string>;
     FUNCTIONS_WORKER_RUNTIME: Readonly<string>;
     ENABLE_ORYX_BUILD: Readonly<string>;
     SCM_DO_BUILD_DURING_DEPLOYMENT: Readonly<string>;

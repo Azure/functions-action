@@ -16,7 +16,7 @@ import { IOrchestratable } from '../interfaces/IOrchestratable';
 import { IScmCredentials } from '../interfaces/IScmCredentials';
 import { Kudu } from '../appservice-rest/Kudu/azure-app-kudu-service';
 import { KuduServiceUtility } from '../appservice-rest/Utilities/KuduServiceUtility';
-import { Logger } from '../utils';
+import { HostStorage, Logger } from '../utils';
 import { RuntimeStackConstant } from '../constants/runtime_stack';
 import { StateConstant } from '../constants/state';
 
@@ -152,9 +152,9 @@ export class ResourceValidator implements IOrchestratable {
             );
         }
 
-        if (!appSettings.properties['AzureWebJobsStorage'] && !appSettings.properties['AzureWebJobsStorage__accountName']) {
+        if (!HostStorage.isConfigured(appSettings.properties)) {
             Logger.Warn(
-                'Neither AzureWebJobsStorage nor AzureWebJobsStorage__accountName exist in app settings (from Azure Resource Manager with RBAC credential). ' +
+                'Neither AzureWebJobsStorage nor any identity-based AzureWebJobsStorage__* setting (e.g. AzureWebJobsStorage__accountName, AzureWebJobsStorage__blobServiceUri) exist in app settings (from Azure Resource Manager with RBAC credential). ' +
                 'Please ensure one of them is configured as it is critical for function runtime. ' +
                 'For more information, please visit the function app settings reference page: ' +
                 'https://docs.microsoft.com/en-us/azure/azure-functions/functions-app-settings#azurewebjobsstorage'
@@ -171,6 +171,7 @@ export class ResourceValidator implements IOrchestratable {
         const result: IAppSettings = {
             AzureWebJobsStorage: appSettings.properties['AzureWebJobsStorage'],
             AzureWebJobsStorage__accountName: appSettings.properties['AzureWebJobsStorage__accountName'],
+            AzureWebJobsStorage__blobServiceUri: appSettings.properties['AzureWebJobsStorage__blobServiceUri'],
             FUNCTIONS_WORKER_RUNTIME: appSettings.properties['FUNCTIONS_WORKER_RUNTIME'],
             ENABLE_ORYX_BUILD: appSettings.properties['ENABLE_ORYX_BUILD'],
             SCM_DO_BUILD_DURING_DEPLOYMENT: appSettings.properties['SCM_DO_BUILD_DURING_DEPLOYMENT'],
@@ -199,9 +200,9 @@ export class ResourceValidator implements IOrchestratable {
             );
         }
 
-        if (!appSettings['AzureWebJobsStorage'] && !appSettings['AzureWebJobsStorage__accountName']) {
+        if (!HostStorage.isConfigured(appSettings)) {
             Logger.Warn(
-                'Neither AzureWebJobsStorage nor AzureWebJobsStorage__accountName exist in app settings (from Kudu SCM site with publish-profile credential). ' +
+                'Neither AzureWebJobsStorage nor any identity-based AzureWebJobsStorage__* setting (e.g. AzureWebJobsStorage__accountName, AzureWebJobsStorage__blobServiceUri) exist in app settings (from Kudu SCM site with publish-profile credential). ' +
                 'Please ensure one of them is configured as it is critical for function runtime. ' +
                 'For more information, please visit the function app settings reference page: ' +
                 'https://docs.microsoft.com/en-us/azure/azure-functions/functions-app-settings#azurewebjobsstorage'
@@ -218,6 +219,7 @@ export class ResourceValidator implements IOrchestratable {
         const result: IAppSettings = {
             AzureWebJobsStorage: appSettings['AzureWebJobsStorage'],
             AzureWebJobsStorage__accountName: appSettings['AzureWebJobsStorage__accountName'],
+            AzureWebJobsStorage__blobServiceUri: appSettings['AzureWebJobsStorage__blobServiceUri'],
             FUNCTIONS_WORKER_RUNTIME: appSettings['FUNCTIONS_WORKER_RUNTIME'],
             ENABLE_ORYX_BUILD: appSettings['ENABLE_ORYX_BUILD'],
             SCM_DO_BUILD_DURING_DEPLOYMENT: appSettings['SCM_DO_BUILD_DURING_DEPLOYMENT'],
